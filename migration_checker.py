@@ -117,11 +117,15 @@ def split_path(path):
 
 
 def print_usage():
-    print('Usage')
+    print('Usage:')
+    print('    python migration_checker.py DJANGO_PROJECT_FOLDER [GIT_COMMIT_ID]')
+    print()
+    print('DJANGO_PROJECT_FOLDER - an absolute or relative path to the django project.')
+    print('GIT_COMMIT_ID - if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used.')
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 1:
+    if len(sys.argv) <= 1:
         print_usage()
         sys.exit(1)
 

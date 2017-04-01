@@ -6,7 +6,7 @@ Detect backward incompatible migrations for your django projects. All in one fil
 
 `python migration_checker.py DJANGO_PROJECT_FOLDER [GIT_COMMIT_ID]`
 
-* `DJANGO_PROJECT_FOLDER` - an absolute or relative path to the django project
+* `DJANGO_PROJECT_FOLDER` - an absolute or relative path to the django project.
 * `GIT_COMMIT_ID` - if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used.
 
 ## Requirements
