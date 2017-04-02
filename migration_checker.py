@@ -25,6 +25,9 @@ class MigrationChecker:
         self.location = django_folder
         self.commit_id = commit_id
         self.ignore_name_contains = kwargs.get('ignore_name_contains', None)
+        self.include_apps = kwargs.get('include_apps', None)
+        self.exclude_apps = kwargs.get('exclude_apps', None)
+
         self.changed_migration_files = []
         self._gather_migrations()
 
@@ -43,7 +46,7 @@ class MigrationChecker:
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         for line in diff_process.stdout.readlines():
             # Only gather lines that include migrations
-            if self.MIGRATION_FOLDER_NAME in line:
+            if re.search('\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME), line):
                 self.changed_migration_files.append(line.strip())
         diff_process.wait()
         if diff_process.returncode != 0:
@@ -56,7 +59,7 @@ class MigrationChecker:
         for migration in self.changed_migration_files:
             app_name, migration_name = self._split_migration_path(migration)
             print('{0}... '.format(migration), end='')
-            if self.ignore_name_contains and self.ignore_name_contains in migration_name:
+            if self.should_ignore_migration(app_name, migration_name):
                 print('IGNORE')
                 nb_ignore += 1
             else:
@@ -82,6 +85,11 @@ class MigrationChecker:
         for i, p in enumerate(decomposed_path):
             if p == self.MIGRATION_FOLDER_NAME:
                 return decomposed_path[i-1], os.path.splitext(decomposed_path[i+1])[0]
+
+    def should_ignore_migration(self, app_name, migration_name):
+        return (self.include_apps and app_name not in self.include_apps)\
+            or (self.exclude_apps and app_name in self.exclude_apps)\
+            or (self.ignore_name_contains and self.ignore_name_contains in migration_name)
 
     def django_sqlmigrate(self, app_name, migration_name):
         git_diff_command = 'cd {0} && python manage.py sqlmigrate {1} {2}'.format(self.location, app_name, migration_name)
@@ -129,9 +137,13 @@ if __name__ == '__main__':
     parser.add_argument('django_folder', metavar='DJANGO_FOLDER', type=str, nargs=1, help='the path to the django project')
     parser.add_argument('commit_id', metavar='GIT_COMMIT_ID', type=str, nargs='?', help='if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used')
     parser.add_argument('--ignore-name-contains', type=str, nargs='?', help='ignore migrations containing this name')
+    incl_excl_group = parser.add_mutually_exclusive_group(required=False)
+    incl_excl_group.add_argument('--include-apps', type=str, nargs='*', help='check only migrations that are in the specified django apps')
+    incl_excl_group.add_argument('--exclude-apps', type=str, nargs='*', help='ignore migrations that are in the specified django apps')
+
     args = parser.parse_args()
 
     folder_name = args.django_folder[0]
     if valid_folder(folder_name):
-        checker = MigrationChecker(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains)
+        checker = MigrationChecker(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains, include_apps=args.include_apps, exclude_apps=args.exclude_apps)
         checker.check_migrations()
