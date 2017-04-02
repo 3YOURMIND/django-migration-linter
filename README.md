@@ -4,10 +4,11 @@ Detect backward incompatible migrations for your django projects. All in one fil
 
 ## Usage
 
-`python migration_checker.py DJANGO_PROJECT_FOLDER [GIT_COMMIT_ID]`
+`python migration_checker.py DJANGO_PROJECT_FOLDER [GIT_COMMIT_ID] [--ignore-name-contains=IGNORE_NAME_CONTAINS]`
 
 * `DJANGO_PROJECT_FOLDER` - an absolute or relative path to the django project.
 * `GIT_COMMIT_ID` - if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used.
+* `--ignore-name-contains IGNORE_NAME_CONTAINS`- ignore migrations containing this name
 
 ## Requirements
 
@@ -28,7 +29,6 @@ More test are to be written.
 ## Improvements
 
 * More tests (always!)
-* Possibility to ignore certain migrations
 * Possibility to only check certain apps within the project (and/or exclude certain ones)
 * Detect data migration (not only scheme migrations)
 * Detection dependent on specified database (mysql, postgresql, ...)

@@ -21,9 +21,10 @@ class MigrationChecker:
         }
     )
 
-    def __init__(self, django_folder, commit_id=None):
+    def __init__(self, django_folder, commit_id=None, **kwargs):
         self.location = django_folder
         self.commit_id = commit_id
+        self.ignore_name_contains = kwargs.get('ignore_name_contains', None)
         self.changed_migration_files = []
         self._gather_migrations()
 
@@ -51,26 +52,30 @@ class MigrationChecker:
     def check_migrations(self):
         nb_valid = 0
         nb_erroneous = 0
+        nb_ignore = 0
         for migration in self.changed_migration_files:
             app_name, migration_name = self._split_migration_path(migration)
-            sql_statements = self.django_sqlmigrate(app_name, migration_name)
             print('{0}... '.format(migration), end='')
-
-            errors = set()
-            for statement in sql_statements:
-                is_valid, err_msg = self._test_sql_statement_for_backward_incompatibility(statement)
-                if not is_valid:
-                    errors.add(err_msg)
-            if not errors:
-                print('OK')
-                nb_valid += 1
+            if self.ignore_name_contains and self.ignore_name_contains in migration_name:
+                print('IGNORE')
+                nb_ignore += 1
             else:
-                print('ERR')
-                nb_erroneous += 1
-                for err in errors:
-                    print('\t' + err)
+                sql_statements = self.django_sqlmigrate(app_name, migration_name)
+                errors = set()
+                for statement in sql_statements:
+                    is_valid, err_msg = self._test_sql_statement_for_backward_incompatibility(statement)
+                    if not is_valid:
+                        errors.add(err_msg)
+                if not errors:
+                    print('OK')
+                    nb_valid += 1
+                else:
+                    print('ERR')
+                    nb_erroneous += 1
+                    for err in errors:
+                        print('\t' + err)
         print('*** Summary:')
-        print('Valid migrations: {0}/{1} - erroneous migrations: {2}/{1}'.format(nb_valid, len(self.changed_migration_files), nb_erroneous))
+        print('Valid migrations: {0}/{1} - erroneous migrations: {2}/{1} - ignored migrations: {3}/{1}'.format(nb_valid, len(self.changed_migration_files), nb_erroneous, nb_ignore))
 
     def _split_migration_path(self, migration_path):
         decomposed_path = split_path(migration_path)
@@ -123,9 +128,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Detect backward incompatible django migrations.')
     parser.add_argument('django_folder', metavar='DJANGO_FOLDER', type=str, nargs=1, help='the path to the django project')
     parser.add_argument('commit_id', metavar='GIT_COMMIT_ID', type=str, nargs='?', help='if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used')
+    parser.add_argument('--ignore-name-contains', type=str, nargs='?', help='ignore migrations containing this name')
     args = parser.parse_args()
 
     folder_name = args.django_folder[0]
     if valid_folder(folder_name):
-        checker = MigrationChecker(folder_name, args.commit_id)
+        checker = MigrationChecker(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains)
         checker.check_migrations()
