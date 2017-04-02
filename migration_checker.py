@@ -1,14 +1,15 @@
 from __future__ import print_function
+import argparse
 import os
 import re
 from subprocess import Popen, PIPE
-import sys
 
 
 class MigrationChecker:
     MIGRATION_FOLDER_NAME = 'migrations'
 
-    migration_tests = ({
+    migration_tests = (
+        {
             'fn': lambda sql: re.search('NOT NULL', sql),
             'err_msg': 'NOT NULL constraint on columns'
         }, {
@@ -25,7 +26,7 @@ class MigrationChecker:
         self.commit_id = commit_id
         self.changed_migration_files = []
         self._gather_migrations()
-        
+
     def _gather_migrations(self):
         # Find (one of) the initial commits
         if not self.commit_id:
@@ -44,6 +45,8 @@ class MigrationChecker:
             if self.MIGRATION_FOLDER_NAME in line:
                 self.changed_migration_files.append(line.strip())
         diff_process.wait()
+        if diff_process.returncode != 0:
+            raise Exception('Error while executing git diff command')
 
     def check_migrations(self):
         nb_valid = 0
@@ -65,7 +68,7 @@ class MigrationChecker:
                 print('ERR')
                 nb_erroneous += 1
                 for err in errors:
-                    print(err)
+                    print('\t' + err)
         print('*** Summary:')
         print('Valid migrations: {0}/{1} - erroneous migrations: {2}/{1}'.format(nb_valid, len(self.changed_migration_files), nb_erroneous))
 
@@ -116,21 +119,13 @@ def split_path(path):
     return (split_path(a) if len(a) > 0 else []) + [b]
 
 
-def print_usage():
-    print('Usage:')
-    print('    python migration_checker.py DJANGO_PROJECT_FOLDER [GIT_COMMIT_ID]')
-    print()
-    print('DJANGO_PROJECT_FOLDER - an absolute or relative path to the django project.')
-    print('GIT_COMMIT_ID - if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used.')
-
-
 if __name__ == '__main__':
-    if len(sys.argv) <= 1:
-        print_usage()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Detect backward incompatible django migrations.')
+    parser.add_argument('django_folder', metavar='DJANGO_FOLDER', type=str, nargs=1, help='the path to the django project')
+    parser.add_argument('commit_id', metavar='GIT_COMMIT_ID', type=str, nargs='?', help='if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used')
+    args = parser.parse_args()
 
-    folder_name = sys.argv[1]
+    folder_name = args.django_folder[0]
     if valid_folder(folder_name):
-        commit_id = sys.argv[2] if len(sys.argv) > 2 else None
-        checker = MigrationChecker(folder_name, commit_id)
+        checker = MigrationChecker(folder_name, args.commit_id)
         checker.check_migrations()
