@@ -5,7 +5,7 @@ import re
 from subprocess import Popen, PIPE
 
 
-class MigrationChecker:
+class MigrationLinter:
     MIGRATION_FOLDER_NAME = 'migrations'
 
     migration_tests = (
@@ -52,7 +52,7 @@ class MigrationChecker:
         if diff_process.returncode != 0:
             raise Exception('Error while executing git diff command')
 
-    def check_migrations(self):
+    def lint_migrations(self):
         nb_valid = 0
         nb_erroneous = 0
         nb_ignore = 0
@@ -80,10 +80,11 @@ class MigrationChecker:
         print('*** Summary:')
         print('Valid migrations: {0}/{1} - erroneous migrations: {2}/{1} - ignored migrations: {3}/{1}'.format(nb_valid, len(self.changed_migration_files), nb_erroneous, nb_ignore))
 
-    def _split_migration_path(self, migration_path):
+    @classmethod
+    def _split_migration_path(cls, migration_path):
         decomposed_path = split_path(migration_path)
         for i, p in enumerate(decomposed_path):
-            if p == self.MIGRATION_FOLDER_NAME:
+            if p == cls.MIGRATION_FOLDER_NAME:
                 return decomposed_path[i-1], os.path.splitext(decomposed_path[i+1])[0]
 
     def should_ignore_migration(self, app_name, migration_name):
@@ -145,5 +146,5 @@ if __name__ == '__main__':
 
     folder_name = args.django_folder[0]
     if valid_folder(folder_name):
-        checker = MigrationChecker(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains, include_apps=args.include_apps, exclude_apps=args.exclude_apps)
-        checker.check_migrations()
+        linter = MigrationLinter(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains, include_apps=args.include_apps, exclude_apps=args.exclude_apps)
+        linter.lint_migrations()
