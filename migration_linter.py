@@ -18,6 +18,12 @@ class MigrationLinter:
         }, {
             'fn': lambda sql: re.search('ADD COLUMN .* DEFAULT', sql),
             'err_msg': 'ADD columns with default'
+        }, {
+            'fn': lambda sql: re.search('ALTER TABLE .* CHANGE', sql) or re.search('ALTER TABLE .* RENAME COLUMN', sql),  # mysql or postgre
+            'err_msg': 'RENAMING columns'
+        }, {
+            'fn': lambda sql: re.search('RENAME TABLE', sql) or re.search('ALTER TABLE .* RENAME TO', sql),  # mysql or postgre
+            'err_msg': 'RENAMING tables'
         }
     )
 
