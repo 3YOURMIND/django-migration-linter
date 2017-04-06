@@ -3,6 +3,7 @@ import argparse
 import os
 import re
 from subprocess import Popen, PIPE
+import sys
 
 
 class MigrationLinter:
@@ -85,6 +86,7 @@ class MigrationLinter:
                         print('\t' + err)
         print('*** Summary:')
         print('Valid migrations: {0}/{1} - erroneous migrations: {2}/{1} - ignored migrations: {3}/{1}'.format(nb_valid, len(self.changed_migration_files), nb_erroneous, nb_ignore))
+        return nb_erroneous > 0
 
     @classmethod
     def _split_migration_path(cls, migration_path):
@@ -153,4 +155,8 @@ if __name__ == '__main__':
     folder_name = args.django_folder[0]
     if valid_folder(folder_name):
         linter = MigrationLinter(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains, include_apps=args.include_apps, exclude_apps=args.exclude_apps)
-        linter.lint_migrations()
+        has_errors = linter.lint_migrations()
+        if has_errors:
+            sys.exit(1)
+    else:
+        sys.exit(1)
