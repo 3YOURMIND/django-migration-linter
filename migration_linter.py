@@ -123,6 +123,7 @@ class MigrationLinter:
             if not line.startswith('--'):  # Do not take sql comments into account
                 sql_statements.append(line.strip())
         diff_process.wait()
+        log.info('Found {0} sql migration lines'.format(len(sql_statements)))
         return sql_statements
 
     def _test_sql_statement_for_backward_incompatibility(self, sql_statement):
