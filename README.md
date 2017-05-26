@@ -12,6 +12,7 @@ Detect backward incompatible migrations for your django project. All in one file
 * `--include-apps INCLUDE_APPS [INCLUDE_APPS ...]` - check only migrations that are in the specified django apps
 * `--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]` - ignore migrations that are in the specified django apps
 * `--verbose` or `-v` - print more information during execution
+* `--database DATABASE` - specify the database for which to generate the SQL. Defaults to *default*
 
 ## Requirements
 
