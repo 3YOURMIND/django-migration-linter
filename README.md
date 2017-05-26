@@ -11,6 +11,7 @@ Detect backward incompatible migrations for your django project. All in one file
 * `--ignore-name-contains IGNORE_NAME_CONTAINS`- ignore migrations containing this name
 * `--include-apps INCLUDE_APPS [INCLUDE_APPS ...]` - check only migrations that are in the specified django apps
 * `--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]` - ignore migrations that are in the specified django apps
+* `--verbose` or `-v` - print more information during execution
 
 ## Requirements
 

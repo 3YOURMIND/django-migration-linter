@@ -14,6 +14,7 @@
 
 from __future__ import print_function
 import argparse
+import logging as log
 import os
 import re
 from subprocess import Popen, PIPE
@@ -127,7 +128,9 @@ class MigrationLinter:
     def _test_sql_statement_for_backward_incompatibility(self, sql_statement):
         for test in self.migration_tests:
             if test['fn'](sql_statement):
+                log.info('Testing {0} -- ERROR'.format(sql_statement))
                 return False, test['err_msg']
+        log.info('Testing {0} -- PASSED'.format(sql_statement))
         return True, None
 
 
@@ -160,11 +163,16 @@ if __name__ == '__main__':
     parser.add_argument('django_folder', metavar='DJANGO_FOLDER', type=str, nargs=1, help='the path to the django project')
     parser.add_argument('commit_id', metavar='GIT_COMMIT_ID', type=str, nargs='?', help='if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used')
     parser.add_argument('--ignore-name-contains', type=str, nargs='?', help='ignore migrations containing this name')
+    parser.add_argument('--verbose', '-v', action='store_true', help='print more information during execution')
     incl_excl_group = parser.add_mutually_exclusive_group(required=False)
     incl_excl_group.add_argument('--include-apps', type=str, nargs='*', help='check only migrations that are in the specified django apps')
     incl_excl_group.add_argument('--exclude-apps', type=str, nargs='*', help='ignore migrations that are in the specified django apps')
 
     args = parser.parse_args()
+    if args.verbose:
+        log.basicConfig(format='%(message)s', level=log.DEBUG)
+    else:
+        log.basicConfig(format='%(message)s')
 
     folder_name = args.django_folder[0]
     if valid_folder(folder_name):
