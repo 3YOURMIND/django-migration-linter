@@ -62,9 +62,11 @@ class MigrationLinter:
                 self.commit_id = line.strip()
                 break
             process.wait()
+        log.info('Operating until git identifier {0}'.format(self.commit_id))
 
         # Get changes since specified commit
         git_diff_command = 'cd {0} && git diff --name-only {1}'.format(self.location, self.commit_id)
+        log.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         for line in diff_process.stdout.readlines():
             # Only gather lines that include migrations
@@ -117,6 +119,7 @@ class MigrationLinter:
 
     def django_sqlmigrate(self, app_name, migration_name):
         git_diff_command = 'cd {0} && python manage.py sqlmigrate {1} {2}'.format(self.location, app_name, migration_name)
+        log.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         sql_statements = []
         for line in diff_process.stdout.readlines():
