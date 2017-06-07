@@ -47,6 +47,7 @@ class MigrationLinter:
         self.location = django_folder
         self.commit_id = commit_id
         self.ignore_name_contains = kwargs.get('ignore_name_contains', None)
+        self.ignore_name = kwargs.get('ignore_name', None) or tuple()
         self.include_apps = kwargs.get('include_apps', None)
         self.exclude_apps = kwargs.get('exclude_apps', None)
         self.database = kwargs.get('database', None) or 'default'
@@ -116,7 +117,8 @@ class MigrationLinter:
     def should_ignore_migration(self, app_name, migration_name):
         return (self.include_apps and app_name not in self.include_apps)\
             or (self.exclude_apps and app_name in self.exclude_apps)\
-            or (self.ignore_name_contains and self.ignore_name_contains in migration_name)
+            or (self.ignore_name_contains and self.ignore_name_contains in migration_name)\
+            or (migration_name in self.ignore_name)
 
     def django_sqlmigrate(self, app_name, migration_name):
         git_diff_command = 'cd {0} && python manage.py sqlmigrate {1} {2} --database {3}'.format(self.location, app_name, migration_name, self.database)
@@ -170,6 +172,7 @@ if __name__ == '__main__':
     parser.add_argument('django_folder', metavar='DJANGO_FOLDER', type=str, nargs=1, help='the path to the django project')
     parser.add_argument('commit_id', metavar='GIT_COMMIT_ID', type=str, nargs='?', help='if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used')
     parser.add_argument('--ignore-name-contains', type=str, nargs='?', help='ignore migrations containing this name')
+    parser.add_argument('--ignore-name', type=str, nargs='*', help='ignore migrations with exactly one of these names')
     parser.add_argument('--verbose', '-v', action='store_true', help='print more information during execution')
     parser.add_argument('--database', type=str, nargs='?', help='specify the database for which to generate the SQL. Defaults to default')
     incl_excl_group = parser.add_mutually_exclusive_group(required=False)
@@ -184,7 +187,12 @@ if __name__ == '__main__':
 
     folder_name = args.django_folder[0]
     if valid_folder(folder_name):
-        linter = MigrationLinter(folder_name, args.commit_id, ignore_name_contains=args.ignore_name_contains, include_apps=args.include_apps, exclude_apps=args.exclude_apps, database=args.database)
+        linter = MigrationLinter(folder_name, args.commit_id,
+                                 ignore_name_contains=args.ignore_name_contains,
+                                 ignore_name=args.ignore_name,
+                                 include_apps=args.include_apps,
+                                 exclude_apps=args.exclude_apps,
+                                 database=args.database)
         has_errors = linter.lint_migrations()
         if has_errors:
             sys.exit(1)

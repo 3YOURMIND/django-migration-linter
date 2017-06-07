@@ -8,7 +8,8 @@ Detect backward incompatible migrations for your django project. All in one file
 
 * `DJANGO_PROJECT_FOLDER` - an absolute or relative path to the django project.
 * `GIT_COMMIT_ID` - if specified, only migrations since this commit will be taken into account. If not specified, the initial repo commit will be used.
-* `--ignore-name-contains IGNORE_NAME_CONTAINS`- ignore migrations containing this name
+* `--ignore-name-contains IGNORE_NAME_CONTAINS` - ignore migrations containing this name
+* `--ignore-name IGNORE_NAME [IGNORE_NAME ...]` - ignore migrations with exactly one of these names
 * `--include-apps INCLUDE_APPS [INCLUDE_APPS ...]` - check only migrations that are in the specified django apps
 * `--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]` - ignore migrations that are in the specified django apps
 * `--verbose` or `-v` - print more information during execution
