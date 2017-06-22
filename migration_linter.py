@@ -26,7 +26,7 @@ class MigrationLinter:
 
     migration_tests = (
         {
-            'fn': lambda sql: re.search('NOT NULL', sql),
+            'fn': lambda sql: re.search('NOT NULL', sql) and not re.search('CREATE TABLE', sql),
             'err_msg': 'NOT NULL constraint on columns'
         }, {
             'fn': lambda sql: re.search('DROP COLUMN', sql),
