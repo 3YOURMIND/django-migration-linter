@@ -72,7 +72,7 @@ class MigrationLinter:
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         for line in diff_process.stdout.readlines():
             # Only gather lines that include migrations
-            if re.search('\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME), line):
+            if re.search('\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME), line) and '__init__' not in line:
                 self.changed_migration_files.append(line.strip())
         diff_process.wait()
         if diff_process.returncode != 0:
