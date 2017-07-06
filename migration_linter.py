@@ -76,6 +76,10 @@ class MigrationLinter:
                 self.changed_migration_files.append(line.strip())
         diff_process.wait()
         if diff_process.returncode != 0:
+            output = []
+            for line in diff_process.stderr.readlines():
+                output.append(line)
+            log.info("Error while git diff command:\n{}".format("".join(output)))
             raise Exception('Error while executing git diff command')
 
     def lint_migrations(self):
