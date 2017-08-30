@@ -1,6 +1,6 @@
 # Django migration linter
 
-Detect backward incompatible migrations for your django project. All in one file.
+Detect backward incompatible migrations for your django project.
 
 ## Usage
 
@@ -23,7 +23,7 @@ Needed software (in PATH):
 * `git`
 * UNIX command line tools like `tail`
 
-The linter will try to detect whether if the project is a django project and is versioned with git.
+The linter will try to detect if the project is a django project and is versioned with git.
 
 ## Tests
 
@@ -33,7 +33,6 @@ More test are to be written.
 
 ## Improvements
 
-* Add an appropriate license
 * More tests (always!)
 * Detect data migration (not only scheme migrations)
 * Detection dependent on specified database (mysql, postgresql, ...)
