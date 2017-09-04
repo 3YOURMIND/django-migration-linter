@@ -21,25 +21,39 @@ from subprocess import Popen, PIPE
 import sys
 
 
+def has_default(sql, **kwargs):
+    if re.search('SET DEFAULT', sql) and kwargs['errors']:
+        err = next(err for err in kwargs['errors'] if err['code'] == 'NOT_NULL')
+        if err:
+            log.info('Found a NOT_NULL error in migration, but it has a default value added: {}'.format(err))
+            kwargs['errors'].remove(err)
+
+    return False  # Never fails
+
 class MigrationLinter:
     MIGRATION_FOLDER_NAME = 'migrations'
 
     migration_tests = (
         {
-            'fn': lambda sql: re.search('NOT NULL', sql) and not re.search('CREATE TABLE', sql),
+            'code': 'NOT_NULL',
+            'fn': lambda sql, **kw: re.search('NOT NULL', sql) and not re.search('CREATE TABLE', sql),
             'err_msg': 'NOT NULL constraint on columns'
         }, {
-            'fn': lambda sql: re.search('DROP COLUMN', sql),
+            'code': 'DROP_COLUMN',
+            'fn': lambda sql, **kw: re.search('DROP COLUMN', sql),
             'err_msg': 'DROPPING columns'
         }, {
-            'fn': lambda sql: re.search('ADD COLUMN .* DEFAULT', sql),
-            'err_msg': 'ADD columns with default'
-        }, {
-            'fn': lambda sql: re.search('ALTER TABLE .* CHANGE', sql) or re.search('ALTER TABLE .* RENAME COLUMN', sql),  # mysql or postgre
+            'code': 'RENAME_COLUMN',
+            'fn': lambda sql, **kw: re.search('ALTER TABLE .* CHANGE', sql) or re.search('ALTER TABLE .* RENAME COLUMN', sql),  # mysql or postgre
             'err_msg': 'RENAMING columns'
         }, {
-            'fn': lambda sql: re.search('RENAME TABLE', sql) or re.search('ALTER TABLE .* RENAME TO', sql),  # mysql or postgre
+            'code': 'RENAME_TABLE',
+            'fn': lambda sql, **kw: re.search('RENAME TABLE', sql) or re.search('ALTER TABLE .* RENAME TO', sql),  # mysql or postgre
             'err_msg': 'RENAMING tables'
+        }, {
+            'code': '',
+            'fn': has_default,
+            'err_msg': ''
         }
     )
 
@@ -94,11 +108,11 @@ class MigrationLinter:
                 nb_ignore += 1
             else:
                 sql_statements = self.django_sqlmigrate(app_name, migration_name)
-                errors = set()
+                errors = []
                 for statement in sql_statements:
-                    is_valid, err_msg = self._test_sql_statement_for_backward_incompatibility(statement)
+                    is_valid, err = self._test_sql_statement_for_backward_incompatibility(statement, errors)
                     if not is_valid:
-                        errors.add(err_msg)
+                        errors.append(err)
                 if not errors:
                     print('OK')
                     nb_valid += 1
@@ -106,7 +120,13 @@ class MigrationLinter:
                     print('ERR')
                     nb_erroneous += 1
                     for err in errors:
-                        print('\t' + err)
+                        error_str = '\t{0}'.format(err['err_msg'])
+                        if err['table']:
+                            error_str += ' (table: {0}'.format(err['table'])
+                            if err['column']:
+                                error_str += ', column: {0}'.format(err['column'])
+                            error_str += ')'
+                        print(error_str)
         print('*** Summary:')
         print('Valid migrations: {0}/{1} - erroneous migrations: {2}/{1} - ignored migrations: {3}/{1}'.format(nb_valid, len(self.changed_migration_files), nb_erroneous, nb_ignore))
         return nb_erroneous > 0
@@ -138,11 +158,19 @@ class MigrationLinter:
         log.info('Found {0} sql migration lines'.format(len(sql_statements)))
         return sql_statements
 
-    def _test_sql_statement_for_backward_incompatibility(self, sql_statement):
+    def _test_sql_statement_for_backward_incompatibility(self, sql_statement, errors):
         for test in self.migration_tests:
-            if test['fn'](sql_statement):
+            if test['fn'](sql_statement, errors=errors):
                 log.info('Testing {0} -- ERROR'.format(sql_statement))
-                return False, test['err_msg']
+                table_search = re.search('TABLE `([^`]*)`', sql_statement, re.IGNORECASE)
+                col_search = re.search('COLUMN `([^`]*)`', sql_statement, re.IGNORECASE)
+                err = {
+                    'err_msg': test['err_msg'],
+                    'code': test['code'],
+                    'table': table_search.group(1) if table_search else None,
+                    'column': col_search.group(1) if col_search else None
+                }
+                return False, err
         log.info('Testing {0} -- PASSED'.format(sql_statement))
         return True, None
 
