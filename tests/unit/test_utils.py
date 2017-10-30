@@ -14,10 +14,11 @@
 
 import unittest
 
-from migration_linter import MigrationLinter
+from tests import fixtures
+from django_migration_linter import MigrationLinter, valid_folder
 
 
-class LinterTest(unittest.TestCase):
+class UtilityFunctionTest(unittest.TestCase):
     def test_split_migration_path(self):
         input_path = 'apps/the_app/migrations/0001_stuff.py'
         app, mig = MigrationLinter._split_migration_path(input_path)
@@ -29,3 +30,12 @@ class LinterTest(unittest.TestCase):
         app, mig = MigrationLinter._split_migration_path(input_path)
         self.assertEqual(app, 'the_app')
         self.assertEqual(mig, '0001_stuff')
+
+    def test_detect_valid_folder(self):
+        self.assertTrue(valid_folder(fixtures.ADD_NOT_NULL_COLUMN_PROJECT))
+
+    def test_detect_not_django_project(self):
+        self.assertFalse(valid_folder(fixtures.NOT_DJANGO_GIT_PROJECT))
+
+    def test_detect_not_git_project(self):
+        self.assertFalse(valid_folder(fixtures.NOT_GIT_DJANGO_PROJECT))
