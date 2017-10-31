@@ -238,7 +238,7 @@ def split_path(path):
     return (split_path(a) if len(a) > 0 else []) + [b]
 
 
-if __name__ == '__main__':
+def _main():
     parser = argparse.ArgumentParser(
         description='Detect backward incompatible django migrations.')
     parser.add_argument(
@@ -310,3 +310,7 @@ if __name__ == '__main__':
             sys.exit(1)
     else:
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    _main()

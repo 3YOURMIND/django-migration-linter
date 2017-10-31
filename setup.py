@@ -46,6 +46,11 @@ setup(
     extras_require={
         'test': test_requirements
     },
+    entry_points={
+        'console_scripts': [
+            'django-migration-linter = django_migration_linter.migration_linter:_main'
+        ]
+    },
 
     keywords='django migration lint linter database backward compatibility',
     classifiers=[
