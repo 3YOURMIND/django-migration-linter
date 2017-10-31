@@ -1,0 +1,23 @@
+All files
+
+# Veuillez saisir le message de validation pour vos modifications. Les lignes
+# commençant par '#' seront ignorées, et un message vide abandonne la validation.
+# Sur la branche master
+# Modifications qui seront validées :
+#	nouveau fichier: .gitignore
+#	nouveau fichier: manage.py
+#	nouveau fichier: test_app/__init__.py
+#	nouveau fichier: test_app/admin.py
+#	nouveau fichier: test_app/apps.py
+#	nouveau fichier: test_app/migrations/0001_create_table.py
+#	nouveau fichier: test_app/migrations/0002_add_new_not_null_field.py
+#	nouveau fichier: test_app/migrations/__init__.py
+#	nouveau fichier: test_app/migrations_utils.py
+#	nouveau fichier: test_app/models.py
+#	nouveau fichier: test_app/tests.py
+#	nouveau fichier: test_app/views.py
+#	nouveau fichier: test_project_add_not_null_column_followed_by_default/__init__.py
+#	nouveau fichier: test_project_add_not_null_column_followed_by_default/settings.py
+#	nouveau fichier: test_project_add_not_null_column_followed_by_default/urls.py
+#	nouveau fichier: test_project_add_not_null_column_followed_by_default/wsgi.py
+#

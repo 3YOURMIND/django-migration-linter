@@ -1,0 +1,10 @@
+Add accepted migration
+
+# Veuillez saisir le message de validation pour vos modifications. Les lignes
+# commençant par '#' seront ignorées, et un message vide abandonne la validation.
+# Sur la branche master
+# Modifications qui seront validées :
+#	nouveau fichier: test_app/migrations/0003_add_new_nullable_field.py
+#	modifié:         test_app/models.py
+#	modifié:         test_project_multi_commit/settings.py
+#

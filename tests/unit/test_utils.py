@@ -19,6 +19,12 @@ from django_migration_linter import MigrationLinter, valid_folder
 
 
 class UtilityFunctionTest(unittest.TestCase):
+    def tearDown(self, *args, **kwargs):
+        #fixtures.clear_all_git_projects()
+        super(
+            UtilityFunctionTest,
+            self).tearDown(*args, **kwargs)
+
     def test_split_migration_path(self):
         input_path = 'apps/the_app/migrations/0001_stuff.py'
         app, mig = MigrationLinter._split_migration_path(input_path)
@@ -32,10 +38,14 @@ class UtilityFunctionTest(unittest.TestCase):
         self.assertEqual(mig, '0001_stuff')
 
     def test_detect_valid_folder(self):
-        self.assertTrue(valid_folder(fixtures.ADD_NOT_NULL_COLUMN_PROJECT))
+        test_project_path = fixtures.MULTI_COMMIT_PROJECT
+        fixtures.prepare_git_project(test_project_path)
+        self.assertTrue(valid_folder(test_project_path))
 
     def test_detect_not_django_project(self):
-        self.assertFalse(valid_folder(fixtures.NOT_DJANGO_GIT_PROJECT))
+        test_project_path = fixtures.NOT_DJANGO_GIT_PROJECT
+        fixtures.prepare_git_project(test_project_path)
+        self.assertFalse(valid_folder(test_project_path))
 
     def test_detect_not_git_project(self):
         self.assertFalse(valid_folder(fixtures.NOT_GIT_DJANGO_PROJECT))

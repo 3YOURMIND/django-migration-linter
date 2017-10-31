@@ -10,3 +10,4 @@ dist/
 *.egg-info/
 .cache/
 env/
+tests/test_project_fixtures/*/.git/

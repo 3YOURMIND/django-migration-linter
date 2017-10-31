@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import shutil
 
 _BASE_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -38,3 +39,32 @@ NOT_DJANGO_GIT_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_git_project/')
 NOT_GIT_DJANGO_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_django_without_git_project/')
+
+ALL_GIT_PROJECTS = (
+    NOT_DJANGO_GIT_PROJECT,
+    ADD_NOT_NULL_COLUMN_PROJECT,
+    CREATE_TABLE_WITH_NOT_NULL_COLUMN_PROJECT,
+    DROP_COLUMN_PROJECT,
+    RENAME_COLUMN_PROJECT,
+    RENAME_TABLE_PROJECT,
+    ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT,
+    MULTI_COMMIT_PROJECT
+)
+
+
+def prepare_git_project(path):
+    """Copy the git/ folder to .git/ so it is
+    actually versioned"""
+    src_git = os.path.join(path, 'git/')
+    dest_git = os.path.join(path, '.git/')
+    try:
+        shutil.copytree(src_git, dest_git)
+    except OSError:
+        pass  # .git/ might already exist
+
+
+def clear_all_git_projects():
+    """Delete all .git/ folders in test projects"""
+    for project_path in ALL_GIT_PROJECTS:
+        git_path = os.path.join(project_path, '.git/')
+        shutil.rmtree(git_path, ignore_errors=True)
