@@ -225,10 +225,10 @@ def valid_folder(folder):
         print(("The passed folder doesn't seem to be a "
                "django project (no manage.py found)."))
         return False
-    git_folder = os.path.join(folder, '.git')
-    if not os.path.isdir(git_folder):
+    if os.system('git rev-parse'):
+        # this returns 0 if folder is under git, otherwise some int
         print(("The passed folder doesn't seem to be "
-               "versioned by git (no .git/ folder found)."))
+               "versioned by git (git rev-parse returned non-zero)."))
         return False
     return True
 
