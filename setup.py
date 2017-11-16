@@ -35,7 +35,7 @@ setup(
     name='django-migration-linter',
     version='0.0.1',
 
-    description='Fetect backward incompatible migrations for your django project',
+    description='Detect backward incompatible migrations for your django project',
     long_description=long_description,
     url='https://github.com/3YOURMIND/django-migration-linter',
     author='3YOURMIND GmbH',
@@ -61,10 +61,5 @@ setup(
 
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        # TODO verify Python 3 compatible
-        # 'Programming Language :: Python :: 3',
-        # 'Programming Language :: Python :: 3.3',
-        # 'Programming Language :: Python :: 3.4',
-        # 'Programming Language :: Python :: 3.5',
     ]
 )
