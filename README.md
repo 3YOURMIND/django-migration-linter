@@ -19,7 +19,7 @@ Detect backward incompatible migrations for your django project.
 
 Needed software (in PATH):
 
-* `python` (only tested on python2.7 (yet))
+* `python`
 * `git`
 * UNIX command line tools like `tail`
 
@@ -27,12 +27,6 @@ The linter will try to detect if the project is a django project and is versione
 
 ## Tests
 
-Launch the tests with: `python -m unittest test_migration_linter`
+The easiest way to run the tests is to invoke [py.test](https://docs.pytest.org/en/latest/).
 
-More test are to be written.
-
-## Improvements
-
-* More tests (always!)
-* Detect data migration (not only scheme migrations)
-* Detection dependent on specified database (mysql, postgresql, ...)
+More tests are always welcome.

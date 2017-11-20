@@ -5,3 +5,9 @@
 tags
 __pycache__/
 *.pyc
+build/
+dist/
+*.egg-info/
+.cache/
+env/
+tests/test_project_fixtures/*/.git/
