@@ -1,0 +1,5 @@
+language: python
+script:
+  - py.test
+install:
+  - pip install -e ".[test]"
