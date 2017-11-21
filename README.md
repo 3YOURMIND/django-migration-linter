@@ -3,7 +3,7 @@
 > Detect backward incompatible migrations for your django project. It will save you time by making sure migrations will not break anything.
 
 <a href="https://travis-ci.org/3YOURMIND/django-migration-linter"><img src="https://travis-ci.org/3YOURMIND/django-migration-linter.svg?branch=master" alt="badge of travis CI" /></a>
-<a href="https://pypi.python.org/pypi/django-migration-linter/"><img src="https://img.shields.io/pypi/v/nine.svg" alt="PyPi version" /></a>
+<a href="https://pypi.python.org/pypi/django-migration-linter/"><img src="https://img.shields.io/pypi/v/django-migration-linter.svg" alt="PyPi version" /></a>
 <a href="./LICENSE"><img src="https://img.shields.io/github/license/3yourmind/django-migration-linter.svg" alt="badge of license" /></a>
 <a href="https://github.com/3YOURMIND/django-migration-linter/pulls"><img src="https://img.shields.io/badge/PR-welcome-green.svg" alt="badge of pull request welcome" /></a>
 <a href="https://www.3yourmind.com/career"><img src="https://img.shields.io/badge/3YOURMIND-Hiring-brightgreen.svg" alt="badge of hiring advertisement of 3yourmind" /></a>
