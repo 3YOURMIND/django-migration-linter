@@ -1,1 +1,1 @@
-from migration_linter import *  # noqa
+from .migration_linter import *  # noqa

@@ -35,6 +35,10 @@ def has_default(sql, **kwargs):
     return False  # Never fails
 
 
+def clean_bytes_to_str(byte_input):
+    return byte_input.decode('utf-8').strip()
+
+
 class MigrationLinter:
     MIGRATION_FOLDER_NAME = 'migrations'
 
@@ -83,8 +87,8 @@ class MigrationLinter:
             git_init_cmd = 'cd {0} && git rev-list HEAD | tail -n 1'.format(
                 self.location)
             process = Popen(git_init_cmd, shell=True, stdout=PIPE, stderr=PIPE)
-            for line in process.stdout.readlines():
-                self.commit_id = line.strip()
+            for line in map(clean_bytes_to_str, process.stdout.readlines()):
+                self.commit_id = line
                 break
             process.wait()
         log.info('Operating until git identifier {0}'.format(self.commit_id))
@@ -95,17 +99,17 @@ class MigrationLinter:
         log.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
-        for line in diff_process.stdout.readlines():
+        for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include migrations
             if re.search(
                     '\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
-                self.changed_migration_files.append(line.strip())
+                self.changed_migration_files.append(line)
         diff_process.wait()
         if diff_process.returncode != 0:
             output = []
-            for line in diff_process.stderr.readlines():
+            for line in map(clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
             log.info("Error while git diff command:\n{}".format(
                 "".join(output)))
@@ -180,14 +184,14 @@ class MigrationLinter:
             '--database {3}').format(
             self.location, app_name, migration_name, self.database)
         log.info('Executing {0}'.format(git_diff_command))
-        diff_process = Popen(
+        sqlmigrate_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         sql_statements = []
-        for line in diff_process.stdout.readlines():
+        for line in map(clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
             if not line.startswith('--'):  # Ignore comments
-                sql_statements.append(line.strip())
-        diff_process.wait()
-        if diff_process.returncode != 0:
+                sql_statements.append(line)
+        sqlmigrate_process.wait()
+        if sqlmigrate_process.returncode != 0:
             raise RuntimeError('sqlmigrate command failed')
         log.info('Found {0} sql migration lines'.format(len(sql_statements)))
         return sql_statements
