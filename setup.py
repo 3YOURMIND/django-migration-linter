@@ -28,7 +28,9 @@ install_requirements = [
 test_requirements = [
     'pytest',
     'django',
-    'django-fake-database-backends'
+    'django-fake-database-backends',
+    'pycodestyle',
+    'flake8'
 ]
 
 setup(

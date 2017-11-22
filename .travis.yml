@@ -5,6 +5,8 @@ python:
   - "3.5"
   - "3.6"
 script:
+  - pycodestyle django_migration_linter
+  - flake8 django_migration_linter
   - py.test
 install:
   - pip install -e ".[test]"

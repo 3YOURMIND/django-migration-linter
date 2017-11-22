@@ -109,7 +109,8 @@ class MigrationLinter:
         diff_process.wait()
         if diff_process.returncode != 0:
             output = []
-            for line in map(clean_bytes_to_str, diff_process.stderr.readlines()):
+            for line in map(
+                    clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
             log.info("Error while git diff command:\n{}".format(
                 "".join(output)))
@@ -187,7 +188,8 @@ class MigrationLinter:
         sqlmigrate_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         sql_statements = []
-        for line in map(clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
+        for line in map(
+                clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
             if not line.startswith('--'):  # Ignore comments
                 sql_statements.append(line)
         sqlmigrate_process.wait()
