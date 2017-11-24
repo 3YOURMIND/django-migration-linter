@@ -29,7 +29,6 @@ test_requirements = [
     'pytest',
     'django',
     'django-fake-database-backends',
-    'pycodestyle',
     'flake8'
 ]
 
