@@ -34,6 +34,8 @@ ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_project_add_not_null_column_followed_by_default/')
 MULTI_COMMIT_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_project_multi_commit/')
+CORRECT_PROJECT = os.path.join(
+    _FIXTURES_FOLDER, 'test_correct_project/')
 
 NOT_DJANGO_GIT_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_git_project/')
@@ -42,12 +44,6 @@ NOT_GIT_DJANGO_PROJECT = os.path.join(
 
 ALL_GIT_PROJECTS = (
     NOT_DJANGO_GIT_PROJECT,
-    ADD_NOT_NULL_COLUMN_PROJECT,
-    CREATE_TABLE_WITH_NOT_NULL_COLUMN_PROJECT,
-    DROP_COLUMN_PROJECT,
-    RENAME_COLUMN_PROJECT,
-    RENAME_TABLE_PROJECT,
-    ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT,
     MULTI_COMMIT_PROJECT
 )
 

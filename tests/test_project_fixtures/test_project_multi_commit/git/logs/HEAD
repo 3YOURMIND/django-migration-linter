@@ -1,4 +1,3 @@
-0000000000000000000000000000000000000000 39d82d794ccb9af40a19c1b708eea6f90695c4d8 David-Wobrock <david.wobrock@gmail.com> 1509050010 +0200	commit (initial): Init
-39d82d794ccb9af40a19c1b708eea6f90695c4d8 44330921696018f8f1480df897b38310549982cb David-Wobrock <david.wobrock@gmail.com> 1509050030 +0200	commit: All files
-44330921696018f8f1480df897b38310549982cb fe961bc4402a57bace36648e1a6f1998bae3c5e3 David-Wobrock <david.wobrock@gmail.com> 1509050084 +0200	commit: Add accepted migration
-fe961bc4402a57bace36648e1a6f1998bae3c5e3 dc16039b7458a98bcf9be2b92389e176ae1d9461 David-Wobrock <david.wobrock@gmail.com> 1509381925 +0100	commit (amend): Add accepted migration
+0000000000000000000000000000000000000000 dbd8d7899446de17d8cf8e57aa7eddb1433bc9c3 David-Wobrock <david.wobrock@gmail.com> 1511996012 +0100	commit (initial): Init
+dbd8d7899446de17d8cf8e57aa7eddb1433bc9c3 d7125d5f4f0cc9623f670a66c54f131acc50032d David-Wobrock <david.wobrock@gmail.com> 1511996033 +0100	commit: Not working stuff
+d7125d5f4f0cc9623f670a66c54f131acc50032d 1021d98b5943db56122c1f848f371ddc38788d0f David-Wobrock <david.wobrock@gmail.com> 1511996049 +0100	commit: Backward compatible migrations

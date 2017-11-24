@@ -13,161 +13,169 @@
 # limitations under the License.
 
 from __future__ import print_function
-import argparse
 import logging as log
 import os
+from io import StringIO
 import re
 from subprocess import Popen, PIPE
 import sys
+from . import utils
+from .sql_analyser import analyse_sql_statements
 
 
-def has_default(sql, **kwargs):
-    if re.search('SET DEFAULT', sql) and kwargs['errors']:
-        err = next(err
-                   for err in kwargs['errors']
-                   if err['code'] == 'NOT_NULL')
-        if err:
-            log.info(
-                ('Found a NOT_NULL error in migration, '
-                 'but it has a default value added: {}').format(err))
-            kwargs['errors'].remove(err)
-
-    return False  # Never fails
-
-
-def clean_bytes_to_str(byte_input):
-    return byte_input.decode('utf-8').strip()
-
-
-class MigrationLinter:
+class MigrationLinter(object):
     MIGRATION_FOLDER_NAME = 'migrations'
 
-    migration_tests = (
-        {
-            'code': 'NOT_NULL',
-            'fn': lambda sql, **kw: re.search('NOT NULL', sql) and
-                    not re.search('CREATE TABLE', sql),
-            'err_msg': 'NOT NULL constraint on columns'
-        }, {
-            'code': 'DROP_COLUMN',
-            'fn': lambda sql, **kw: re.search('DROP COLUMN', sql),
-            'err_msg': 'DROPPING columns'
-        }, {
-            'code': 'RENAME_COLUMN',
-            'fn': lambda sql, **kw: re.search('ALTER TABLE .* CHANGE', sql) or
-                    re.search('ALTER TABLE .* RENAME COLUMN', sql),
-            'err_msg': 'RENAMING columns'
-        }, {
-            'code': 'RENAME_TABLE',
-            'fn': lambda sql, **kw: re.search('RENAME TABLE', sql) or
-                    re.search('ALTER TABLE .* RENAME TO', sql),
-            'err_msg': 'RENAMING tables'
-        }, {
-            'code': '',
-            'fn': has_default,
-            'err_msg': ''
-        }
-    )
+    def __init__(self, project_path, **kwargs):
+        # Verify correctness
+        if not utils.is_directory(project_path):
+            raise ValueError('The given path {0} does not seem to be a directory.'.format(project_path))
+        if not utils.is_django_project(project_path):
+            raise ValueError('The given path {0} does not seem to be a django project.'.format(project_path))
 
-    def __init__(self, django_folder, commit_id=None, **kwargs):
-        self.location = django_folder
-        self.commit_id = commit_id
+        # Store parameters and options
+        self.django_path = project_path
         self.ignore_name_contains = kwargs.get('ignore_name_contains', None)
         self.ignore_name = kwargs.get('ignore_name', None) or tuple()
         self.include_apps = kwargs.get('include_apps', None)
         self.exclude_apps = kwargs.get('exclude_apps', None)
         self.database = kwargs.get('database', None) or 'default'
 
-        self.changed_migration_files = []
-        self._gather_migrations()
+        # Initialise counters
+        self.nb_valid = 0
+        self.nb_ignored = 0
+        self.nb_erroneous = 0
+        self.nb_total = 0
 
-    def _gather_migrations(self):
-        # Find (one of) the initial commits
-        if not self.commit_id:
-            git_init_cmd = 'cd {0} && git rev-list HEAD | tail -n 1'.format(
-                self.location)
-            process = Popen(git_init_cmd, shell=True, stdout=PIPE, stderr=PIPE)
-            for line in map(clean_bytes_to_str, process.stdout.readlines()):
-                self.commit_id = line
-                break
-            process.wait()
-        log.info('Operating until git identifier {0}'.format(self.commit_id))
+    def lint_migration(self, app_name, migration_name):
+        print('({0}, {1})... '.format(app_name, migration_name), end='')
+        self.nb_total += 1
 
+        if self.should_ignore_migration(app_name, migration_name):
+            print('IGNORE')
+            self.nb_ignore += 1
+            return
+
+        sql_statements = self.get_sql(
+            app_name, migration_name)
+        analysis_result = analyse_sql_statements(
+            sql_statements)
+        errors = analysis_result['errors']
+        if not errors:
+            print('OK')
+            self.nb_valid += 1
+            return
+
+        # Print errors
+        print('ERR')
+        self.nb_erroneous += 1
+        for err in errors:
+            error_str = '\t{0}'.format(err['err_msg'])
+            if err['table']:
+                error_str += ' (table: {0}'.format(err['table'])
+                if err['column']:
+                    error_str += ', column: {0}'.format(
+                        err['column'])
+                error_str += ')'
+            print(error_str)
+
+    def lint_all_migrations(self, git_commit_id=None):
+        # Collect migrations
+        if git_commit_id:
+            if not utils.is_git_project(self.django_path):
+                raise ValueError('The given project {0} does not seem to be versioned by git.'.format(self.django_path))
+            migrations = self._gather_migrations_git(git_commit_id)
+        else:
+            migrations = self._gather_all_migrations()
+
+        # Lint those migrations
+        for m in migrations:
+            self.lint_migration(*m)
+
+    def print_summary(self):
+        print('*** Summary:')
+        print(('Valid migrations: {1}/{0} - '
+               'erroneous migrations: {2}/{0} - '
+               'ignored migrations: {3}/{0}').format(
+            self.nb_total,
+            self.nb_valid,
+            self.nb_erroneous,
+            self.nb_ignore))
+
+    @property
+    def has_errors(self):
+        return self.nb_erroneous > 0
+
+    def get_sql(self, app_name, migration_name):
+        """ It would be much faster to call the
+        command directly from the code using
+        call_command(), but requires the code
+        to setup django (by calling django.setup())
+        and set the DJANGO_SETTINGS_MODULE.
+        However, django is global and doesn't allow
+        multiple linter instances to exist at the same time.
+        (because they would all just lint the same django project)
+        Even if calling a shell is slow and ugly, for now,
+        it allows to seperate the instances correctly.
+        """
+        git_diff_command = (
+            'cd {0} && '
+            'python manage.py sqlmigrate {1} {2} '
+            '--database {3}').format(
+                self.django_path, app_name, migration_name, self.database)
+        log.info('Executing {0}'.format(git_diff_command))
+        sqlmigrate_process = Popen(
+            git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
+
+        sql_statements = []
+        for line in map(
+                utils.clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
+            sql_statements.append(line)
+        sqlmigrate_process.wait()
+        if sqlmigrate_process.returncode != 0:
+            raise RuntimeError('sqlmigrate command failed')
+        log.info('Found {0} sql migration lines'.format(len(sql_statements)))
+        return sql_statements
+
+    def _gather_migrations_git(self, git_commit_id):
+        migrations = []
         # Get changes since specified commit
         git_diff_command = 'cd {0} && git diff --name-only {1}'.format(
-            self.location, self.commit_id)
+            self.django_path, git_commit_id)
         log.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
-        for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
+        for line in map(utils.clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include migrations
             if re.search(
                     '\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
-                self.changed_migration_files.append(line)
+                app_name, migration_name = self._split_migration_path(line)
+                migrations.append((app_name, migration_name))
         diff_process.wait()
+
         if diff_process.returncode != 0:
             output = []
             for line in map(
-                    clean_bytes_to_str, diff_process.stderr.readlines()):
+                    utils.clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
             log.info("Error while git diff command:\n{}".format(
                 "".join(output)))
             raise Exception('Error while executing git diff command')
+        return migrations
 
-    def lint_migrations(self):
-        nb_valid = 0
-        nb_erroneous = 0
-        nb_ignore = 0
-        for migration in self.changed_migration_files:
-            app_name, migration_name = self._split_migration_path(migration)
-            print('{0}... '.format(migration), end='')
-            if self.should_ignore_migration(app_name, migration_name):
-                print('IGNORE')
-                nb_ignore += 1
-            else:
-                sql_statements = self.django_sqlmigrate(
-                    app_name, migration_name)
-                errors = []
-                for statement in sql_statements:
-                    is_valid, err = \
-                        self._test_sql_statement_for_backward_incompatibility(
-                            statement, errors)
-                    if not is_valid:
-                        errors.append(err)
-                if not errors:
-                    print('OK')
-                    nb_valid += 1
-                else:
-                    print('ERR')
-                    nb_erroneous += 1
-                    for err in errors:
-                        error_str = '\t{0}'.format(err['err_msg'])
-                        if err['table']:
-                            error_str += ' (table: {0}'.format(err['table'])
-                            if err['column']:
-                                error_str += ', column: {0}'.format(
-                                    err['column'])
-                            error_str += ')'
-                        print(error_str)
-        print('*** Summary:')
-        print(('Valid migrations: {0}/{1} - '
-               'erroneous migrations: {2}/{1} - '
-               'ignored migrations: {3}/{1}').format(
-            nb_valid,
-            len(self.changed_migration_files),
-            nb_erroneous,
-            nb_ignore))
-        return nb_erroneous > 0
-
-    @classmethod
-    def _split_migration_path(cls, migration_path):
-        decomposed_path = split_path(migration_path)
-        for i, p in enumerate(decomposed_path):
-            if p == cls.MIGRATION_FOLDER_NAME:
-                return (decomposed_path[i-1],
-                        os.path.splitext(decomposed_path[i+1])[0])
+    def _gather_all_migrations(self):
+        migrations = []
+        for root, dirs, files in os.walk(self.django_path):
+            for file_name in files:
+                if os.path.basename(root) == self.MIGRATION_FOLDER_NAME and \
+                        file_name.endswith('.py') and \
+                        file_name != '__init__.py':
+                    full_migration_path = os.path.join(root, file_name)
+                    app_name, migration_name = self._split_migration_path(full_migration_path)
+                    migrations.append((app_name, migration_name))
+        return migrations
 
     def should_ignore_migration(self, app_name, migration_name):
         return (self.include_apps and
@@ -178,73 +186,17 @@ class MigrationLinter:
                 self.ignore_name_contains in migration_name)\
             or (migration_name in self.ignore_name)
 
-    def django_sqlmigrate(self, app_name, migration_name):
-        git_diff_command = (
-            'cd {0} && '
-            'python manage.py sqlmigrate {1} {2} '
-            '--database {3}').format(
-            self.location, app_name, migration_name, self.database)
-        log.info('Executing {0}'.format(git_diff_command))
-        sqlmigrate_process = Popen(
-            git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
-        sql_statements = []
-        for line in map(
-                clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
-            if not line.startswith('--'):  # Ignore comments
-                sql_statements.append(line)
-        sqlmigrate_process.wait()
-        if sqlmigrate_process.returncode != 0:
-            raise RuntimeError('sqlmigrate command failed')
-        log.info('Found {0} sql migration lines'.format(len(sql_statements)))
-        return sql_statements
-
-    def _test_sql_statement_for_backward_incompatibility(
-            self, sql_statement, errors):
-        for test in self.migration_tests:
-            if test['fn'](sql_statement, errors=errors):
-                log.info('Testing {0} -- ERROR'.format(sql_statement))
-                table_search = re.search(
-                    'TABLE `([^`]*)`', sql_statement, re.IGNORECASE)
-                col_search = re.search(
-                    'COLUMN `([^`]*)`', sql_statement, re.IGNORECASE)
-                err = {
-                    'err_msg': test['err_msg'],
-                    'code': test['code'],
-                    'table': table_search.group(1) if table_search else None,
-                    'column': col_search.group(1) if col_search else None
-                }
-                return False, err
-        log.info('Testing {0} -- PASSED'.format(sql_statement))
-        return True, None
-
-
-def valid_folder(folder):
-    """Verify folder exists,
-    folder is a django project
-    and folder is git versioned
-    """
-    if not os.path.isdir(folder):
-        print("The passed argument doesn't seem to be a folder.")
-        return False
-    django_manage_file = os.path.join(folder, 'manage.py')
-    if not os.path.isfile(django_manage_file):
-        print(("The passed folder doesn't seem to be a "
-               "django project (no manage.py found)."))
-        return False
-    git_folder = os.path.join(folder, '.git')
-    if not os.path.isdir(git_folder):
-        print(("The passed folder doesn't seem to be "
-               "versioned by git (no .git/ folder found)."))
-        return False
-    return True
-
-
-def split_path(path):
-    a, b = os.path.split(path)
-    return (split_path(a) if len(a) > 0 else []) + [b]
+    @classmethod
+    def _split_migration_path(cls, migration_path):
+        decomposed_path = utils.split_path(migration_path)
+        for i, p in enumerate(decomposed_path):
+            if p == cls.MIGRATION_FOLDER_NAME:
+                return (decomposed_path[i-1],
+                        os.path.splitext(decomposed_path[i+1])[0])
 
 
 def _main():
+    import argparse
     parser = argparse.ArgumentParser(
         description='Detect backward incompatible django migrations.')
     parser.add_argument(
@@ -302,19 +254,18 @@ def _main():
         log.basicConfig(format='%(message)s')
 
     folder_name = args.django_folder[0]
-    if valid_folder(folder_name):
-        linter = MigrationLinter(
-            folder_name,
-            args.commit_id,
-            ignore_name_contains=args.ignore_name_contains,
-            ignore_name=args.ignore_name,
-            include_apps=args.include_apps,
-            exclude_apps=args.exclude_apps,
-            database=args.database)
-        has_errors = linter.lint_migrations()
-        if has_errors:
-            sys.exit(1)
-    else:
+    # Create and use linter
+    linter = MigrationLinter(
+        folder_name,
+        ignore_name_contains=args.ignore_name_contains,
+        ignore_name=args.ignore_name,
+        include_apps=args.include_apps,
+        exclude_apps=args.exclude_apps,
+        database=args.database)
+    linter.lint_all_migrations(
+        git_commit_id=args.commit_id)
+    linter.print_summary()
+    if linter.has_errors:
         sys.exit(1)
 
 

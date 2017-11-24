@@ -66,19 +66,19 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
         fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_no_errors(
             test_project_path,
-            commit_id='44330921696018f8f1480df897b38310549982cb')
+            commit_id='1021d98b5943db56122c1f848f371ddc38788d0f')
 
-    #def test_specify_git_hash_by_tag(self):
-    #    test_project_path = fixtures.MULTI_COMMIT_PROJECT
-    #    fixtures.prepare_git_project(test_project_path)
-    #    self._test_linter_finds_no_errors(test_project_path, commit_id='tag1')
+    def test_specify_git_hash_by_tag(self):
+        test_project_path = fixtures.MULTI_COMMIT_PROJECT
+        fixtures.prepare_git_project(test_project_path)
+        self._test_linter_finds_no_errors(test_project_path, commit_id='tag1')
 
     def _test_linter_finds_errors(self, path, commit_id=None):
-        linter = MigrationLinter(path, commit_id=commit_id)
-        has_errors = linter.lint_migrations()
-        self.assertTrue(has_errors)
+        linter = MigrationLinter(path)
+        linter.lint_all_migrations(git_commit_id=commit_id)
+        self.assertTrue(linter.has_errors)
 
     def _test_linter_finds_no_errors(self, path, commit_id=None):
-        linter = MigrationLinter(path, commit_id=commit_id)
-        has_errors = linter.lint_migrations()
-        self.assertFalse(has_errors)
+        linter = MigrationLinter(path)
+        linter.lint_all_migrations(git_commit_id=commit_id)
+        self.assertFalse(linter.has_errors)
