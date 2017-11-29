@@ -15,7 +15,6 @@
 from __future__ import print_function
 import logging as log
 import os
-from io import StringIO
 import re
 from subprocess import Popen, PIPE
 import sys
@@ -29,9 +28,13 @@ class MigrationLinter(object):
     def __init__(self, project_path, **kwargs):
         # Verify correctness
         if not utils.is_directory(project_path):
-            raise ValueError('The given path {0} does not seem to be a directory.'.format(project_path))
+            raise ValueError(
+                'The given path {0} does not seem to be a directory.'.format(
+                    project_path))
         if not utils.is_django_project(project_path):
-            raise ValueError('The given path {0} does not seem to be a django project.'.format(project_path))
+            raise ValueError(
+                ('The given path {0} does not '
+                 'seem to be a django project.').format(project_path))
 
         # Store parameters and options
         self.django_path = project_path
@@ -83,7 +86,9 @@ class MigrationLinter(object):
         # Collect migrations
         if git_commit_id:
             if not utils.is_git_project(self.django_path):
-                raise ValueError('The given project {0} does not seem to be versioned by git.'.format(self.django_path))
+                raise ValueError(
+                    ('The given project {0} does not seem '
+                     'to be versioned by git.').format(self.django_path))
             migrations = self._gather_migrations_git(git_commit_id)
         else:
             migrations = self._gather_all_migrations()
@@ -129,7 +134,8 @@ class MigrationLinter(object):
 
         sql_statements = []
         for line in map(
-                utils.clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
+                utils.clean_bytes_to_str,
+                sqlmigrate_process.stdout.readlines()):
             sql_statements.append(line)
         sqlmigrate_process.wait()
         if sqlmigrate_process.returncode != 0:
@@ -145,7 +151,8 @@ class MigrationLinter(object):
         log.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
-        for line in map(utils.clean_bytes_to_str, diff_process.stdout.readlines()):
+        for line in map(
+                utils.clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include migrations
             if re.search(
                     '\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
@@ -173,7 +180,8 @@ class MigrationLinter(object):
                         file_name.endswith('.py') and \
                         file_name != '__init__.py':
                     full_migration_path = os.path.join(root, file_name)
-                    app_name, migration_name = self._split_migration_path(full_migration_path)
+                    app_name, migration_name = self._split_migration_path(
+                        full_migration_path)
                     migrations.append((app_name, migration_name))
         return migrations
 

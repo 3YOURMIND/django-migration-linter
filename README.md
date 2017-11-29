@@ -15,8 +15,7 @@
   <summary><b>Needed software (in PATH)</b></summary>
 
   * `python`
-  * `git`
-  * UNIX command line tools like `tail`
+  * `git` (if you specify a git identifier)
 </details></p>
 
 The linter will try to detect if the project is a django project and is versioned with git.

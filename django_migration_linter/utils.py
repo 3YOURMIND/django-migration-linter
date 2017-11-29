@@ -14,7 +14,7 @@
 
 from __future__ import print_function
 import os
-import re
+import sys
 
 
 def is_django_project(path):
@@ -42,7 +42,9 @@ def find_project_settings_module(path):
     for root, dirs, files in os.walk(path):
         for file_name in files:
             if file_name == 'settings.py':
-                return os.path.join(root.replace(path, ''), file_name).replace('/', '.').rstrip('.py')
+                return os.path.join(
+                    root.replace(path, ''),
+                    file_name).replace('/', '.').rstrip('.py')
 
 
 def split_path(path):
