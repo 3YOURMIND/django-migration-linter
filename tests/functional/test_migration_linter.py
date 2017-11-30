@@ -27,33 +27,27 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
 
     def test_create_table_with_not_null_column(self):
         test_project_path = fixtures.CREATE_TABLE_WITH_NOT_NULL_COLUMN_PROJECT
-        fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_no_errors(test_project_path)
 
     def test_detect_adding_not_null_column(self):
         test_project_path = fixtures.ADD_NOT_NULL_COLUMN_PROJECT
-        fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_errors(test_project_path)
 
     def test_detect_drop_column(self):
         test_project_path = fixtures.DROP_COLUMN_PROJECT
-        fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_errors(test_project_path)
 
     def test_detect_rename_column(self):
         test_project_path = fixtures.RENAME_COLUMN_PROJECT
-        fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_errors(test_project_path)
 
     def test_detect_rename_table(self):
         test_project_path = fixtures.RENAME_TABLE_PROJECT
-        fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_errors(test_project_path)
 
     def test_accept_not_null_column_followed_by_adding_default(self):
         test_project_path = \
             fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT
-        fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_no_errors(test_project_path)
 
     def test_no_specify_git_hash(self):
@@ -66,7 +60,7 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
         fixtures.prepare_git_project(test_project_path)
         self._test_linter_finds_no_errors(
             test_project_path,
-            commit_id='1021d98b5943db56122c1f848f371ddc38788d0f')
+            commit_id='d7125d5f4f0cc9623f670a66c54f131acc50032d')
 
     #def test_specify_git_hash_by_tag(self):
     #    test_project_path = fixtures.MULTI_COMMIT_PROJECT

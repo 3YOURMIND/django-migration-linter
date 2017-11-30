@@ -56,7 +56,7 @@ class MigrationLinter(object):
 
         if self.should_ignore_migration(app_name, migration_name):
             print('IGNORE')
-            self.nb_ignore += 1
+            self.nb_ignored += 1
             return
 
         sql_statements = self.get_sql(
@@ -105,7 +105,7 @@ class MigrationLinter(object):
             self.nb_total,
             self.nb_valid,
             self.nb_erroneous,
-            self.nb_ignore))
+            self.nb_ignored))
 
     @property
     def has_errors(self):
