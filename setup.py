@@ -34,7 +34,7 @@ test_requirements = [
 
 setup(
     name='django-migration-linter',
-    version='0.0.1',
+    version='0.0.2',
 
     description='Detect backward incompatible migrations for your django project',
     long_description=long_description,

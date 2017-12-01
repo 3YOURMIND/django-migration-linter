@@ -51,8 +51,6 @@ The linter will try to detect if the project is a django project and is versione
 
 The easiest way to run the tests is to invoke [py.test](https://docs.pytest.org/en/latest/).
 
-More tests are always welcome.
-
 ## License
 
 *django-migration-linter* is released under the [Apache 2.0 License](./LICENSE).
