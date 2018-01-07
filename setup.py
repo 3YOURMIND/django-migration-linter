@@ -26,8 +26,8 @@ install_requirements = [
 ]
 
 test_requirements = [
-    'tox',
     'pytest',
+    'tox',
     'django>=1.9',
     'django-fake-database-backends',
     'flake8'

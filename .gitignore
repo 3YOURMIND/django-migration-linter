@@ -11,3 +11,4 @@ dist/
 .cache/
 env/
 tests/test_project_fixtures/*/.git/
+.tox/
