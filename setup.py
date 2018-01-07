@@ -26,8 +26,9 @@ install_requirements = [
 ]
 
 test_requirements = [
+    'tox',
     'pytest',
-    'django',
+    'django>=1.9',
     'django-fake-database-backends',
     'flake8'
 ]
@@ -59,6 +60,10 @@ setup(
         'Intended Audience :: Developers',
         'Environment :: Web Environment',
         'Framework :: Django',
+        'Framework :: Django :: 1.9',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
 
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
