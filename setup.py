@@ -30,7 +30,6 @@ test_requirements = [
     'tox',
     'django>=1.9',
     'django-fake-database-backends',
-    'flake8'
 ]
 
 setup(

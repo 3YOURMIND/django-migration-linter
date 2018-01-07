@@ -16,11 +16,18 @@ import unittest
 from subprocess import Popen, PIPE
 from django_migration_linter import utils
 from tests import fixtures
+import sys
 
 
 class CallLinterFromCommandLineTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(CallLinterFromCommandLineTest, cls).setUpClass()
+        linter_name = 'django-migration-linter'
+        cls.linter_exec = '{0}/bin/{1}'.format(sys.prefix,  linter_name) if hasattr(sys, 'real_prefix') else linter_name
+
     def test_call_linter_cmd_line_working(self):
-        cmd = 'django-migration-linter {0}'.format(fixtures.CORRECT_PROJECT)
+        cmd = '{0} {1}'.format(self.linter_exec, fixtures.CORRECT_PROJECT)
 
         process = Popen(
             cmd, shell=True, stdout=PIPE, stderr=PIPE)
@@ -33,7 +40,8 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('OK'))
 
     def test_call_linter_cmd_line_errors(self):
-        cmd = 'django-migration-linter {0}'.format(
+        cmd = '{0} {1}'.format(
+            self.linter_exec,
             fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
 
         process = Popen(
@@ -48,7 +56,8 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue('RENAMING tables' in lines[2])
 
     def test_call_linter_cmd_line_exclude_apps(self):
-        cmd = 'django-migration-linter {0} --exclude-apps test_app2'.format(
+        cmd = '{0} {1} --exclude-apps test_app2'.format(
+            self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
         process = Popen(
@@ -62,7 +71,8 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('IGNORE'))
 
     def test_call_linter_cmd_line_include_apps(self):
-        cmd = 'django-migration-linter {0} --include-apps test_app2'.format(
+        cmd = '{0} {1} --include-apps test_app2'.format(
+            self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
         process = Popen(
@@ -76,7 +86,8 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('OK'))
 
     def test_call_linter_cmd_line_ignore_name(self):
-        cmd = 'django-migration-linter {0} --ignore-name 0001_initial'.format(
+        cmd = '{0} {1} --ignore-name 0001_initial'.format(
+            self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
         process = Popen(
@@ -90,7 +101,8 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('OK'))
 
     def test_call_linter_cmd_line_ignore_name_contains(self):
-        cmd = 'django-migration-linter {0} --ignore-name-contains 0001'.format(
+        cmd = '{0} {1} --ignore-name-contains 0001'.format(
+            self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
         process = Popen(
@@ -104,7 +116,8 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('IGNORE'))
 
     def test_call_linter_cmd_line_git_id(self):
-        cmd = 'django-migration-linter {0} d7125d5f4f0cc9623f670a66c54f131acc50032d'.format(
+        cmd = '{0} {1} d7125d5f4f0cc9623f670a66c54f131acc50032d'.format(
+            self.linter_exec,
             fixtures.MULTI_COMMIT_PROJECT)
         fixtures.prepare_git_project(fixtures.MULTI_COMMIT_PROJECT)
 
