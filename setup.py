@@ -28,7 +28,7 @@ install_requirements = [
 test_requirements = [
     'pytest',
     'tox',
-    'django>=1.9',
+    'django>=1.10',
     'django-fake-database-backends',
 ]
 
@@ -59,7 +59,6 @@ setup(
         'Intended Audience :: Developers',
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
         'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',

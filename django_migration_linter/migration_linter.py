@@ -43,7 +43,8 @@ class MigrationLinter(object):
         self.include_apps = kwargs.get('include_apps', None)
         self.exclude_apps = kwargs.get('exclude_apps', None)
         self.database = kwargs.get('database', None) or 'default'
-        self.python_exe = '{0}/bin/{1}'.format(sys.prefix, 'python') if hasattr(sys, 'real_prefix') else 'python'
+        self.python_exe = '{0}/bin/{1}'.format(sys.prefix, 'python') if \
+            hasattr(sys, 'real_prefix') else 'python'
 
         # Initialise counters
         self.nb_valid = 0
