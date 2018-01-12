@@ -1,4 +1,4 @@
-# Copyright 2017 3YOURMIND GmbH
+# Copyright 2018 3YOURMIND GmbH
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ class MigrationLinter(object):
         self.include_apps = kwargs.get('include_apps', None)
         self.exclude_apps = kwargs.get('exclude_apps', None)
         self.database = kwargs.get('database', None) or 'default'
+        self.python_exe = '{0}/bin/{1}'.format(sys.prefix, 'python') if \
+            hasattr(sys, 'real_prefix') else 'python'
 
         # Initialise counters
         self.nb_valid = 0
@@ -125,9 +127,11 @@ class MigrationLinter(object):
         """
         git_diff_command = (
             'cd {0} && '
-            'python manage.py sqlmigrate {1} {2} '
-            '--database {3}').format(
-                self.django_path, app_name, migration_name, self.database)
+            '{1} manage.py sqlmigrate {2} {3} '
+            '--database {4}').format(
+                self.django_path,
+                self.python_exe, app_name, migration_name,
+                self.database)
         log.info('Executing {0}'.format(git_diff_command))
         sqlmigrate_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)

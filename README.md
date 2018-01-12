@@ -49,7 +49,7 @@ The linter will try to detect if the project is a django project and is versione
 
 ## Tests
 
-The easiest way to run the tests is to invoke [py.test](https://docs.pytest.org/en/latest/).
+The easiest way to run the tests is to invoke [tox](https://pypi.python.org/pypi/tox).
 
 ## License
 
