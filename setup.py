@@ -1,4 +1,4 @@
-# Copyright 2017 3YOURMIND GmbH
+# Copyright 2018 3YOURMIND GmbH
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,17 +19,20 @@ from setuptools import setup, find_packages
 
 PROJECT_DIR = path.abspath(path.dirname(__file__))
 
-with open(path.join(PROJECT_DIR, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
 
 install_requirements = [
 ]
 
 test_requirements = [
     'pytest',
-    'django',
+    'tox',
+    'django>=1.10',
     'django-fake-database-backends',
-    'flake8'
 ]
 
 setup(
@@ -59,6 +62,9 @@ setup(
         'Intended Audience :: Developers',
         'Environment :: Web Environment',
         'Framework :: Django',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
 
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
