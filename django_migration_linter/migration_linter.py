@@ -18,8 +18,8 @@ import os
 import re
 from subprocess import Popen, PIPE
 import sys
-import utils
-from sql_analyser import analyse_sql_statements
+from . import utils
+from .sql_analyser import analyse_sql_statements
 
 
 class MigrationLinter(object):
@@ -143,10 +143,9 @@ class MigrationLinter(object):
             sql_statements.append(line)
         sqlmigrate_process.wait()
         if sqlmigrate_process.returncode != 0:
-            out, err = sqlmigrate_process.communicate()
-            print('sqlmigrate command failed')
-            print(err.decode('ascii'))
-            raise RuntimeError()
+            _, err = sqlmigrate_process.communicate()
+            raise RuntimeError('sqlmigrate command failed {0}'.format(
+                err.decode('utf-8')))
         log.info('Found {0} sql migration lines'.format(len(sql_statements)))
         return sql_statements
 
