@@ -51,6 +51,11 @@ The linter will try to detect if the project is a django project and is versione
 
 The easiest way to run the tests is to invoke [tox](https://pypi.python.org/pypi/tox).
 
+## Contributing
+
+First, thank you very much if you want to contribute to the project.
+Please base your work on the `dev` branch and also target this branch in your pull request.
+
 ## License
 
 *django-migration-linter* is released under the [Apache 2.0 License](./LICENSE).
