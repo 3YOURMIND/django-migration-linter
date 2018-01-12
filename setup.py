@@ -19,8 +19,11 @@ from setuptools import setup, find_packages
 
 PROJECT_DIR = path.abspath(path.dirname(__file__))
 
-with open(path.join(PROJECT_DIR, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
 
 install_requirements = [
 ]
