@@ -28,6 +28,8 @@ DROP_COLUMN_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_project_drop_column/')
 RENAME_COLUMN_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_project_rename_column/')
+ALTER_COLUMN_PROJECT = os.path.join(
+    _FIXTURES_FOLDER, 'test_project_alter_column')
 RENAME_TABLE_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_project_rename_table/')
 ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT = os.path.join(

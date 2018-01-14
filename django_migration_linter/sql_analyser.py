@@ -51,6 +51,10 @@ migration_tests = (
                 re.search('ALTER TABLE .* RENAME TO', sql),
         'err_msg': 'RENAMING tables'
     }, {
+        'code': 'ALTER_COLUMN',
+        'fn': lambda sql, **kw: re.search('ALTER TABLE .* MODIFY', sql),
+        'err_msg': 'ALTERING columns'
+    }, {
         'code': '',
         'fn': has_default,
         'err_msg': ''
