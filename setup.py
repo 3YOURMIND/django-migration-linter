@@ -26,12 +26,12 @@ except(IOError, ImportError):
     long_description = open('README.md').read()
 
 install_requirements = [
+    'django>=1.10',
 ]
 
 test_requirements = [
     'pytest',
     'tox',
-    'django>=1.10',
     'django-fake-database-backends',
 ]
 
