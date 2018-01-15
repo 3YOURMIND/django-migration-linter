@@ -19,11 +19,7 @@ from setuptools import setup, find_packages
 
 PROJECT_DIR = path.abspath(path.dirname(__file__))
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-except(IOError, ImportError):
-    long_description = open('README.md').read()
+long_description = open('README.rst').read()
 
 install_requirements = [
     'django>=1.10',
