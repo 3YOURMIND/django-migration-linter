@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from codecs import open
 from os import path
 from setuptools import setup, find_packages
 
 
 PROJECT_DIR = path.abspath(path.dirname(__file__))
 
-long_description = open('README.rst').read()
+with open(path.join(PROJECT_DIR, 'README.rst')) as f:
+    long_description = f.read()
 
 install_requirements = [
     'django>=1.10',
