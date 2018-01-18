@@ -125,16 +125,16 @@ class MigrationLinter(object):
         Even if calling a shell is slow and ugly, for now,
         it allows to seperate the instances correctly.
         """
-        git_diff_command = (
+        sqlmigrate_command = (
             'cd {0} && '
             '{1} manage.py sqlmigrate {2} {3} '
             '--database {4}').format(
                 self.django_path,
                 self.python_exe, app_name, migration_name,
                 self.database)
-        log.info('Executing {0}'.format(git_diff_command))
+        log.info('Executing {0}'.format(sqlmigrate_command))
         sqlmigrate_process = Popen(
-            git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
+            sqlmigrate_command, shell=True, stdout=PIPE, stderr=PIPE)
 
         sql_statements = []
         for line in map(
@@ -164,6 +164,7 @@ class MigrationLinter(object):
                     '^A.*\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
+                line = line.split()[-1]  # Remove the status letter
                 app_name, migration_name = self._split_migration_path(line)
                 migrations.append((app_name, migration_name))
         diff_process.wait()

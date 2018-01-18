@@ -116,10 +116,10 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('IGNORE'))
 
     def test_call_linter_cmd_line_git_id(self):
-        cmd = '{0} {1} d7125d5f4f0cc9623f670a66c54f131acc50032d'.format(
+        cmd = '{0} {1} 154ecf6119325cc3b1f3f5a4e709bfbd61a4a4ba'.format(
             self.linter_exec,
-            fixtures.MULTI_COMMIT_PROJECT)
-        fixtures.prepare_git_project(fixtures.MULTI_COMMIT_PROJECT)
+            fixtures.DELETED_MIGRATION_PROJECT)
+        fixtures.prepare_git_project(fixtures.DELETED_MIGRATION_PROJECT)
 
         process = Popen(
             cmd, shell=True, stdout=PIPE, stderr=PIPE)
