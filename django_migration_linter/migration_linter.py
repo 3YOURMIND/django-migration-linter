@@ -152,8 +152,10 @@ class MigrationLinter(object):
     def _gather_migrations_git(self, git_commit_id):
         migrations = []
         # Get changes since specified commit
-        git_diff_command = 'cd {0} && git diff --name-status {1}'.format(
-            self.django_path, git_commit_id)
+        git_diff_command = (
+            'cd {0} && '
+            'git diff --name-only --diff-filter=A {1}').format(
+                self.django_path, git_commit_id)
         log.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
@@ -161,10 +163,9 @@ class MigrationLinter(object):
                 utils.clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if re.search(
-                    '^A.*\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
+                    '\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
-                line = line.split()[-1]  # Remove the status letter
                 app_name, migration_name = self._split_migration_path(line)
                 migrations.append((app_name, migration_name))
         diff_process.wait()

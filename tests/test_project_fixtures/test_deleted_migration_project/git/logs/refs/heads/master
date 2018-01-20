@@ -1,3 +1,4 @@
 0000000000000000000000000000000000000000 0395cbee60f2ea1b97f42ebdd43991c8f5d8d76e David-Wobrock <david.wobrock@gmail.com> 1516314144 +0100	commit (initial): Project init
 0395cbee60f2ea1b97f42ebdd43991c8f5d8d76e 154ecf6119325cc3b1f3f5a4e709bfbd61a4a4ba David-Wobrock <david.wobrock@gmail.com> 1516314322 +0100	commit: Add backward incompatible migration
 154ecf6119325cc3b1f3f5a4e709bfbd61a4a4ba be2fae887ee7ecd2d1e6371af1a865c17414bde9 David-Wobrock <david.wobrock@gmail.com> 1516314457 +0100	commit: Delete file and insert new
+be2fae887ee7ecd2d1e6371af1a865c17414bde9 4bdc4ba9e7695893423be1b54f3101d6ccbd11c7 David-Wobrock <david.wobrock@gmail.com> 1516459290 +0100	commit (amend): Delete file and insert new

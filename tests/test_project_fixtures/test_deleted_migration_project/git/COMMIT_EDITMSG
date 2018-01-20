@@ -1,1 +1,16 @@
 Delete file and insert new
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Thu Jan 18 23:27:37 2018 +0100
+#
+# On branch master
+# Changes to be committed:
+#	deleted:    test_app/migrations/0002_new_not_null_field.py
+#	new file:   test_app/migrations/0003_new_nullable_field.py
+#	modified:   test_app/models.py
+#
+# Untracked files:
+#	git/
+#
