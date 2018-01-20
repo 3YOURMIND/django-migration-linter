@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test_project_rename_table.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test_deleted_migration_project.settings")
 
 application = get_wsgi_application()

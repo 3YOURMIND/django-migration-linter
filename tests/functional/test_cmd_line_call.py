@@ -129,3 +129,18 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(len(lines), 3)
         self.assertTrue(lines[0].endswith('OK'))
         self.assertTrue(lines[1].startswith('*** Summary'))
+
+    def test_call_linter_with_deleted_migrations(self):
+        cmd = '{0} {1} 154ecf6119325cc3b1f3f5a4e709bfbd61a4a4ba'.format(
+            self.linter_exec,
+            fixtures.DELETED_MIGRATION_PROJECT)
+        fixtures.prepare_git_project(fixtures.DELETED_MIGRATION_PROJECT)
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
+        self.assertEqual(len(lines), 3)
+        self.assertTrue(lines[0].endswith('OK'))
+        self.assertTrue(lines[1].startswith('*** Summary'))

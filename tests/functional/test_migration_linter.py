@@ -25,6 +25,17 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
             BackwardcompatibilityDetectionTest,
             self).tearDown(*args, **kwargs)
 
+    def _test_linter_finds_errors(self, path, commit_id=None):
+        linter = MigrationLinter(path)
+        linter.lint_all_migrations(git_commit_id=commit_id)
+        self.assertTrue(linter.has_errors)
+
+    def _test_linter_finds_no_errors(self, path, commit_id=None):
+        linter = MigrationLinter(path)
+        linter.lint_all_migrations(git_commit_id=commit_id)
+        self.assertFalse(linter.has_errors)
+
+    # *** Tests ***
     def test_create_table_with_not_null_column(self):
         test_project_path = fixtures.CREATE_TABLE_WITH_NOT_NULL_COLUMN_PROJECT
         self._test_linter_finds_no_errors(test_project_path)
@@ -50,6 +61,10 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
             fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT
         self._test_linter_finds_no_errors(test_project_path)
 
+    def test_detect_alter_column(self):
+        test_project_path = fixtures.ALTER_COLUMN_PROJECT
+        self._test_linter_finds_errors(test_project_path)
+
     def test_no_specify_git_hash(self):
         test_project_path = fixtures.MULTI_COMMIT_PROJECT
         fixtures.prepare_git_project(test_project_path)
@@ -66,13 +81,3 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
     #    test_project_path = fixtures.MULTI_COMMIT_PROJECT
     #    fixtures.prepare_git_project(test_project_path)
     #    self._test_linter_finds_no_errors(test_project_path, commit_id='tag1')
-
-    def _test_linter_finds_errors(self, path, commit_id=None):
-        linter = MigrationLinter(path)
-        linter.lint_all_migrations(git_commit_id=commit_id)
-        self.assertTrue(linter.has_errors)
-
-    def _test_linter_finds_no_errors(self, path, commit_id=None):
-        linter = MigrationLinter(path)
-        linter.lint_all_migrations(git_commit_id=commit_id)
-        self.assertFalse(linter.has_errors)
