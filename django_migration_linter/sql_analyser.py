@@ -53,7 +53,8 @@ migration_tests = (
     }, {
         'code': 'ALTER_COLUMN',
         'fn': lambda sql, **kw: re.search('ALTER TABLE .* MODIFY', sql),
-        'err_msg': 'ALTERING columns (Could be backward compatible. You may ignore this migration.)'
+        'err_msg': ('ALTERING columns (Could be backward compatible. '
+                    'You may ignore this migration.)')
     }, {
         'code': '',
         'fn': has_default,
