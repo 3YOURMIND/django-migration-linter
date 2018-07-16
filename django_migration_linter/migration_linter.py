@@ -267,9 +267,9 @@ def _main():
 
     args = parser.parse_args()
     if args.verbose:
-        log.basicConfig(format='%(message)s', level=log.DEBUG)
+        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
     else:
-        log.basicConfig(format='%(message)s')
+        logging.basicConfig(format='%(message)s')
 
     folder_name = args.django_folder[0]
     # Create and use linter
