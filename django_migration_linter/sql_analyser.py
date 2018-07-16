@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import re
-import logging as log
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def has_default(sql, **kwargs):

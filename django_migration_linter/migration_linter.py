@@ -13,13 +13,15 @@
 # limitations under the License.
 
 from __future__ import print_function
-import logging as log
+import logging
 import os
 import re
 from subprocess import Popen, PIPE
 import sys
 from . import utils
 from .sql_analyser import analyse_sql_statements
+
+log = logging.getLogger(__name__)
 
 
 class MigrationLinter(object):
