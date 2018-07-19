@@ -15,7 +15,7 @@
 import re
 import logging
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def has_default(sql, **kwargs):
@@ -24,7 +24,7 @@ def has_default(sql, **kwargs):
                    for err in kwargs['errors']
                    if err['code'] == 'NOT_NULL')
         if err:
-            log.info(
+            logger.info(
                 ('Found a NOT_NULL error in migration, '
                  'but it has a default value added: {}').format(err))
             kwargs['errors'].remove(err)
@@ -70,7 +70,7 @@ def analyse_sql_statements(sql_statements):
     for statement in sql_statements:
         for test in migration_tests:
             if test['fn'](statement, errors=errors):
-                log.info('Testing {0} -- ERROR'.format(statement))
+                logger.info('Testing {0} -- ERROR'.format(statement))
                 table_search = re.search(
                     'TABLE `([^`]*)`', statement, re.IGNORECASE)
                 col_search = re.search(
@@ -83,7 +83,7 @@ def analyse_sql_statements(sql_statements):
                 }
                 errors.append(err)
             else:
-                log.info('Testing {0} -- PASSED'.format(statement))
+                logger.info('Testing {0} -- PASSED'.format(statement))
     return {
         'errors': errors,
     }

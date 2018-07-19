@@ -21,7 +21,7 @@ import sys
 from . import utils
 from .sql_analyser import analyse_sql_statements
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MigrationLinter(object):
@@ -134,7 +134,7 @@ class MigrationLinter(object):
                 self.django_path,
                 self.python_exe, app_name, migration_name,
                 self.database)
-        log.info('Executing {0}'.format(sqlmigrate_command))
+        logger.info('Executing {0}'.format(sqlmigrate_command))
         sqlmigrate_process = Popen(
             sqlmigrate_command, shell=True, stdout=PIPE, stderr=PIPE)
 
@@ -148,7 +148,7 @@ class MigrationLinter(object):
             _, err = sqlmigrate_process.communicate()
             raise RuntimeError('sqlmigrate command failed {0}'.format(
                 err.decode('utf-8')))
-        log.info('Found {0} sql migration lines'.format(len(sql_statements)))
+        logger.info('Found {0} sql migration lines'.format(len(sql_statements)))
         return sql_statements
 
     def _gather_migrations_git(self, git_commit_id):
@@ -158,7 +158,7 @@ class MigrationLinter(object):
             'cd {0} && '
             'git diff --name-only --diff-filter=A {1}').format(
                 self.django_path, git_commit_id)
-        log.info('Executing {0}'.format(git_diff_command))
+        logger.info('Executing {0}'.format(git_diff_command))
         diff_process = Popen(
             git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         for line in map(
@@ -177,7 +177,7 @@ class MigrationLinter(object):
             for line in map(
                     utils.clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
-            log.info("Error while git diff command:\n{}".format(
+            logger.info("Error while git diff command:\n{}".format(
                 "".join(output)))
             raise Exception('Error while executing git diff command')
         return migrations
