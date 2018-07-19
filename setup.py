@@ -22,7 +22,7 @@ with open(path.join(PROJECT_DIR, 'README.rst')) as f:
     long_description = f.read()
 
 install_requirements = [
-    'django>=1.10',
+    'django>=1.11',
 ]
 
 test_requirements = [
@@ -58,7 +58,6 @@ setup(
         'Intended Audience :: Developers',
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 1.10',
         'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
 

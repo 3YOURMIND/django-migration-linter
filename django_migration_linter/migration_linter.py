@@ -148,7 +148,8 @@ class MigrationLinter(object):
             _, err = sqlmigrate_process.communicate()
             raise RuntimeError('sqlmigrate command failed {0}'.format(
                 err.decode('utf-8')))
-        logger.info('Found {0} sql migration lines'.format(len(sql_statements)))
+        logger.info(
+            'Found {0} sql migration lines'.format(len(sql_statements)))
         return sql_statements
 
     def _gather_migrations_git(self, git_commit_id):
