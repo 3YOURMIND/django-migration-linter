@@ -20,13 +20,15 @@ logger = logging.getLogger(__name__)
 
 def has_default(sql, **kwargs):
     if re.search('SET DEFAULT', sql) and kwargs['errors']:
-        err = next(err
-                   for err in kwargs['errors']
-                   if err['code'] == 'NOT_NULL')
+        err = next(
+            (err for err in kwargs['errors'] if err['code'] == 'NOT_NULL'),
+            None,
+        )
         if err:
             logger.info(
                 ('Found a NOT_NULL error in migration, '
-                 'but it has a default value added: {}').format(err))
+                 'but it has a default value added: {}').format(err)
+            )
             kwargs['errors'].remove(err)
 
     return False  # Never fails
