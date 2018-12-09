@@ -24,6 +24,11 @@ from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
 
+# Can be used to mark ignored migrations.
+# This is a noop for SQL. Comments would be better.
+# But comments are stripped by RunSQL
+IGNORE_MIGRATION = "SELECT 'dml-ignore'"
+
 
 class MigrationLinter(object):
     MIGRATION_FOLDER_NAME = 'migrations'
@@ -69,6 +74,12 @@ class MigrationLinter(object):
         analysis_result = analyse_sql_statements(
             sql_statements)
         errors = analysis_result['errors']
+
+        if analysis_result['ignored']:
+            print('IGNORE')
+            self.nb_ignored += 1
+            return
+
         if not errors:
             print('OK')
             self.nb_valid += 1

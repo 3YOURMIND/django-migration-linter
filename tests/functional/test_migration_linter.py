@@ -56,6 +56,10 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
         test_project_path = fixtures.RENAME_TABLE_PROJECT
         self._test_linter_finds_errors(test_project_path)
 
+    def test_ignore_migration(self):
+        test_project_path = fixtures.IGNORE_MIGRATION_PROJECT
+        self._test_linter_finds_no_errors(test_project_path)
+
     def test_accept_not_null_column_followed_by_adding_default(self):
         test_project_path = \
             fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT
