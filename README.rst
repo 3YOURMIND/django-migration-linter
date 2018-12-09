@@ -52,6 +52,23 @@ Examples
 3YOURMIND is running the linter on `Bitbucket Pipelines`_ on every build getting pushed.
 Checkout the ``examples/`` folder to see how you could integrate the linter in your test suite.
 
+Ignoring Migrations
+-------------------
+
+You can also ignore migrations by adding this to your migrations:
+
+.. code-block::
+
+    from django_migration_linter import IGNORE_MIGRATION
+    # ...
+
+       operations = [
+            migrations.RunSQL(IGNORE_MIGRATION),
+       # ...
+       ]
+    # ...
+
+
 Tests
 -----
 

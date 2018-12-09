@@ -23,6 +23,7 @@ with open(path.join(PROJECT_DIR, 'README.rst')) as f:
 
 install_requirements = [
     'django>=1.11',
+    'sqlparse>=0.2.4'
 ]
 
 test_requirements = [
