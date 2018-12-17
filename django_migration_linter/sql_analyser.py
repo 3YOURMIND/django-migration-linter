@@ -15,6 +15,8 @@
 import re
 import logging
 
+from django_migration_linter.constants import IGNORE_MIGRATION
+
 logger = logging.getLogger(__name__)
 
 
@@ -65,7 +67,7 @@ migration_tests = (
         'err_msg': ''
     }, {
         'code': 'IGNORED_MIGRATION',
-        'fn': lambda sql, **kw: re.search('dml-ignore', sql),
+        'fn': lambda sql, **kw: re.search(IGNORE_MIGRATION[0], sql),
         'err_msg': '',
     }
 )
