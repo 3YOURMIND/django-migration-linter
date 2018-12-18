@@ -18,6 +18,7 @@ import os
 import re
 from subprocess import Popen, PIPE
 import sys
+
 from . import utils
 from .sql_analyser import analyse_sql_statements
 
@@ -186,7 +187,7 @@ class MigrationLinter(object):
     def _gather_all_migrations(self):
         migrations = []
         for root, dirs, files in os.walk(self.django_path):
-            for file_name in files:
+            for file_name in sorted(files):
                 if os.path.basename(root) == self.MIGRATION_FOLDER_NAME and \
                         file_name.endswith('.py') and \
                         file_name != '__init__.py':
