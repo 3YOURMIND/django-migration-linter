@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import unittest
 from subprocess import Popen, PIPE
 from django_migration_linter import utils
+from django_migration_linter.utils import get_default_cache_file
 from tests import fixtures
 import sys
 
@@ -114,6 +116,49 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[0].endswith('IGNORE'))
         self.assertTrue(lines[1].endswith('OK'))
         self.assertTrue(lines[2].endswith('IGNORE'))
+
+    def test_call_linter_cmd_line_cache(self):
+        if os.path.exists(get_default_cache_file('test_correct_project')):
+            os.remove(get_default_cache_file('test_correct_project'))
+        cmd = '{0} {1}'.format(
+            self.linter_exec,
+            fixtures.CORRECT_PROJECT
+        )
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertTrue(os.path.exists(get_default_cache_file('test_correct_project')))
+
+    def test_call_linter_cmd_line_cache_path(self):
+        if os.path.exists('/tmp/migration-linter-cache-tests'):
+            os.remove('/tmp/migration-linter-cache-tests')
+        cmd = '{0} {1} --cache-path={2}'.format(
+            self.linter_exec,
+            fixtures.CORRECT_PROJECT,
+            '/tmp/migration-linter-cache-tests'
+        )
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        self.assertTrue(os.path.exists('/tmp/migration-linter-cache-tests'))
+
+    def test_call_linter_cmd_line_no_cache(self):
+        if os.path.exists(get_default_cache_file('test_correct_project')):
+            os.remove(get_default_cache_file('test_correct_project'))
+
+        cmd = '{0} {1} --no-cache'.format(
+            self.linter_exec,
+            fixtures.CORRECT_PROJECT
+        )
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        self.assertFalse(os.path.exists(get_default_cache_file('test_correct_project')))
 
     def test_call_linter_cmd_line_git_id(self):
         cmd = '{0} {1} d7125d5f4f0cc9623f670a66c54f131acc50032d'.format(

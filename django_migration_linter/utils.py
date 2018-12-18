@@ -16,6 +16,8 @@ from __future__ import print_function
 import os
 import sys
 
+from django_migration_linter.constants import DEFAULT_CACHE_PATH
+
 
 def is_django_project(path):
     django_manage_file = os.path.join(path, 'manage.py')
@@ -54,3 +56,7 @@ def split_path(path):
 
 def clean_bytes_to_str(byte_input):
     return byte_input.decode('utf-8').strip()
+
+
+def get_default_cache_file(project_name):
+    os.join(DEFAULT_CACHE_PATH, '{0}.pickle'.format(project_name))

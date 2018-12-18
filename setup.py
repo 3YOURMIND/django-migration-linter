@@ -18,11 +18,16 @@ from setuptools import setup, find_packages
 
 PROJECT_DIR = path.abspath(path.dirname(__file__))
 
+# Read __VERSION__
+exec(open('./django_migration_linter/constants.py').read())
+
+
 with open(path.join(PROJECT_DIR, 'README.rst')) as f:
     long_description = f.read()
 
 install_requirements = [
     'django>=1.11',
+    'appdirs==1.4.3'
 ]
 
 test_requirements = [
@@ -31,9 +36,10 @@ test_requirements = [
     'django-fake-database-backends',
 ]
 
+# noinspection PyUnresolvedReferences
 setup(
     name='django-migration-linter',
-    version='0.0.7',
+    version=__VERSION__,
 
     description='Detect backward incompatible migrations for your django project',
     long_description=long_description,
