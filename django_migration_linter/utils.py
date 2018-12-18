@@ -59,4 +59,4 @@ def clean_bytes_to_str(byte_input):
 
 
 def get_default_cache_file(project_name):
-    os.join(DEFAULT_CACHE_PATH, '{0}.pickle'.format(project_name))
+    return os.path.join(DEFAULT_CACHE_PATH, '{0}.pickle'.format(project_name))
