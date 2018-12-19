@@ -166,7 +166,7 @@ class MigrationLinter(object):
                 utils.clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if re.search(
-                    '\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
+                    r'\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
                 app_name, migration_name = self._split_migration_path(line)
