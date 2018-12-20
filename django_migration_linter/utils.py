@@ -74,6 +74,3 @@ def compose_migration_path(django_folder, app_name, migration):
 
 def clean_bytes_to_str(byte_input):
     return byte_input.decode('utf-8').strip()
-
-
-

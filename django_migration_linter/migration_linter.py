@@ -20,7 +20,8 @@ from subprocess import Popen, PIPE
 import sys
 
 from django_migration_linter.cache import Cache
-from django_migration_linter.constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
+from django_migration_linter.constants import DEFAULT_CACHE_PATH, \
+    MIGRATION_FOLDER_NAME
 from django_migration_linter.utils import split_migration_path
 from . import utils
 from .sql_analyser import analyse_sql_statements
@@ -289,7 +290,8 @@ def _main():
     cache_group.add_argument(
         '--cache-path',
         type=str,
-        help='specify a directory that should be used to store cache-files in.')
+        help='specify a directory that should be used to'
+             'store cache-files in.')
     cache_group.add_argument(
         '--no-cache',
         action='store_true',
