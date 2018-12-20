@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import pprint
 import shutil
 import tempfile
 import unittest
-from unittest import mock
+import sys
 
-from django_migration_linter.utils import get_default_cache_file
 from tests import fixtures
 
-from django_migration_linter import MigrationLinter
-from tests.fixtures import ADD_NOT_NULL_COLUMN_PROJECT
+from django_migration_linter import MigrationLinter, Cache, DEFAULT_CACHE_PATH
+
+if sys.version_info >= (3, 3):
+    import unittest.mock as mock
+else:
+    import mock
+
 
 
 class CacheTest(unittest.TestCase):
-    MIGRATION_FILE = os.path.join(ADD_NOT_NULL_COLUMN_PROJECT, 'test_app', 'migrations', '0001_create_table.py')
+    MIGRATION_FILE = os.path.join(fixtures.ALTER_COLUMN_PROJECT, 'test_app', 'migrations', '0001_initial.py')
     fd, temp_path = tempfile.mkstemp()
 
     def setUp(self):
@@ -36,50 +41,83 @@ class CacheTest(unittest.TestCase):
         os.remove(self.temp_path)
 
     def test_cache_normal(self):
-        if os.path.exists(get_default_cache_file('test_project_add_not_null_column')):
-            os.remove(get_default_cache_file('test_project_add_not_null_column'))
+        cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_project_add_not_null_column.pickle')
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
         linter = MigrationLinter(fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
-        linter.lint_all_migrations()
-        cache = linter.get_cache()
-        self.assertEqual(cache['hash']['result'], 'OK')
-        self.assertEqual(cache['hashERR']['result'], 'ERR')
-        self.assertDictEqual(cache['hashERR']['errors'], ...)
 
-        with mock.patch(
-                'subprocess.Popen'
-        ) as popen_mock:
+        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql)as sql_mock:
             linter.lint_all_migrations()
-        self.assertEqual(popen_mock.call_count, 2)
+            sql_mock.assert_called()
 
-        with mock.patch(
-                'subprocess.Popen'
-        ) as popen_mock:
+        cache = Cache(
+            fixtures.ADD_NOT_NULL_COLUMN_PROJECT,
+            DEFAULT_CACHE_PATH
+        )
+        cache.load()
+
+        self.assertEqual(cache['3ef74e7f3e53e273e2fc95379248d58d']['result'], 'OK')
+        self.assertEqual(cache['e1e312b6d08ecbe017c25c58fc2be257']['result'], 'ERR')
+        self.assertListEqual(
+            cache['e1e312b6d08ecbe017c25c58fc2be257']['errors'],
+            [{'err_msg': 'RENAMING tables', 'code': 'RENAME_TABLE', 'table': None, 'column': None}]
+        )
+
+        # Start the Linter again -> should use cache now.
+        linter = MigrationLinter(fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
+
+        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql)as sql_mock:
             linter.lint_all_migrations()
+            sql_mock.assert_not_called()
 
-        self.assertEqual(popen_mock.call_count, 0)
-        self.assertFalse(linter.has_errors())
+        self.assertTrue(linter.has_errors)
 
     def test_cache_ignored(self):
         pass
 
     def test_cache_modified(self):
-        if os.path.exists(get_default_cache_file('test_project_add_not_null_column')):
-            os.remove(get_default_cache_file('test_project_add_not_null_column'))
-        linter = MigrationLinter(fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
+        cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_project_alter_column.pickle')
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
+        linter = MigrationLinter(fixtures.ALTER_COLUMN_PROJECT)
         linter.lint_all_migrations()
-        cache = linter.get_cache()
-        self.assertEqual(cache['hash']['result'], 'OK')
-        self.assertEqual(cache['hashERR']['result'], 'ERR')
-        self.assertDictEqual(cache['hashERR']['errors'], ...)
+        cache = Cache(
+            fixtures.ALTER_COLUMN_PROJECT,
+            DEFAULT_CACHE_PATH
+        )
+        cache.load()
 
-        with open( self.MIGRATION_FILE, "a") as f:
+        self.assertEqual(cache['8589aa107b6da296c4b49cd2681d2230']['result'], 'OK',
+                         'If this fails, tearDown might have failed to remove '
+                         'the modification from tests/test_project_fixtures/'
+                         'test_project_alter_column/test_app/migrations/0001_initial.py'
+                         )
+        self.assertEqual(cache['8f54c4a434cfaa9838e8ca12eb988255']['result'], 'ERR')
+        self.assertListEqual(
+            cache['8f54c4a434cfaa9838e8ca12eb988255']['errors'],
+            [{u'err_msg': u'ALTERING columns (Could be backward compatible. '
+                          u'You may ignore this migration.)',
+              u'code': u'ALTER_COLUMN',
+              u'table': u'test_app_a',
+              u'column': None}
+             ]
+        )
+
+        # Modify migration
+        with open(self.MIGRATION_FILE, "a") as f:
             f.write("# modification at the end of the file\n")
 
+        # Start the Linter again -> Cache should look different now
+        linter = MigrationLinter(fixtures.ALTER_COLUMN_PROJECT)
         linter.lint_all_migrations()
-        cache = linter.get_cache()
+        cache = Cache(
+            fixtures.ALTER_COLUMN_PROJECT,
+            DEFAULT_CACHE_PATH
+        )
+        cache.load()
 
-        self.assertNotIn('hash', cache)
-        self.assertEqual(cache['newhash']['result'], 'OK')
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(cache)
 
-
-
+        self.assertNotIn('8589aa107b6da296c4b49cd2681d2230', cache)
+        self.assertEqual(cache['44f9d6d019d6f158946c2819b2bd8bf9']['result'], 'OK')

@@ -18,6 +18,10 @@ import os
 import re
 from subprocess import Popen, PIPE
 import sys
+
+from django_migration_linter.cache import Cache
+from django_migration_linter.constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
+from django_migration_linter.utils import split_migration_path
 from . import utils
 from .sql_analyser import analyse_sql_statements
 
@@ -25,7 +29,6 @@ logger = logging.getLogger(__name__)
 
 
 class MigrationLinter(object):
-    MIGRATION_FOLDER_NAME = 'migrations'
 
     def __init__(self, project_path, **kwargs):
         # Verify correctness
@@ -45,6 +48,9 @@ class MigrationLinter(object):
         self.include_apps = kwargs.get('include_apps', None)
         self.exclude_apps = kwargs.get('exclude_apps', None)
         self.database = kwargs.get('database', None) or 'default'
+        self.cache_path = kwargs.get('cache_path', None) or DEFAULT_CACHE_PATH
+        self.no_cache = kwargs.get('no_cache', None) or False
+
         self.python_exe = '{0}/bin/{1}'.format(sys.prefix, 'python') if \
             hasattr(sys, 'real_prefix') else 'python'
 
@@ -54,12 +60,37 @@ class MigrationLinter(object):
         self.nb_erroneous = 0
         self.nb_total = 0
 
+        # Initialise cache. Read from old, write to new to prune old entries.
+        self.old_cache = Cache(self.django_path, self.cache_path)
+        self.new_cache = Cache(self.django_path, self.cache_path)
+        if not self.no_cache:
+            self.old_cache.load()
+
     def lint_migration(self, app_name, migration_name):
         print('({0}, {1})... '.format(app_name, migration_name), end='')
         self.nb_total += 1
 
+        md5hash = self.old_cache.md5(app_name, migration_name)
+        if md5hash in self.old_cache:
+            if self.old_cache[md5hash]['result'] == 'IGNORE':
+                print('IGNORE (cached)')
+                self.nb_ignored += 1
+            elif self.old_cache[md5hash]['result'] == 'OK':
+                print('OK (cached)')
+                self.nb_valid += 1
+            else:
+                print('ERR (cached)')
+                self.nb_erroneous += 1
+
+            if 'errors' in self.old_cache[md5hash]:
+                self.print_errors(self.old_cache[md5hash]['errors'])
+
+            self.new_cache[md5hash] = self.old_cache[md5hash]
+            return
+
         if self.should_ignore_migration(app_name, migration_name):
             print('IGNORE')
+            self.new_cache[md5hash] = {'result': 'IGNORE'}
             self.nb_ignored += 1
             return
 
@@ -70,12 +101,17 @@ class MigrationLinter(object):
         errors = analysis_result['errors']
         if not errors:
             print('OK')
+            self.new_cache[md5hash] = {'result': 'OK'}
             self.nb_valid += 1
             return
 
-        # Print errors
         print('ERR')
+        self.new_cache[md5hash] = {'result': 'ERR', 'errors': errors}
         self.nb_erroneous += 1
+        self.print_errors(errors)
+
+    @staticmethod
+    def print_errors(errors):
         for err in errors:
             error_str = '\t{0}'.format(err['err_msg'])
             if err['table']:
@@ -100,6 +136,9 @@ class MigrationLinter(object):
         # Lint those migrations
         for m in migrations:
             self.lint_migration(*m)
+
+        if not self.no_cache:
+            self.new_cache.save()
 
     def print_summary(self):
         print('*** Summary:')
@@ -166,10 +205,10 @@ class MigrationLinter(object):
                 utils.clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if re.search(
-                    '\/{0}\/.*\.py'.format(self.MIGRATION_FOLDER_NAME),
+                    '\/{0}\/.*\.py'.format(MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
-                app_name, migration_name = self._split_migration_path(line)
+                app_name, migration_name = split_migration_path(line)
                 migrations.append((app_name, migration_name))
         diff_process.wait()
 
@@ -187,11 +226,11 @@ class MigrationLinter(object):
         migrations = []
         for root, dirs, files in os.walk(self.django_path):
             for file_name in files:
-                if os.path.basename(root) == self.MIGRATION_FOLDER_NAME and \
+                if os.path.basename(root) == MIGRATION_FOLDER_NAME and \
                         file_name.endswith('.py') and \
                         file_name != '__init__.py':
                     full_migration_path = os.path.join(root, file_name)
-                    app_name, migration_name = self._split_migration_path(
+                    app_name, migration_name = split_migration_path(
                         full_migration_path)
                     migrations.append((app_name, migration_name))
         return migrations
@@ -204,14 +243,6 @@ class MigrationLinter(object):
             or (self.ignore_name_contains and
                 self.ignore_name_contains in migration_name)\
             or (migration_name in self.ignore_name)
-
-    @classmethod
-    def _split_migration_path(cls, migration_path):
-        decomposed_path = utils.split_path(migration_path)
-        for i, p in enumerate(decomposed_path):
-            if p == cls.MIGRATION_FOLDER_NAME:
-                return (decomposed_path[i-1],
-                        os.path.splitext(decomposed_path[i+1])[0])
 
 
 def _main():
@@ -253,6 +284,17 @@ def _main():
         help=('specify the database for which to generate the SQL. '
               'Defaults to default'))
 
+    cache_group = parser.add_mutually_exclusive_group(
+        required=False)
+    cache_group.add_argument(
+        '--cache-path',
+        type=str,
+        help='specify a directory that should be used to store cache-files in.')
+    cache_group.add_argument(
+        '--no-cache',
+        action='store_true',
+        help='don\'t use a cache')
+
     incl_excl_group = parser.add_mutually_exclusive_group(
         required=False)
     incl_excl_group.add_argument(
@@ -280,7 +322,10 @@ def _main():
         ignore_name=args.ignore_name,
         include_apps=args.include_apps,
         exclude_apps=args.exclude_apps,
-        database=args.database)
+        database=args.database,
+        cache_path=args.cache_path,
+        no_cache=args.no_cache
+    )
     linter.lint_all_migrations(
         git_commit_id=args.commit_id)
     linter.print_summary()

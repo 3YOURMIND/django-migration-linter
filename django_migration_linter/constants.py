@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pathlib import Path
-
 from appdirs import user_cache_dir
 
-__VERSION__ = '0.0.7'
+__version__ = '0.0.7'
 
-DEFAULT_CACHE_PATH = Path(
-    user_cache_dir("django-migration-linter", version=__VERSION__)
+MIGRATION_FOLDER_NAME = 'migrations'
+
+DEFAULT_CACHE_PATH = user_cache_dir(
+    "django-migration-linter", version=__version__
 )

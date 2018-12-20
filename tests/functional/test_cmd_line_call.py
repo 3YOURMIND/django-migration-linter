@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import os
+import shutil
 import unittest
 from subprocess import Popen, PIPE
-from django_migration_linter import utils
-from django_migration_linter.utils import get_default_cache_file
+from django_migration_linter import utils, DEFAULT_CACHE_PATH
 from tests import fixtures
 import sys
 
@@ -29,7 +29,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         cls.linter_exec = '{0}/bin/{1}'.format(sys.prefix,  linter_name) if hasattr(sys, 'real_prefix') else linter_name
 
     def test_call_linter_cmd_line_working(self):
-        cmd = '{0} {1}'.format(self.linter_exec, fixtures.CORRECT_PROJECT)
+        cmd = '{0} --no-cache {1}'.format(self.linter_exec, fixtures.CORRECT_PROJECT)
 
         process = Popen(
             cmd, shell=True, stdout=PIPE, stderr=PIPE)
@@ -42,7 +42,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('OK'))
 
     def test_call_linter_cmd_line_errors(self):
-        cmd = '{0} {1}'.format(
+        cmd = '{0} --no-cache {1}'.format(
             self.linter_exec,
             fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
 
@@ -58,12 +58,12 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue('RENAMING tables' in lines[2])
 
     def test_call_linter_cmd_line_exclude_apps(self):
-        cmd = '{0} {1} --exclude-apps test_app2'.format(
+        cmd = '{0} --no-cache {1} --exclude-apps test_app2'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
         process = Popen(
-            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+            cmd, shell=True, stdout=PIPE, stderr=sys.stderr)
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
@@ -73,7 +73,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('IGNORE'))
 
     def test_call_linter_cmd_line_include_apps(self):
-        cmd = '{0} {1} --include-apps test_app2'.format(
+        cmd = '{0} --no-cache {1} --include-apps test_app2'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
@@ -88,7 +88,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('OK'))
 
     def test_call_linter_cmd_line_ignore_name(self):
-        cmd = '{0} {1} --ignore-name 0001_initial'.format(
+        cmd = '{0} --no-cache {1} --ignore-name 0001_initial'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
@@ -103,7 +103,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('OK'))
 
     def test_call_linter_cmd_line_ignore_name_contains(self):
-        cmd = '{0} {1} --ignore-name-contains 0001'.format(
+        cmd = '{0} --no-cache {1} --ignore-name-contains 0001'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT)
 
@@ -118,8 +118,9 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[2].endswith('IGNORE'))
 
     def test_call_linter_cmd_line_cache(self):
-        if os.path.exists(get_default_cache_file('test_correct_project')):
-            os.remove(get_default_cache_file('test_correct_project'))
+        cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_correct_project.pickle')
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
         cmd = '{0} {1}'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT
@@ -128,15 +129,15 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         process = Popen(
             cmd, shell=True, stdout=PIPE, stderr=PIPE)
         process.wait()
-        self.assertTrue(os.path.exists(get_default_cache_file('test_correct_project')))
+        self.assertTrue(os.path.exists(DEFAULT_CACHE_PATH))
 
     def test_call_linter_cmd_line_cache_path(self):
-        if os.path.exists('/tmp/migration-linter-cache-tests'):
-            os.remove('/tmp/migration-linter-cache-tests')
+        if os.path.exists('/tmp/migration-linter-cache-tests/'):
+            shutil.rmtree('/tmp/migration-linter-cache-tests/')
         cmd = '{0} {1} --cache-path={2}'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT,
-            '/tmp/migration-linter-cache-tests'
+            '/tmp/migration-linter-cache-tests/'
         )
 
         process = Popen(
@@ -146,10 +147,12 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(os.path.exists('/tmp/migration-linter-cache-tests'))
 
     def test_call_linter_cmd_line_no_cache(self):
-        if os.path.exists(get_default_cache_file('test_correct_project')):
-            os.remove(get_default_cache_file('test_correct_project'))
+        cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_correct_project.pickle')
+        print(cache_file)
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
 
-        cmd = '{0} {1} --no-cache'.format(
+        cmd = '{0} --no-cache {1}'.format(
             self.linter_exec,
             fixtures.CORRECT_PROJECT
         )
@@ -158,10 +161,10 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
             cmd, shell=True, stdout=PIPE, stderr=PIPE)
         process.wait()
         self.assertEqual(process.returncode, 0)
-        self.assertFalse(os.path.exists(get_default_cache_file('test_correct_project')))
+        self.assertFalse(os.path.exists(cache_file))
 
     def test_call_linter_cmd_line_git_id(self):
-        cmd = '{0} {1} d7125d5f4f0cc9623f670a66c54f131acc50032d'.format(
+        cmd = '{0} --no-cache {1} d7125d5f4f0cc9623f670a66c54f131acc50032d'.format(
             self.linter_exec,
             fixtures.MULTI_COMMIT_PROJECT)
         fixtures.prepare_git_project(fixtures.MULTI_COMMIT_PROJECT)
@@ -176,7 +179,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[1].startswith('*** Summary'))
 
     def test_call_linter_with_deleted_migrations(self):
-        cmd = '{0} {1} 154ecf6119325cc3b1f3f5a4e709bfbd61a4a4ba'.format(
+        cmd = '{0} --no-cache {1} 154ecf6119325cc3b1f3f5a4e709bfbd61a4a4ba'.format(
             self.linter_exec,
             fixtures.DELETED_MIGRATION_PROJECT)
         fixtures.prepare_git_project(fixtures.DELETED_MIGRATION_PROJECT)
