@@ -91,7 +91,6 @@ class MigrationLinter(object):
 
         if self.should_ignore_migration(app_name, migration_name):
             print('IGNORE')
-            self.new_cache[md5hash] = {'result': 'IGNORE'}
             self.nb_ignored += 1
             return
 

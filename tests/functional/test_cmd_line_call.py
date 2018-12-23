@@ -172,7 +172,6 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
 
     def test_call_linter_cmd_line_no_cache(self):
         cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_correct_project.pickle')
-        print(cache_file)
         if os.path.exists(cache_file):
             os.remove(cache_file)
 

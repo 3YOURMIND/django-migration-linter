@@ -33,18 +33,15 @@ class Cache(dict):
 
     def load(self):
         try:
-            f = open(self.filename, 'rb')
-            tmp_dict = pickle.load(f)
-            self.update(tmp_dict)
-            f.close()
+            with open(self.filename, 'rb') as f:
+                tmp_dict = pickle.load(f)
+                self.update(tmp_dict)
         except IOError:
             pass
 
     def save(self):
-        print(self)
-        f = open(self.filename, 'wb')
-        pickle.dump(self, f, 2)
-        f.close()
+        with open(self.filename, 'wb') as f:
+            pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def md5(self, app_name, migration):
         path = compose_migration_path(self.django_folder, app_name, migration)

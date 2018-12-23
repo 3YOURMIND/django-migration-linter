@@ -65,7 +65,7 @@ class CacheTest(unittest.TestCase):
         # Start the Linter again -> should use cache now.
         linter = MigrationLinter(fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
 
-        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql)as sql_mock:
+        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
             sql_mock.assert_not_called()
 
@@ -77,7 +77,7 @@ class CacheTest(unittest.TestCase):
             os.remove(cache_file)
         linter = MigrationLinter(fixtures.IGNORE_MIGRATION_PROJECT)
 
-        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql)as sql_mock:
+        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
             sql_mock.assert_called()
 
@@ -93,9 +93,29 @@ class CacheTest(unittest.TestCase):
         # Start the Linter again -> should use cache now.
         linter = MigrationLinter(fixtures.IGNORE_MIGRATION_PROJECT)
 
-        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql)as sql_mock:
+        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
             sql_mock.assert_not_called()
+
+    def test_cache_ignored_command_line(self):
+        cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_project_ignore_migration.pickle')
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
+        linter = MigrationLinter(fixtures.IGNORE_MIGRATION_PROJECT,
+                                 ignore_name_contains='0001')
+
+        with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
+            linter.lint_all_migrations()
+            sql_mock.assert_called()
+
+        cache = Cache(
+            fixtures.IGNORE_MIGRATION_PROJECT,
+            DEFAULT_CACHE_PATH
+        )
+        cache.load()
+
+        self.assertNotIn('63230606af0eccaef7f1f78c537c624c', cache)
+        self.assertEqual(cache['5c5ca1780a9f28439c1defc1f32af894']['result'], 'IGNORE')
 
     def test_cache_modified(self):
         cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_project_alter_column.pickle')
