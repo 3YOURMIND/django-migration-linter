@@ -67,7 +67,7 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
             fixtures.CORRECT_PROJECT)
 
         process = Popen(
-            cmd, shell=True, stdout=PIPE, stderr=sys.stderr)
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))

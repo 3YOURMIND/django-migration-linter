@@ -41,6 +41,7 @@ class Cache(dict):
             pass
 
     def save(self):
+        print(self)
         f = open(self.filename, 'wb')
         pickle.dump(self, f, 2)
         f.close()

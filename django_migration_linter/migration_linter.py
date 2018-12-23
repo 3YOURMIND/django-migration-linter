@@ -103,6 +103,7 @@ class MigrationLinter(object):
 
         if analysis_result['ignored']:
             print('IGNORE')
+            self.new_cache[md5hash] = {'result': 'IGNORE'}
             self.nb_ignored += 1
             return
 
