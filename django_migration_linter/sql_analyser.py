@@ -15,7 +15,9 @@
 import re
 import logging
 
-from django_migration_linter.constants import IGNORE_MIGRATION
+from django_migration_linter.operations import IGNORE_MIGRATION_SQL
+
+IGNORED_MIGRATION = "IGNORED_MIGRATION"
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +68,8 @@ migration_tests = (
         'fn': has_default,
         'err_msg': ''
     }, {
-        'code': 'IGNORED_MIGRATION',
-        'fn': lambda sql, **kw: re.search(IGNORE_MIGRATION[0], sql),
+        'code': IGNORED_MIGRATION,
+        'fn': lambda sql, **kw: re.search(IGNORE_MIGRATION_SQL, sql),
         'err_msg': '',
     }
 )
@@ -79,7 +81,7 @@ def analyse_sql_statements(sql_statements):
     for statement in sql_statements:
         for test in migration_tests:
             if test['fn'](statement, errors=errors):
-                if test['code'] == 'IGNORED_MIGRATION':
+                if test['code'] == IGNORED_MIGRATION:
                     logger.info(
                         'Testing {0} -- IGNORING MIGRATION'.format(statement)
                     )

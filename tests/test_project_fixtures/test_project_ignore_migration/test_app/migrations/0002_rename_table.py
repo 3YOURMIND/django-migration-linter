@@ -4,8 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
-from django_migration_linter import IGNORE_MIGRATION
-
+import django_migration_linter as linter
 
 class Migration(migrations.Migration):
 
@@ -14,7 +13,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(IGNORE_MIGRATION),
+        linter.IgnoreMigration(),
         migrations.RenameModel(
             old_name='A',
             new_name='B',
