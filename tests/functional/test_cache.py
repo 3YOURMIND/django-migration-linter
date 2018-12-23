@@ -47,7 +47,7 @@ class CacheTest(unittest.TestCase):
 
         with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql)as sql_mock:
             linter.lint_all_migrations()
-            sql_mock.assert_called()
+            self.assertEqual(sql_mock.call_count, 2)
 
         cache = Cache(
             fixtures.ADD_NOT_NULL_COLUMN_PROJECT,
@@ -67,7 +67,7 @@ class CacheTest(unittest.TestCase):
 
         with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
-            sql_mock.assert_not_called()
+            self.assertEqual(sql_mock.call_count, 0)
 
         self.assertTrue(linter.has_errors)
 
@@ -79,7 +79,7 @@ class CacheTest(unittest.TestCase):
 
         with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
-            sql_mock.assert_called()
+            self.assertEqual(sql_mock.call_count, 2)
 
         cache = Cache(
             fixtures.IGNORE_MIGRATION_PROJECT,
@@ -95,7 +95,7 @@ class CacheTest(unittest.TestCase):
 
         with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
-            sql_mock.assert_not_called()
+            self.assertEqual(sql_mock.call_count, 0)
 
     def test_cache_ignored_command_line(self):
         cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_project_ignore_migration.pickle')
@@ -106,7 +106,7 @@ class CacheTest(unittest.TestCase):
 
         with mock.patch.object(MigrationLinter, 'get_sql', wraps=linter.get_sql) as sql_mock:
             linter.lint_all_migrations()
-            sql_mock.assert_called()
+            self.assertEqual(sql_mock.call_count, 1)
 
         cache = Cache(
             fixtures.IGNORE_MIGRATION_PROJECT,

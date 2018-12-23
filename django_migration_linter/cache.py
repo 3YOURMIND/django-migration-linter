@@ -41,7 +41,7 @@ class Cache(dict):
 
     def save(self):
         with open(self.filename, 'wb') as f:
-            pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self, f, protocol=2)
 
     def md5(self, app_name, migration):
         path = compose_migration_path(self.django_folder, app_name, migration)
