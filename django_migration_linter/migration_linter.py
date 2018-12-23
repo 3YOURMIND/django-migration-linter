@@ -100,6 +100,12 @@ class MigrationLinter(object):
         analysis_result = analyse_sql_statements(
             sql_statements)
         errors = analysis_result['errors']
+
+        if analysis_result['ignored']:
+            print('IGNORE')
+            self.nb_ignored += 1
+            return
+
         if not errors:
             print('OK')
             self.new_cache[md5hash] = {'result': 'OK'}
@@ -206,7 +212,7 @@ class MigrationLinter(object):
                 utils.clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if re.search(
-                    '\/{0}\/.*\.py'.format(MIGRATION_FOLDER_NAME),
+                    r'\/{0}\/.*\.py'.format(MIGRATION_FOLDER_NAME),
                     line) and \
                         '__init__' not in line:
                 app_name, migration_name = split_migration_path(line)
@@ -226,7 +232,7 @@ class MigrationLinter(object):
     def _gather_all_migrations(self):
         migrations = []
         for root, dirs, files in os.walk(self.django_path):
-            for file_name in files:
+            for file_name in sorted(files):
                 if os.path.basename(root) == MIGRATION_FOLDER_NAME and \
                         file_name.endswith('.py') and \
                         file_name != '__init__.py':

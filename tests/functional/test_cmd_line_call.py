@@ -37,9 +37,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
         self.assertEqual(len(lines), 5)
-        self.assertTrue(lines[0].endswith('OK'))
-        self.assertTrue(lines[1].endswith('OK'))
-        self.assertTrue(lines[2].endswith('OK'))
+        self.assertEqual(
+            sorted(lines[:3]),
+            sorted([
+                 "(test_app1, 0001_initial)... OK",
+                 "(test_app1, 0002_a_new_null_field)... OK",
+                 "(test_app2, 0001_foo)... OK",
+             ])
+        )
 
     def test_call_linter_cmd_line_errors(self):
         cmd = '{0} --no-cache {1}'.format(
@@ -52,7 +57,6 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertNotEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
         self.assertEqual(len(lines), 5)
-        print(lines)
         self.assertTrue(lines[0].endswith('OK'))
         self.assertTrue(lines[1].endswith('ERR'))
         self.assertTrue('RENAMING tables' in lines[2])
@@ -68,9 +72,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
         self.assertEqual(len(lines), 5)
-        self.assertTrue(lines[0].endswith('OK'))
-        self.assertTrue(lines[1].endswith('OK'))
-        self.assertTrue(lines[2].endswith('IGNORE'))
+        self.assertEqual(
+            sorted(lines[:3]),
+            sorted([
+                 "(test_app1, 0001_initial)... OK",
+                 "(test_app1, 0002_a_new_null_field)... OK",
+                 "(test_app2, 0001_foo)... IGNORE",
+             ])
+        )
 
     def test_call_linter_cmd_line_include_apps(self):
         cmd = '{0} --no-cache {1} --include-apps test_app2'.format(
@@ -83,9 +92,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
         self.assertEqual(len(lines), 5)
-        self.assertTrue(lines[0].endswith('IGNORE'))
-        self.assertTrue(lines[1].endswith('IGNORE'))
-        self.assertTrue(lines[2].endswith('OK'))
+        self.assertEqual(
+            sorted(lines[:3]),
+            sorted([
+                 "(test_app1, 0001_initial)... IGNORE",
+                 "(test_app1, 0002_a_new_null_field)... IGNORE",
+                 "(test_app2, 0001_foo)... OK",
+             ])
+        )
 
     def test_call_linter_cmd_line_ignore_name(self):
         cmd = '{0} --no-cache {1} --ignore-name 0001_initial'.format(
@@ -98,9 +112,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
         self.assertEqual(len(lines), 5)
-        self.assertTrue(lines[0].endswith('IGNORE'))
-        self.assertTrue(lines[1].endswith('OK'))
-        self.assertTrue(lines[2].endswith('OK'))
+        self.assertEqual(
+            sorted(lines[:3]),
+            sorted([
+                 "(test_app1, 0001_initial)... IGNORE",
+                 "(test_app1, 0002_a_new_null_field)... OK",
+                 "(test_app2, 0001_foo)... OK",
+             ])
+        )
 
     def test_call_linter_cmd_line_ignore_name_contains(self):
         cmd = '{0} --no-cache {1} --ignore-name-contains 0001'.format(
@@ -113,9 +132,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
         self.assertEqual(len(lines), 5)
-        self.assertTrue(lines[0].endswith('IGNORE'))
-        self.assertTrue(lines[1].endswith('OK'))
-        self.assertTrue(lines[2].endswith('IGNORE'))
+        self.assertEqual(
+            sorted(lines[:3]),
+            sorted([
+                 "(test_app1, 0001_initial)... IGNORE",
+                 "(test_app1, 0002_a_new_null_field)... OK",
+                 "(test_app2, 0001_foo)... IGNORE",
+             ])
+        )
 
     def test_call_linter_cmd_line_cache(self):
         cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_correct_project.pickle')

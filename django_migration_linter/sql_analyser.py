@@ -15,6 +15,10 @@
 import re
 import logging
 
+from django_migration_linter.operations import IGNORE_MIGRATION_SQL
+
+IGNORED_MIGRATION = "IGNORED_MIGRATION"
+
 logger = logging.getLogger(__name__)
 
 
@@ -63,29 +67,45 @@ migration_tests = (
         'code': '',
         'fn': has_default,
         'err_msg': ''
+    }, {
+        'code': IGNORED_MIGRATION,
+        'fn': lambda sql, **kw: re.search(IGNORE_MIGRATION_SQL, sql),
+        'err_msg': '',
     }
 )
 
 
 def analyse_sql_statements(sql_statements):
     errors = []
+    ignored = False
     for statement in sql_statements:
         for test in migration_tests:
             if test['fn'](statement, errors=errors):
-                logger.info('Testing {0} -- ERROR'.format(statement))
-                table_search = re.search(
-                    'TABLE `([^`]*)`', statement, re.IGNORECASE)
-                col_search = re.search(
-                    'COLUMN `([^`]*)`', statement, re.IGNORECASE)
-                err = {
-                    'err_msg': test['err_msg'],
-                    'code': test['code'],
-                    'table': table_search.group(1) if table_search else None,
-                    'column': col_search.group(1) if col_search else None
-                }
-                errors.append(err)
+                if test['code'] == IGNORED_MIGRATION:
+                    logger.info(
+                        'Testing {0} -- IGNORING MIGRATION'.format(statement)
+                    )
+                    ignored = True
+                else:
+                    logger.info('Testing {0} -- ERROR'.format(statement))
+                    table_search = re.search(
+                        'TABLE `([^`]*)`', statement, re.IGNORECASE)
+                    col_search = re.search(
+                        'COLUMN `([^`]*)`', statement, re.IGNORECASE)
+                    err = {
+                        'err_msg':
+                            test['err_msg'],
+                        'code':
+                            test['code'],
+                        'table':
+                            table_search.group(1) if table_search else None,
+                        'column':
+                            col_search.group(1) if col_search else None
+                    }
+                    errors.append(err)
             else:
                 logger.info('Testing {0} -- PASSED'.format(statement))
     return {
         'errors': errors,
+        'ignored': ignored
     }

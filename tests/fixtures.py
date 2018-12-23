@@ -40,6 +40,8 @@ CORRECT_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_correct_project/')
 DELETED_MIGRATION_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_deleted_migration_project/')
+IGNORE_MIGRATION_PROJECT = os.path.join(
+    _FIXTURES_FOLDER, 'test_project_ignore_migration/')
 
 NOT_DJANGO_GIT_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_git_project/')
