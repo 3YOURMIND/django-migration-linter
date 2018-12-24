@@ -26,12 +26,10 @@ class IgnoreMigration(Operation):
     def state_forwards(self, app_label, state):
         pass
 
-    def database_forwards(
-            self, app_label, schema_editor, from_state, to_state):
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
         schema_editor.execute(IGNORE_MIGRATION_SQL)
 
-    def database_backwards(
-            self, app_label, schema_editor, from_state, to_state):
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
         schema_editor.execute(IGNORE_MIGRATION_SQL + "(reversed)")
 
     def describe(self):
