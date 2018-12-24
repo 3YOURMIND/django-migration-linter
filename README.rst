@@ -44,6 +44,8 @@ Usage
 ``--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]`` Ignore migrations that are in the specified django apps.
 ``--verbose or -v``                                Print more information during execution.
 ``--database DATABASE``                            Specify the database for which to generate the SQL. Defaults to *default*.
+``--cache-path PATH``                              specify a directory that should be used to store cache-files in.
+``--no-cache``                                     Don't use a cache.
 ================================================== ===========================================================================================================================
 
 Examples
@@ -68,6 +70,15 @@ You can also ignore migrations by adding this to your migrations:
         ]
     # ...
 
+Cache
+-----
+By default, the linter uses a cache to prevent linting the same migration again.
+The default location of the cache on Linux is
+``/home/<username>/.cache/django-migration-linter/<version>/<ldjango-project>.pickle``.
+
+Since the linter uses hashes, modifying migration files, will re-run the linter on that migration.
+If you want to run the linter without cache, use the flag ``--no-cache``.
+If you want to invalidate the cache, delete the cache folder.
 
 Tests
 -----

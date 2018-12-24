@@ -16,7 +16,8 @@ import os
 import unittest
 
 from tests import fixtures
-from django_migration_linter.utils import is_django_project, is_git_project, is_directory, find_project_settings_module, split_path
+from django_migration_linter.utils import is_django_project, is_git_project, is_directory, find_project_settings_module, \
+    split_path, split_migration_path
 
 
 class UtilityFunctionTest(unittest.TestCase):
@@ -70,3 +71,21 @@ class UtilityFunctionTest(unittest.TestCase):
         self.assertEqual(splitted[0], 'foo')
         self.assertEqual(splitted[1], 'bar')
         self.assertEqual(splitted[2], 'fuz.py')
+
+    def test_split_migration_long_path(self):
+        input_path = 'apps/the_app/migrations/0001_stuff.py'
+        app, mig = split_migration_path(input_path)
+        self.assertEqual(app, 'the_app')
+        self.assertEqual(mig, '0001_stuff')
+
+    def test_split_migration_path(self):
+        input_path = 'the_app/migrations/0001_stuff.py'
+        app, mig = split_migration_path(input_path)
+        self.assertEqual(app, 'the_app')
+        self.assertEqual(mig, '0001_stuff')
+
+    def test_split_migration_full_path(self):
+        input_path = '/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py'
+        app, mig = split_migration_path(input_path)
+        self.assertEqual(app, 'the_app')
+        self.assertEqual(mig, '0001_stuff')

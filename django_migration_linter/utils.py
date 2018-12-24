@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from __future__ import print_function
+
 import os
 import sys
+
+from django_migration_linter.constants import MIGRATION_FOLDER_NAME
 
 
 def is_django_project(path):
@@ -50,6 +53,23 @@ def find_project_settings_module(path):
 def split_path(path):
     a, b = os.path.split(path)
     return (split_path(a) if (len(a) > 0 and a != '/') else []) + [b]
+
+
+def split_migration_path(migration_path):
+    decomposed_path = split_path(migration_path)
+    for i, p in enumerate(decomposed_path):
+        if p == MIGRATION_FOLDER_NAME:
+            return (decomposed_path[i-1],
+                    os.path.splitext(decomposed_path[i+1])[0])
+
+
+def compose_migration_path(django_folder, app_name, migration):
+    return os.path.join(
+        django_folder,
+        app_name,
+        MIGRATION_FOLDER_NAME,
+        '{0}.py'.format(migration)
+    )
 
 
 def clean_bytes_to_str(byte_input):

@@ -32,13 +32,13 @@ class TestLinterFunctions(unittest.TestCase):
         linter = MigrationLinter(project_path)
         self.assertFalse(linter.has_errors)
 
-        linter.lint_migration('test_app', '0001')
+        linter.lint_migration('test_app', '0001_create_table')
         self.assertFalse(linter.has_errors)
 
-        linter.lint_migration('test_app', '0002')
+        linter.lint_migration('test_app', '0002_add_new_not_null_field')
         self.assertTrue(linter.has_errors)
 
-        linter.lint_migration('test_app', '0001')
+        linter.lint_migration('test_app', '0001_create_table')
         self.assertTrue(linter.has_errors)
 
     def test_linter_creation(self):
@@ -48,24 +48,6 @@ class TestLinterFunctions(unittest.TestCase):
             MigrationLinter('/dev/null')
         with self.assertRaises(ValueError):
             MigrationLinter(fixtures.NOT_DJANGO_GIT_PROJECT)
-
-    def test_split_migration_long_path(self):
-        input_path = 'apps/the_app/migrations/0001_stuff.py'
-        app, mig = MigrationLinter._split_migration_path(input_path)
-        self.assertEqual(app, 'the_app')
-        self.assertEqual(mig, '0001_stuff')
-
-    def test_split_migration_path(self):
-        input_path = 'the_app/migrations/0001_stuff.py'
-        app, mig = MigrationLinter._split_migration_path(input_path)
-        self.assertEqual(app, 'the_app')
-        self.assertEqual(mig, '0001_stuff')
-
-    def test_split_migration_full_path(self):
-        input_path = '/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py'
-        app, mig = MigrationLinter._split_migration_path(input_path)
-        self.assertEqual(app, 'the_app')
-        self.assertEqual(mig, '0001_stuff')
 
     def test_ignore_migration_include_apps(self):
         linter = MigrationLinter(

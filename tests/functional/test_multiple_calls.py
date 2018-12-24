@@ -24,10 +24,10 @@ class TestMultipleLinters(unittest.TestCase):
         l2 = MigrationLinter(fixtures.RENAME_COLUMN_PROJECT)
         l3 = MigrationLinter(fixtures.CORRECT_PROJECT)
 
-        l1.lint_migration('test_app', '0002')
-        l2.lint_migration('test_app', '0002')
-        l3.lint_migration('test_app1', '0001')
-        l3.lint_migration('test_app1', '0002')
+        l1.lint_migration('test_app', '0002_add_new_not_null_field')
+        l2.lint_migration('test_app', '0002_rename_column')
+        l3.lint_migration('test_app1', '0001_initial')
+        l3.lint_migration('test_app1', '0002_a_new_null_field')
 
         self.assertTrue(l1.has_errors)
         self.assertTrue(l2.has_errors)
