@@ -14,7 +14,7 @@
 
 from appdirs import user_cache_dir
 
-__version__ = "0.0.7"
+__version__ = "0.1.0"
 
 MIGRATION_FOLDER_NAME = "migrations"
 

@@ -51,7 +51,7 @@ Usage
 Examples
 --------
 
-3YOURMIND is running the linter on `Bitbucket Pipelines`_ on every build getting pushed.
+3YOURMIND is running the linter on every build getting pushed through CI.
 Checkout the ``examples/`` folder to see how you could integrate the linter in your test suite.
 
 Ignoring migrations
