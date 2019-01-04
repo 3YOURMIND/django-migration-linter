@@ -80,12 +80,13 @@ class TestLinterFunctions(unittest.TestCase):
     def test_gather_all_migrations(self):
         linter = MigrationLinter(fixtures.CORRECT_PROJECT)
         migrations = linter._gather_all_migrations()
-        self.assertEqual(len(migrations), 3)
+        self.assertEqual(len(migrations), 4)
         self.assertEqual(
             sorted(migrations),
             sorted([
                 ("test_app1", "0001_initial"),
                 ("test_app1", "0002_a_new_null_field"),
                 ("test_app2", "0001_foo"),
+                ("test_app3", "0001_initial"),
             ])
         )
