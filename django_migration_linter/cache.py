@@ -16,7 +16,7 @@ import hashlib
 import os
 import pickle
 
-from django_migration_linter.utils import split_path
+from .utils import split_path
 
 
 class Cache(dict):

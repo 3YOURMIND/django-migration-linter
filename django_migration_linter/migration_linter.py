@@ -19,10 +19,10 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
-from django_migration_linter.cache import Cache
-from django_migration_linter.constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
-from . import utils
+from .cache import Cache
+from .constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
 from .migration import Migration
+from .utils import is_directory, is_django_project, is_git_project, clean_bytes_to_str
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
@@ -31,13 +31,13 @@ logger = logging.getLogger(__name__)
 class MigrationLinter(object):
     def __init__(self, project_path, **kwargs):
         # Verify correctness
-        if not utils.is_directory(project_path):
+        if not is_directory(project_path):
             raise ValueError(
                 "The given path {0} does not seem to be a directory.".format(
                     project_path
                 )
             )
-        if not utils.is_django_project(project_path):
+        if not is_django_project(project_path):
             raise ValueError(
                 ("The given path {0} does not " "seem to be a django project.").format(
                     project_path
@@ -136,7 +136,7 @@ class MigrationLinter(object):
     def lint_all_migrations(self, git_commit_id=None):
         # Collect migrations
         if git_commit_id:
-            if not utils.is_git_project(self.django_path):
+            if not is_git_project(self.django_path):
                 raise ValueError(
                     (
                         "The given project {0} does not seem " "to be versioned by git."
@@ -190,9 +190,7 @@ class MigrationLinter(object):
         )
 
         sql_statements = []
-        for line in map(
-            utils.clean_bytes_to_str, sqlmigrate_process.stdout.readlines()
-        ):
+        for line in map(clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
             sql_statements.append(line)
         sqlmigrate_process.wait()
         if sqlmigrate_process.returncode != 0:
@@ -211,7 +209,7 @@ class MigrationLinter(object):
         ).format(self.django_path, git_commit_id)
         logger.info("Executing {0}".format(git_diff_command))
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
-        for line in map(utils.clean_bytes_to_str, diff_process.stdout.readlines()):
+        for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if (
                 re.search(r"\/{0}\/.*\.py".format(MIGRATION_FOLDER_NAME), line)
@@ -222,7 +220,7 @@ class MigrationLinter(object):
 
         if diff_process.returncode != 0:
             output = []
-            for line in map(utils.clean_bytes_to_str, diff_process.stderr.readlines()):
+            for line in map(clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
             logger.info("Error while git diff command:\n{}".format("".join(output)))
             raise Exception("Error while executing git diff command")
