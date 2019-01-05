@@ -36,13 +36,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
-        self.assertEqual(len(lines), 5)
+        self.assertEqual(len(lines), 6)
         self.assertEqual(
-            sorted(lines[:3]),
+            sorted(lines[:4]),
             sorted([
                  "(test_app1, 0001_initial)... OK",
                  "(test_app1, 0002_a_new_null_field)... OK",
                  "(test_app2, 0001_foo)... OK",
+                 "(test_app3, 0001_initial)... OK",
              ])
         )
 
@@ -71,13 +72,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
-        self.assertEqual(len(lines), 5)
+        self.assertEqual(len(lines), 6)
         self.assertEqual(
-            sorted(lines[:3]),
+            sorted(lines[:4]),
             sorted([
                  "(test_app1, 0001_initial)... OK",
                  "(test_app1, 0002_a_new_null_field)... OK",
                  "(test_app2, 0001_foo)... IGNORE",
+                 "(test_app3, 0001_initial)... OK",
              ])
         )
 
@@ -91,13 +93,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
-        self.assertEqual(len(lines), 5)
+        self.assertEqual(len(lines), 6)
         self.assertEqual(
-            sorted(lines[:3]),
+            sorted(lines[:4]),
             sorted([
                  "(test_app1, 0001_initial)... IGNORE",
                  "(test_app1, 0002_a_new_null_field)... IGNORE",
                  "(test_app2, 0001_foo)... OK",
+                 "(test_app3, 0001_initial)... IGNORE",
              ])
         )
 
@@ -111,13 +114,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
-        self.assertEqual(len(lines), 5)
+        self.assertEqual(len(lines), 6)
         self.assertEqual(
-            sorted(lines[:3]),
+            sorted(lines[:4]),
             sorted([
                  "(test_app1, 0001_initial)... IGNORE",
                  "(test_app1, 0002_a_new_null_field)... OK",
                  "(test_app2, 0001_foo)... OK",
+                 "(test_app3, 0001_initial)... IGNORE",
              ])
         )
 
@@ -131,13 +135,14 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         process.wait()
         self.assertEqual(process.returncode, 0)
         lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
-        self.assertEqual(len(lines), 5)
+        self.assertEqual(len(lines), 6)
         self.assertEqual(
-            sorted(lines[:3]),
+            sorted(lines[:4]),
             sorted([
                  "(test_app1, 0001_initial)... IGNORE",
                  "(test_app1, 0002_a_new_null_field)... OK",
                  "(test_app2, 0001_foo)... IGNORE",
+                 "(test_app3, 0001_initial)... IGNORE",
              ])
         )
 
