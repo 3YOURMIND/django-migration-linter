@@ -15,7 +15,7 @@
 import re
 import logging
 
-from django_migration_linter.operations import IGNORE_MIGRATION_SQL
+from .operations import IGNORE_MIGRATION_SQL
 
 IGNORED_MIGRATION = "IGNORED_MIGRATION"
 
