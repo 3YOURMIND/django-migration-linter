@@ -217,7 +217,7 @@ class MigrationLinter(object):
             output = []
             for line in map(utils.clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
-            logger.info("Error while git diff command:\n{}".format("".join(output)))
+            logger.error("Error while git diff command:\n{}".format("".join(output)))
             raise Exception("Error while executing git diff command")
         return migrations
 
