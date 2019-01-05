@@ -217,7 +217,7 @@ class MigrationLinter(object):
                 re.search(r"\/{0}\/.*\.py".format(MIGRATION_FOLDER_NAME), line)
                 and "__init__" not in line
             ):
-                migrations.append(Migration(line))
+                migrations.append(Migration(os.path.join(self.django_path, line)))
         diff_process.wait()
 
         if diff_process.returncode != 0:

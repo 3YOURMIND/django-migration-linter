@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import unittest
+import os
 
 from django_migration_linter import MigrationLinter
+from django_migration_linter.migration import Migration
 from tests import fixtures
 
 
@@ -32,13 +34,16 @@ class TestLinterFunctions(unittest.TestCase):
         linter = MigrationLinter(project_path)
         self.assertFalse(linter.has_errors)
 
-        linter.lint_migration('test_app', '0001_create_table')
+        m = Migration(os.path.join(project_path, 'test_app/migrations/0001_create_table.py'))
+        linter.lint_migration(m)
         self.assertFalse(linter.has_errors)
 
-        linter.lint_migration('test_app', '0002_add_new_not_null_field')
+        m = Migration(os.path.join(project_path, 'test_app/migrations/0002_add_new_not_null_field.py'))
+        linter.lint_migration(m)
         self.assertTrue(linter.has_errors)
 
-        linter.lint_migration('test_app', '0001_create_table')
+        m = Migration(os.path.join(project_path, 'test_app/migrations/0001_create_table.py'))
+        linter.lint_migration(m)
         self.assertTrue(linter.has_errors)
 
     def test_linter_creation(self):
@@ -82,7 +87,7 @@ class TestLinterFunctions(unittest.TestCase):
         migrations = linter._gather_all_migrations()
         self.assertEqual(len(migrations), 4)
         self.assertEqual(
-            sorted(migrations),
+            sorted([(m.app_name, m.name) for m in migrations]),
             sorted([
                 ("test_app1", "0001_initial"),
                 ("test_app1", "0002_a_new_null_field"),
