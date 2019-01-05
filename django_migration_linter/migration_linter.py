@@ -21,8 +21,8 @@ import sys
 
 from django_migration_linter.cache import Cache
 from django_migration_linter.constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
-from django_migration_linter.utils import split_migration_path
 from . import utils
+from .migration import Migration
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
@@ -72,11 +72,13 @@ class MigrationLinter(object):
         if not self.no_cache:
             self.old_cache.load()
 
-    def lint_migration(self, app_name, migration_name):
+    def lint_migration(self, migration):
+        app_name = migration.app_name
+        migration_name = migration.name
         print("({0}, {1})... ".format(app_name, migration_name), end="")
         self.nb_total += 1
 
-        md5hash = self.old_cache.md5(app_name, migration_name)
+        md5hash = self.old_cache.md5(migration.abs_path)
         if md5hash in self.old_cache:
             if self.old_cache[md5hash]["result"] == "IGNORE":
                 print("IGNORE (cached)")
@@ -146,7 +148,7 @@ class MigrationLinter(object):
 
         # Lint those migrations
         for m in migrations:
-            self.lint_migration(*m)
+            self.lint_migration(m)
 
         if not self.no_cache:
             self.new_cache.save()
@@ -215,8 +217,7 @@ class MigrationLinter(object):
                 re.search(r"\/{0}\/.*\.py".format(MIGRATION_FOLDER_NAME), line)
                 and "__init__" not in line
             ):
-                app_name, migration_name = split_migration_path(line)
-                migrations.append((app_name, migration_name))
+                migrations.append(Migration(line))
         diff_process.wait()
 
         if diff_process.returncode != 0:
@@ -237,8 +238,7 @@ class MigrationLinter(object):
                     and file_name != "__init__.py"
                 ):
                     full_migration_path = os.path.join(root, file_name)
-                    app_name, migration_name = split_migration_path(full_migration_path)
-                    migrations.append((app_name, migration_name))
+                    migrations.append(Migration(full_migration_path))
         return migrations
 
     def should_ignore_migration(self, app_name, migration_name):
