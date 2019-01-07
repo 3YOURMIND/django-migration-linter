@@ -22,7 +22,7 @@ import sys
 from .cache import Cache
 from .constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
 from .migration import Migration
-from .utils import is_directory, is_django_project, is_git_project, clean_bytes_to_str
+from .utils import is_directory, is_django_project, clean_bytes_to_str
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
