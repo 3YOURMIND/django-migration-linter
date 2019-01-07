@@ -22,7 +22,7 @@ import sys
 from .cache import Cache
 from .constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
 from .migration import Migration
-from .utils import is_directory, is_django_project, is_git_project, clean_bytes_to_str
+from .utils import is_directory, is_django_project, clean_bytes_to_str
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
@@ -136,12 +136,6 @@ class MigrationLinter(object):
     def lint_all_migrations(self, git_commit_id=None):
         # Collect migrations
         if git_commit_id:
-            if not is_git_project(self.django_path):
-                raise ValueError(
-                    (
-                        "The given project {0} does not seem " "to be versioned by git."
-                    ).format(self.django_path)
-                )
             migrations = self._gather_migrations_git(git_commit_id)
         else:
             migrations = self._gather_all_migrations()
@@ -180,7 +174,7 @@ class MigrationLinter(object):
         it allows to seperate the instances correctly.
         """
         sqlmigrate_command = (
-            "cd {0} && " "{1} manage.py sqlmigrate {2} {3} " "--database {4}"
+            "cd {0} && {1} manage.py sqlmigrate {2} {3} " "--database {4}"
         ).format(
             self.django_path, self.python_exe, app_name, migration_name, self.database
         )
@@ -205,7 +199,7 @@ class MigrationLinter(object):
         migrations = []
         # Get changes since specified commit
         git_diff_command = (
-            "cd {0} && " "git diff --name-only --diff-filter=A {1}"
+            "cd {0} && git diff --name-only --diff-filter=A {1}"
         ).format(self.django_path, git_commit_id)
         logger.info("Executing {0}".format(git_diff_command))
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
@@ -222,7 +216,7 @@ class MigrationLinter(object):
             output = []
             for line in map(clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
-            logger.info("Error while git diff command:\n{}".format("".join(output)))
+            logger.error("Error while git diff command:\n{}".format("".join(output)))
             raise Exception("Error while executing git diff command")
         return migrations
 

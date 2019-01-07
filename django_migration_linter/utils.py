@@ -25,11 +25,6 @@ def is_django_project(path):
     return os.path.isfile(django_manage_file)
 
 
-def is_git_project(path):
-    git_directory = os.path.join(path, ".git")
-    return os.path.isdir(git_directory)
-
-
 def is_directory(path):
     return os.path.isdir(path)
 
