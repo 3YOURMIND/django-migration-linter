@@ -19,10 +19,10 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
-from django_migration_linter.cache import Cache
-from django_migration_linter.constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
-from django_migration_linter.utils import split_migration_path
-from . import utils
+from .cache import Cache
+from .constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
+from .migration import Migration
+from .utils import is_directory, is_django_project, is_git_project, clean_bytes_to_str
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
@@ -31,13 +31,13 @@ logger = logging.getLogger(__name__)
 class MigrationLinter(object):
     def __init__(self, project_path, **kwargs):
         # Verify correctness
-        if not utils.is_directory(project_path):
+        if not is_directory(project_path):
             raise ValueError(
                 "The given path {0} does not seem to be a directory.".format(
                     project_path
                 )
             )
-        if not utils.is_django_project(project_path):
+        if not is_django_project(project_path):
             raise ValueError(
                 ("The given path {0} does not " "seem to be a django project.").format(
                     project_path
@@ -72,11 +72,13 @@ class MigrationLinter(object):
         if not self.no_cache:
             self.old_cache.load()
 
-    def lint_migration(self, app_name, migration_name):
+    def lint_migration(self, migration):
+        app_name = migration.app_name
+        migration_name = migration.name
         print("({0}, {1})... ".format(app_name, migration_name), end="")
         self.nb_total += 1
 
-        md5hash = self.old_cache.md5(app_name, migration_name)
+        md5hash = self.old_cache.md5(migration.abs_path)
         if md5hash in self.old_cache:
             if self.old_cache[md5hash]["result"] == "IGNORE":
                 print("IGNORE (cached)")
@@ -140,7 +142,7 @@ class MigrationLinter(object):
 
         # Lint those migrations
         for m in migrations:
-            self.lint_migration(*m)
+            self.lint_migration(m)
 
         if not self.no_cache:
             self.new_cache.save()
@@ -182,9 +184,7 @@ class MigrationLinter(object):
         )
 
         sql_statements = []
-        for line in map(
-            utils.clean_bytes_to_str, sqlmigrate_process.stdout.readlines()
-        ):
+        for line in map(clean_bytes_to_str, sqlmigrate_process.stdout.readlines()):
             sql_statements.append(line)
         sqlmigrate_process.wait()
         if sqlmigrate_process.returncode != 0:
@@ -203,19 +203,18 @@ class MigrationLinter(object):
         ).format(self.django_path, git_commit_id)
         logger.info("Executing {0}".format(git_diff_command))
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
-        for line in map(utils.clean_bytes_to_str, diff_process.stdout.readlines()):
+        for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if (
                 re.search(r"\/{0}\/.*\.py".format(MIGRATION_FOLDER_NAME), line)
                 and "__init__" not in line
             ):
-                app_name, migration_name = split_migration_path(line)
-                migrations.append((app_name, migration_name))
+                migrations.append(Migration(os.path.join(self.django_path, line)))
         diff_process.wait()
 
         if diff_process.returncode != 0:
             output = []
-            for line in map(utils.clean_bytes_to_str, diff_process.stderr.readlines()):
+            for line in map(clean_bytes_to_str, diff_process.stderr.readlines()):
                 output.append(line)
             logger.error("Error while git diff command:\n{}".format("".join(output)))
             raise Exception("Error while executing git diff command")
@@ -231,8 +230,7 @@ class MigrationLinter(object):
                     and file_name != "__init__.py"
                 ):
                     full_migration_path = os.path.join(root, file_name)
-                    app_name, migration_name = split_migration_path(full_migration_path)
-                    migrations.append((app_name, migration_name))
+                    migrations.append(Migration(full_migration_path))
         return migrations
 
     def should_ignore_migration(self, app_name, migration_name):

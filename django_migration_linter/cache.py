@@ -16,7 +16,7 @@ import hashlib
 import os
 import pickle
 
-from django_migration_linter.utils import split_path, compose_migration_path
+from .utils import split_path
 
 
 class Cache(dict):
@@ -42,8 +42,7 @@ class Cache(dict):
         with open(self.filename, "wb") as f:
             pickle.dump(self, f, protocol=2)
 
-    def md5(self, app_name, migration):
-        path = compose_migration_path(self.django_folder, app_name, migration)
+    def md5(self, path):
         hash_md5 = hashlib.md5()
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):

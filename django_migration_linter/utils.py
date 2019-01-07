@@ -17,7 +17,7 @@ from __future__ import print_function
 import os
 import sys
 
-from django_migration_linter.constants import MIGRATION_FOLDER_NAME
+from .constants import MIGRATION_FOLDER_NAME
 
 
 def is_django_project(path):
