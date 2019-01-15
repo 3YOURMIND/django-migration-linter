@@ -219,7 +219,7 @@ class MigrationLinter(object):
         git_root = self._get_git_root()
         # Get changes since specified commit
         git_diff_command = (
-            "cd {0} && git diff --name-only --diff-filter=A {1}"
+            "cd {0} && git diff --relative --name-only --diff-filter=A {1}"
         ).format(self.django_path, git_commit_id)
         logger.info("Executing {0}".format(git_diff_command))
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
