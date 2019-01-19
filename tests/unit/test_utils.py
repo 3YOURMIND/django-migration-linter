@@ -58,6 +58,12 @@ class UtilityFunctionTest(unittest.TestCase):
         self.assertEqual(splitted[1], 'bar')
         self.assertEqual(splitted[2], 'fuz.py')
 
+    def test_split_folder_path(self):
+        splitted = split_path('/foo/bar')
+        self.assertEqual(len(splitted), 2)
+        self.assertEqual(splitted[0], 'foo')
+        self.assertEqual(splitted[1], 'bar')
+
     def test_split_migration_long_path(self):
         input_path = 'apps/the_app/migrations/0001_stuff.py'
         app, mig = split_migration_path(input_path)

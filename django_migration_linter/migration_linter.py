@@ -45,7 +45,7 @@ class MigrationLinter(object):
             )
 
         # Store parameters and options
-        self.django_path = project_path
+        self.django_path = os.path.abspath(project_path)
         self.ignore_name_contains = kwargs.get("ignore_name_contains", None)
         self.ignore_name = kwargs.get("ignore_name", None) or tuple()
         self.include_apps = kwargs.get("include_apps", None)
