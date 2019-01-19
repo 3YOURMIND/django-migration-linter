@@ -220,3 +220,24 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertEqual(len(lines), 3)
         self.assertTrue(lines[0].endswith('OK'))
         self.assertTrue(lines[1].startswith('*** Summary'))
+
+    def test_call_from_within_project(self):
+        cmd = 'cd {0} && {1} --no-cache .'.format(
+            fixtures.CORRECT_PROJECT,
+            self.linter_exec)
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
+        self.assertEqual(len(lines), 6)
+        self.assertEqual(
+            sorted(lines[:4]),
+            sorted([
+                 "(test_app1, 0001_initial)... OK",
+                 "(test_app1, 0002_a_new_null_field)... OK",
+                 "(test_app2, 0001_foo)... OK",
+                 "(test_app3, 0001_initial)... OK",
+             ])
+        )

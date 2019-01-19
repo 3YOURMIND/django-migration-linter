@@ -49,7 +49,7 @@ def find_project_settings_module(path):
 
 def split_path(path):
     a, b = os.path.split(path)
-    return (split_path(a) if (len(a) > 0 and a != "/") else []) + [b]
+    return (split_path(a) if (len(a) > 0 and a != "/") else []) + ([b] if b else [])
 
 
 def split_migration_path(migration_path):
