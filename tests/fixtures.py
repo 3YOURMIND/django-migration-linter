@@ -48,10 +48,19 @@ NOT_DJANGO_GIT_PROJECT = os.path.join(
 NOT_GIT_DJANGO_PROJECT = os.path.join(
     _FIXTURES_FOLDER, 'test_django_without_git_project/')
 
+NON_GIT_ROOT_GIT_FOLDER = os.path.join(
+    _FIXTURES_FOLDER, 'test_non_root_git_project/'
+)
+NON_GIT_ROOT_DJANGO_PROJECT = os.path.join(
+    NON_GIT_ROOT_GIT_FOLDER, 'django_project/'
+)
+
+
 ALL_GIT_PROJECTS = (
     NOT_DJANGO_GIT_PROJECT,
     MULTI_COMMIT_PROJECT,
-    DELETED_MIGRATION_PROJECT
+    DELETED_MIGRATION_PROJECT,
+    NON_GIT_ROOT_GIT_FOLDER,
 )
 
 
