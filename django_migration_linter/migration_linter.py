@@ -195,28 +195,8 @@ class MigrationLinter(object):
         logger.info("Found {0} sql migration lines".format(len(sql_statements)))
         return sql_statements
 
-    def _get_git_root(self):
-        git_root = self.django_path
-        command = "cd {0} && git rev-parse --show-toplevel".format(self.django_path)
-        logger.info("Executing {0}".format(command))
-        diff_process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
-        for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
-            git_root = line
-        diff_process.wait()
-
-        if diff_process.returncode != 0:
-            output = []
-            for line in map(clean_bytes_to_str, diff_process.stderr.readlines()):
-                output.append(line)
-            logger.error(
-                "Error while git rev-parse command:\n{}".format("".join(output))
-            )
-            raise Exception("Error while executing git rev-parse command")
-        return git_root
-
     def _gather_migrations_git(self, git_commit_id):
         migrations = []
-        git_root = self._get_git_root()
         # Get changes since specified commit
         git_diff_command = (
             "cd {0} && git diff --relative --name-only --diff-filter=A {1}"
@@ -229,7 +209,7 @@ class MigrationLinter(object):
                 re.search(r"\/{0}\/.*\.py".format(MIGRATION_FOLDER_NAME), line)
                 and "__init__" not in line
             ):
-                migrations.append(Migration(os.path.join(git_root, line)))
+                migrations.append(Migration(os.path.join(self.django_path, line)))
         diff_process.wait()
 
         if diff_process.returncode != 0:
