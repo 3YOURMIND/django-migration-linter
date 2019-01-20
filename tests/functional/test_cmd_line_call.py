@@ -241,3 +241,36 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
                  "(test_app3, 0001_initial)... OK",
              ])
         )
+
+    def test_call_project_non_git_root(self):
+        # could use tag: version_ok (but doesn't work in Travis)
+        cmd = '{0} --no-cache {1} 2c46f438a89972f9ce2d5151a825a5bfb7f7db4b'.format(
+            self.linter_exec,
+            fixtures.NON_GIT_ROOT_DJANGO_PROJECT)
+        fixtures.prepare_git_project(fixtures.NON_GIT_ROOT_GIT_FOLDER)
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
+        self.assertEqual(len(lines), 3)
+        self.assertTrue(lines[0].endswith('OK'))
+        self.assertTrue(lines[1].startswith('*** Summary'))
+
+    def test_call_project_non_git_root_ko(self):
+        # could use tag: version_ko (but doesn't work in Travis)
+        cmd = '{0} --no-cache {1} 0140e142724fc58944797f9ddc2ebf964146339a'.format(
+            self.linter_exec,
+            fixtures.NON_GIT_ROOT_DJANGO_PROJECT)
+        fixtures.prepare_git_project(fixtures.NON_GIT_ROOT_GIT_FOLDER)
+
+        process = Popen(
+            cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertNotEqual(process.returncode, 0)
+        lines = list(map(utils.clean_bytes_to_str, process.stdout.readlines()))
+        self.assertEqual(len(lines), 5)
+        self.assertTrue(lines[0].endswith('ERR'))
+        self.assertTrue(lines[2].endswith('OK'))
+        self.assertTrue(lines[3].startswith('*** Summary'))
