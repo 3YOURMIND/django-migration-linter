@@ -16,7 +16,7 @@ import os
 import shutil
 import unittest
 from subprocess import Popen, PIPE
-from django_migration_linter import utils, DEFAULT_CACHE_PATH
+from django_migration_linter import utils, DEFAULT_CACHE_PATH, constants
 from tests import fixtures
 import sys
 
@@ -274,3 +274,25 @@ class CallLinterFromCommandLineTest(unittest.TestCase):
         self.assertTrue(lines[0].endswith('ERR'))
         self.assertTrue(lines[2].endswith('OK'))
         self.assertTrue(lines[3].startswith('*** Summary'))
+
+
+class VersionOptionLinterFromCommandLineTest(CallLinterFromCommandLineTest):
+    def test_call_with_version_option(self):
+        cmd = "{} --version".format(self.linter_exec)
+        process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        process_read_stream = process.stderr if sys.version_info.major == 2 else process.stdout
+        lines = list(map(utils.clean_bytes_to_str, process_read_stream.readlines()))
+        self.assertEqual(len(lines), 1)
+        self.assertEqual(lines[0], "django-migration-linter {}".format(constants.__version__))
+
+    def test_call_with_short_version_option(self):
+        cmd = "{} -V".format(self.linter_exec)
+        process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        process.wait()
+        self.assertEqual(process.returncode, 0)
+        process_read_stream = process.stderr if sys.version_info.major == 2 else process.stdout
+        lines = list(map(utils.clean_bytes_to_str, process_read_stream.readlines()))
+        self.assertEqual(len(lines), 1)
+        self.assertEqual(lines[0], "django-migration-linter {}".format(constants.__version__))
