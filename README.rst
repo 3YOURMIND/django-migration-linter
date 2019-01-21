@@ -54,6 +54,19 @@ Examples
 3YOURMIND is running the linter on every build getting pushed through CI.
 Checkout the ``examples/`` folder to see how you could integrate the linter in your test suite.
 
+Backward incompatible migrations
+--------------------------------
+
+The linter analyses your migrations and checks the SQL for:
+
+- Added ``NOT NULL`` columns, which don't have a DEFAULT value
+- Dropping columns
+- Renaming columns
+- Renaming tables
+- Altering columns (which can be backward compatible and eventually ignored)
+
+Those are the most important and frequent backward incompatible migrations. We are happy to add more if you have some.
+
 Ignoring migrations
 -------------------
 
@@ -97,6 +110,5 @@ License
 *django-migration-linter* is released under the `Apache 2.0 License`_.
 
 
-.. _`Bitbucket Pipelines`: https://bitbucket.org/product/features/pipelines
 .. _`tox`: https://pypi.python.org/pypi/tox
 .. _`Apache 2.0 License`: https://github.com/3YOURMIND/django-migration-linter/blob/master/LICENSE
