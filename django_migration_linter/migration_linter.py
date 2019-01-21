@@ -20,7 +20,7 @@ from subprocess import Popen, PIPE
 import sys
 
 from .cache import Cache
-from .constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME
+from .constants import DEFAULT_CACHE_PATH, MIGRATION_FOLDER_NAME, __version__
 from .migration import Migration
 from .utils import is_directory, is_django_project, clean_bytes_to_str
 from .sql_analyser import analyse_sql_statements
@@ -286,6 +286,9 @@ def _main():
         "-v",
         action="store_true",
         help="print more information during execution",
+    )
+    parser.add_argument(
+        "--version", "-V", action="version", version="%(prog)s {}".format(__version__)
     )
     parser.add_argument(
         "--database",
