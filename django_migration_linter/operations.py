@@ -14,7 +14,7 @@
 
 from django.db.migrations.operations.base import Operation
 
-IGNORE_MIGRATION_SQL = "-- dml ignores this migration"
+IGNORE_MIGRATION_SQL = "select 1; -- dml ignores this migration"
 
 
 class IgnoreMigration(Operation):
