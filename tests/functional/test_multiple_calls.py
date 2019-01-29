@@ -1,4 +1,4 @@
-# Copyright 2018 3YOURMIND GmbH
+# Copyright 2019 3YOURMIND GmbH
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import unittest
+import os
 
 from django_migration_linter import MigrationLinter
+from django_migration_linter.migration import Migration
 from tests import fixtures
 
 
@@ -24,10 +26,10 @@ class TestMultipleLinters(unittest.TestCase):
         l2 = MigrationLinter(fixtures.RENAME_COLUMN_PROJECT)
         l3 = MigrationLinter(fixtures.CORRECT_PROJECT)
 
-        l1.lint_migration('test_app', '0002')
-        l2.lint_migration('test_app', '0002')
-        l3.lint_migration('test_app1', '0001')
-        l3.lint_migration('test_app1', '0002')
+        l1.lint_migration(Migration(os.path.join(fixtures.ADD_NOT_NULL_COLUMN_PROJECT, 'test_app/migrations/0002_add_new_not_null_field.py')))
+        l2.lint_migration(Migration(os.path.join(fixtures.RENAME_COLUMN_PROJECT, 'test_app/migrations/0002_rename_column.py')))
+        l3.lint_migration(Migration(os.path.join(fixtures.CORRECT_PROJECT, 'test_app1/migrations/0001_initial.py')))
+        l3.lint_migration(Migration(os.path.join(fixtures.CORRECT_PROJECT, 'test_app1/migrations/0002_a_new_null_field.py')))
 
         self.assertTrue(l1.has_errors)
         self.assertTrue(l2.has_errors)

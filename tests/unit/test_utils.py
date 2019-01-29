@@ -1,4 +1,4 @@
-# Copyright 2018 3YOURMIND GmbH
+# Copyright 2019 3YOURMIND GmbH
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,24 +16,11 @@ import os
 import unittest
 
 from tests import fixtures
-from django_migration_linter.utils import is_django_project, is_git_project, is_directory, find_project_settings_module, split_path
+from django_migration_linter.utils import is_django_project, is_directory, find_project_settings_module, \
+    split_path, split_migration_path
 
 
 class UtilityFunctionTest(unittest.TestCase):
-    def tearDown(self, *args, **kwargs):
-        fixtures.clear_all_git_projects()
-        super(
-            UtilityFunctionTest,
-            self).tearDown(*args, **kwargs)
-
-    def test_detect_not_git_project(self):
-        self.assertFalse(is_git_project(fixtures.NOT_GIT_DJANGO_PROJECT))
-
-    def test_detect_git_project(self):
-        project_path = fixtures.MULTI_COMMIT_PROJECT
-        fixtures.prepare_git_project(project_path)
-        self.assertTrue(is_git_project(project_path))
-
     def test_detect_django_project(self):
         self.assertTrue(is_django_project(fixtures.ADD_NOT_NULL_COLUMN_PROJECT))
 
@@ -70,3 +57,27 @@ class UtilityFunctionTest(unittest.TestCase):
         self.assertEqual(splitted[0], 'foo')
         self.assertEqual(splitted[1], 'bar')
         self.assertEqual(splitted[2], 'fuz.py')
+
+    def test_split_folder_path(self):
+        splitted = split_path('/foo/bar')
+        self.assertEqual(len(splitted), 2)
+        self.assertEqual(splitted[0], 'foo')
+        self.assertEqual(splitted[1], 'bar')
+
+    def test_split_migration_long_path(self):
+        input_path = 'apps/the_app/migrations/0001_stuff.py'
+        app, mig = split_migration_path(input_path)
+        self.assertEqual(app, 'the_app')
+        self.assertEqual(mig, '0001_stuff')
+
+    def test_split_migration_path(self):
+        input_path = 'the_app/migrations/0001_stuff.py'
+        app, mig = split_migration_path(input_path)
+        self.assertEqual(app, 'the_app')
+        self.assertEqual(mig, '0001_stuff')
+
+    def test_split_migration_full_path(self):
+        input_path = '/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py'
+        app, mig = split_migration_path(input_path)
+        self.assertEqual(app, 'the_app')
+        self.assertEqual(mig, '0001_stuff')

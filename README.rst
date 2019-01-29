@@ -44,12 +44,54 @@ Usage
 ``--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]`` Ignore migrations that are in the specified django apps.
 ``--verbose or -v``                                Print more information during execution.
 ``--database DATABASE``                            Specify the database for which to generate the SQL. Defaults to *default*.
+``--cache-path PATH``                              specify a directory that should be used to store cache-files in.
+``--no-cache``                                     Don't use a cache.
 ================================================== ===========================================================================================================================
 
 Examples
 --------
 
-3YOURMIND is running the linter on `Bitbucket Pipelines`_ on every build getting pushed.
+3YOURMIND is running the linter on every build getting pushed through CI.
+Checkout the ``examples/`` folder to see how you could integrate the linter in your test suite.
+
+Backward incompatible migrations
+--------------------------------
+
+The linter analyses your migrations and checks the SQL for:
+
+- Added ``NOT NULL`` columns, which don't have a DEFAULT value
+- Dropping columns
+- Renaming columns
+- Renaming tables
+- Altering columns (which can be backward compatible and eventually ignored)
+
+Those are the most important and frequent backward incompatible migrations. We are happy to add more if you have some.
+
+Ignoring migrations
+-------------------
+
+You can also ignore migrations by adding this to your migrations:
+
+.. code-block::
+
+    import django_migration_linter as linter
+    # ...
+
+        operations = [
+            linter.IgnoreMigration(),
+            # ...
+        ]
+    # ...
+
+Cache
+-----
+By default, the linter uses a cache to prevent linting the same migration again.
+The default location of the cache on Linux is
+``/home/<username>/.cache/django-migration-linter/<version>/<ldjango-project>.pickle``.
+
+Since the linter uses hashes, modifying migration files, will re-run the linter on that migration.
+If you want to run the linter without cache, use the flag ``--no-cache``.
+If you want to invalidate the cache, delete the cache folder.
 
 Tests
 -----
@@ -60,7 +102,7 @@ Contributing
 ------------
 
 First, thank you very much if you want to contribute to the project.
-Please base your work on the ``dev`` branch and also target this branch in your pull request.
+Please base your work on the ``master`` branch and also target this branch in your pull request.
 
 License
 -------
@@ -68,6 +110,5 @@ License
 *django-migration-linter* is released under the `Apache 2.0 License`_.
 
 
-.. _`Bitbucket Pipelines`: https://bitbucket.org/product/features/pipelines
 .. _`tox`: https://pypi.python.org/pypi/tox
 .. _`Apache 2.0 License`: https://github.com/3YOURMIND/django-migration-linter/blob/master/LICENSE

@@ -1,4 +1,4 @@
-# Copyright 2018 3YOURMIND GmbH
+# Copyright 2019 3YOURMIND GmbH
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,6 +55,10 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
     def test_detect_rename_table(self):
         test_project_path = fixtures.RENAME_TABLE_PROJECT
         self._test_linter_finds_errors(test_project_path)
+
+    def test_ignore_migration(self):
+        test_project_path = fixtures.IGNORE_MIGRATION_PROJECT
+        self._test_linter_finds_no_errors(test_project_path)
 
     def test_accept_not_null_column_followed_by_adding_default(self):
         test_project_path = \
