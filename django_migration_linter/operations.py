@@ -14,7 +14,7 @@
 
 from django.db.migrations.operations.base import Operation
 
-IGNORE_MIGRATION_SQL = "select 1;"
+IGNORE_MIGRATION_SQL = "select 1; -- dml ignores this migration"
 
 
 class IgnoreMigration(Operation):
@@ -30,7 +30,7 @@ class IgnoreMigration(Operation):
         schema_editor.execute(IGNORE_MIGRATION_SQL)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute(IGNORE_MIGRATION_SQL)
+        schema_editor.execute(IGNORE_MIGRATION_SQL + "(reversed)")
 
     def describe(self):
         return "The Django migration linter will ignore this migration"
