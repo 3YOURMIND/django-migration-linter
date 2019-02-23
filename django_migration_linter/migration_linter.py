@@ -54,12 +54,6 @@ class MigrationLinter(object):
         self.cache_path = kwargs.get("cache_path", None) or DEFAULT_CACHE_PATH
         self.no_cache = kwargs.get("no_cache", None) or False
 
-        self.python_exe = (
-            "{0}/bin/{1}".format(sys.prefix, "python")
-            if hasattr(sys, "real_prefix")
-            else "python"
-        )
-
         # Initialise counters
         self.nb_valid = 0
         self.nb_ignored = 0
@@ -176,7 +170,7 @@ class MigrationLinter(object):
         sqlmigrate_command = (
             "cd {0} && {1} manage.py sqlmigrate {2} {3} " "--database {4}"
         ).format(
-            self.django_path, self.python_exe, app_name, migration_name, self.database
+            self.django_path, sys.executable, app_name, migration_name, self.database
         )
         logger.info("Executing {0}".format(sqlmigrate_command))
         sqlmigrate_process = Popen(
