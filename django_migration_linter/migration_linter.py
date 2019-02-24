@@ -39,7 +39,7 @@ class MigrationLinter(object):
             )
         if not is_django_project(project_path):
             raise ValueError(
-                ("The given path {0} does not " "seem to be a django project.").format(
+                "The given path {0} does not seem to be a django project.".format(
                     project_path
                 )
             )
@@ -168,7 +168,7 @@ class MigrationLinter(object):
         it allows to seperate the instances correctly.
         """
         sqlmigrate_command = (
-            "cd {0} && {1} manage.py sqlmigrate {2} {3} " "--database {4}"
+            "cd {0} && {1} manage.py sqlmigrate {2} {3} --database {4}"
         ).format(
             self.django_path, sys.executable, app_name, migration_name, self.database
         )
@@ -200,7 +200,7 @@ class MigrationLinter(object):
         for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
             if (
-                re.search(r"\/{0}\/.*\.py".format(MIGRATION_FOLDER_NAME), line)
+                re.search(r"/{0}/.*\.py".format(MIGRATION_FOLDER_NAME), line)
                 and "__init__" not in line
             ):
                 migrations.append(Migration(os.path.join(self.django_path, line)))
@@ -289,7 +289,7 @@ def _main():
         type=str,
         nargs="?",
         help=(
-            "specify the database for which to generate the SQL. " "Defaults to default"
+            "specify the database for which to generate the SQL. Defaults to default"
         ),
     )
 
@@ -297,7 +297,7 @@ def _main():
     cache_group.add_argument(
         "--cache-path",
         type=str,
-        help="specify a directory that should be used to" "store cache-files in.",
+        help="specify a directory that should be used to store cache-files in.",
     )
     cache_group.add_argument(
         "--no-cache", action="store_true", help="don't use a cache"
