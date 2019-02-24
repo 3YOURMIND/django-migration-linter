@@ -70,7 +70,7 @@ def split_migration_path(migration_path):
     decomposed_path = split_path(migration_path)
     for i, p in enumerate(decomposed_path):
         if p == MIGRATION_FOLDER_NAME:
-            return (decomposed_path[i - 1], os.path.splitext(decomposed_path[i + 1])[0])
+            return decomposed_path[i - 1], os.path.splitext(decomposed_path[i + 1])[0]
 
 
 def compose_migration_path(django_folder, app_name, migration):

@@ -42,7 +42,8 @@ class Cache(dict):
         with open(self.filename, "wb") as f:
             pickle.dump(self, f, protocol=2)
 
-    def md5(self, path):
+    @staticmethod
+    def md5(path):
         hash_md5 = hashlib.md5()
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
