@@ -61,9 +61,9 @@ class MigrationLinter(object):
         self.nb_total = 0
 
         # Initialise cache. Read from old, write to new to prune old entries.
-        self.old_cache = Cache(self.django_path, self.cache_path)
-        self.new_cache = Cache(self.django_path, self.cache_path)
         if not self.no_cache:
+            self.old_cache = Cache(self.django_path, self.cache_path)
+            self.new_cache = Cache(self.django_path, self.cache_path)
             self.old_cache.load()
 
     def lint_migration(self, migration):
@@ -72,22 +72,9 @@ class MigrationLinter(object):
         print("({0}, {1})... ".format(app_name, migration_name), end="")
         self.nb_total += 1
 
-        md5hash = self.old_cache.md5(migration.abs_path)
-        if md5hash in self.old_cache:
-            if self.old_cache[md5hash]["result"] == "IGNORE":
-                print("IGNORE (cached)")
-                self.nb_ignored += 1
-            elif self.old_cache[md5hash]["result"] == "OK":
-                print("OK (cached)")
-                self.nb_valid += 1
-            else:
-                print("ERR (cached)")
-                self.nb_erroneous += 1
-
-            if "errors" in self.old_cache[md5hash]:
-                self.print_errors(self.old_cache[md5hash]["errors"])
-
-            self.new_cache[md5hash] = self.old_cache[md5hash]
+        md5hash = migration.get_md5hash()
+        if not self.no_cache and md5hash in self.old_cache:
+            self.lint_cached_migration(md5hash)
             return
 
         if self.should_ignore_migration(app_name, migration_name):
@@ -101,20 +88,39 @@ class MigrationLinter(object):
 
         if analysis_result["ignored"]:
             print("IGNORE")
-            self.new_cache[md5hash] = {"result": "IGNORE"}
             self.nb_ignored += 1
+            if not self.no_cache:
+                self.new_cache[md5hash] = {"result": "IGNORE"}
             return
 
         if not errors:
             print("OK")
-            self.new_cache[md5hash] = {"result": "OK"}
             self.nb_valid += 1
+            if not self.no_cache:
+                self.new_cache[md5hash] = {"result": "OK"}
             return
 
         print("ERR")
-        self.new_cache[md5hash] = {"result": "ERR", "errors": errors}
         self.nb_erroneous += 1
         self.print_errors(errors)
+        if not self.no_cache:
+            self.new_cache[md5hash] = {"result": "ERR", "errors": errors}
+
+    def lint_cached_migration(self, md5hash):
+        cached_value = self.old_cache[md5hash]
+        if cached_value["result"] == "IGNORE":
+            print("IGNORE (cached)")
+            self.nb_ignored += 1
+        elif cached_value["result"] == "OK":
+            print("OK (cached)")
+            self.nb_valid += 1
+        else:
+            print("ERR (cached)")
+            self.nb_erroneous += 1
+            if "errors" in cached_value:
+                self.print_errors(cached_value["errors"])
+
+        self.new_cache[md5hash] = cached_value
 
     @staticmethod
     def print_errors(errors):

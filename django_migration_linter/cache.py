@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import hashlib
 import os
 import pickle
 
@@ -41,11 +40,3 @@ class Cache(dict):
     def save(self):
         with open(self.filename, "wb") as f:
             pickle.dump(self, f, protocol=2)
-
-    @staticmethod
-    def md5(path):
-        hash_md5 = hashlib.md5()
-        with open(path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
-                hash_md5.update(chunk)
-        return hash_md5.hexdigest()
