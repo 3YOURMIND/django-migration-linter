@@ -18,20 +18,20 @@ from django_migration_linter import MigrationLinter
 from tests import fixtures
 
 
-class BackwardcompatibilityDetectionTest(unittest.TestCase):
+class BaseBackwardCompatibilityDetection(object):
     def tearDown(self, *args, **kwargs):
         fixtures.clear_all_git_projects()
         super(
-            BackwardcompatibilityDetectionTest,
+            BaseBackwardCompatibilityDetection,
             self).tearDown(*args, **kwargs)
 
     def _test_linter_finds_errors(self, path, commit_id=None):
-        linter = MigrationLinter(path)
+        linter = MigrationLinter(path, database=self.DATABASE, no_cache=True)
         linter.lint_all_migrations(git_commit_id=commit_id)
         self.assertTrue(linter.has_errors)
 
     def _test_linter_finds_no_errors(self, path, commit_id=None):
-        linter = MigrationLinter(path)
+        linter = MigrationLinter(path, database=self.DATABASE, no_cache=True)
         linter.lint_all_migrations(git_commit_id=commit_id)
         self.assertFalse(linter.has_errors)
 
@@ -85,3 +85,26 @@ class BackwardcompatibilityDetectionTest(unittest.TestCase):
     #    test_project_path = fixtures.MULTI_COMMIT_PROJECT
     #    fixtures.prepare_git_project(test_project_path)
     #    self._test_linter_finds_no_errors(test_project_path, commit_id='tag1')
+
+
+class MySqlBackwardCompatibilityDetectionTest(unittest.TestCase, BaseBackwardCompatibilityDetection):
+    DATABASE = "mysql"
+
+class SqliteBackwardCompatibilityDetectionTest(unittest.TestCase, BaseBackwardCompatibilityDetection):
+    DATABASE = "sqlite"
+
+    def test_accept_not_null_column_followed_by_adding_default(self):
+        test_project_path = \
+            fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT_PROJECT
+        self._test_linter_finds_errors(test_project_path)
+
+    def test_specify_git_hash_by_commit_hash(self):
+        test_project_path = fixtures.MULTI_COMMIT_PROJECT
+        fixtures.prepare_git_project(test_project_path)
+        self._test_linter_finds_errors(
+            test_project_path,
+            commit_id='d7125d5f4f0cc9623f670a66c54f131acc50032d')
+
+
+class PostgresqlBackwardCompatibilityDetectionTest(unittest.TestCase, BaseBackwardCompatibilityDetection):
+    DATABASE = "postgresql"
