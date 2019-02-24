@@ -44,25 +44,27 @@ class UtilityFunctionTest(unittest.TestCase):
         actual = find_project_settings_module(fixtures.CORRECT_PROJECT)
         self.assertEqual(actual, expected)
 
+
+class SplitPathTest(unittest.TestCase):
     def test_split_path(self):
-        splitted = split_path('foo/bar/fuz.py')
-        self.assertEqual(len(splitted), 3)
-        self.assertEqual(splitted[0], 'foo')
-        self.assertEqual(splitted[1], 'bar')
-        self.assertEqual(splitted[2], 'fuz.py')
+        split = split_path('foo/bar/fuz.py')
+        self.assertEqual(split, ["foo", "bar", "fuz.py"])
 
     def test_split_full_path(self):
-        splitted = split_path('/foo/bar/fuz.py')
-        self.assertEqual(len(splitted), 3)
-        self.assertEqual(splitted[0], 'foo')
-        self.assertEqual(splitted[1], 'bar')
-        self.assertEqual(splitted[2], 'fuz.py')
+        split = split_path('/foo/bar/fuz.py')
+        self.assertEqual(split, ["/", "foo", "bar", "fuz.py"])
 
     def test_split_folder_path(self):
-        splitted = split_path('/foo/bar')
-        self.assertEqual(len(splitted), 2)
-        self.assertEqual(splitted[0], 'foo')
-        self.assertEqual(splitted[1], 'bar')
+        split = split_path('/foo/bar')
+        self.assertEqual(split, ["/", "foo", "bar"])
+
+    def test_split_folder_path_trailing_slash(self):
+        split = split_path('/foo/bar/')
+        self.assertEqual(split, ["/", "foo", "bar"])
+
+    def test_split_folder_path_trailing_slashes(self):
+        split = split_path('/foo/bar///')
+        self.assertEqual(split, ["/", "foo", "bar"])
 
     def test_split_migration_long_path(self):
         input_path = 'apps/the_app/migrations/0001_stuff.py'

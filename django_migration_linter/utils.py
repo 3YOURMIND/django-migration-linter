@@ -42,14 +42,28 @@ def find_project_settings_module(path):
             if file_name == "settings.py":
                 return (
                     os.path.join(root.replace(path, ""), file_name)
-                    .replace("/", ".")
+                    .replace(os.sep, ".")
                     .rstrip(".py")
                 )
 
 
 def split_path(path):
-    a, b = os.path.split(path)
-    return (split_path(a) if (len(a) > 0 and a != "/") else []) + ([b] if b else [])
+    decomposed_path = []
+    while 1:
+        head, tail = os.path.split(path)
+        if head == path:  # sentinel for absolute paths
+            decomposed_path.insert(0, head)
+            break
+        elif tail == path:  # sentinel for relative paths
+            decomposed_path.insert(0, tail)
+            break
+        else:
+            path = head
+            decomposed_path.insert(0, tail)
+
+    if not decomposed_path[-1]:
+        decomposed_path = decomposed_path[:-1]
+    return decomposed_path
 
 
 def split_migration_path(migration_path):
