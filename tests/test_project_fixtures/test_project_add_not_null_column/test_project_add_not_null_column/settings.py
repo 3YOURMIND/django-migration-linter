@@ -78,7 +78,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    },
+    'mysql': {
+        'ENGINE': 'django_fake_database_backends.backends.mysql',
+    },
+    'sqlite': {
+        'ENGINE': 'django_fake_database_backends.backends.sqlite3',
+    },
+    'postgresql': {
+        'ENGINE': 'django_fake_database_backends.backends.postgresql',
+    },
 }
 
 

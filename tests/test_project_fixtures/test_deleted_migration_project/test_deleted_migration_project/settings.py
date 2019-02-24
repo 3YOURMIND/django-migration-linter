@@ -77,7 +77,16 @@ WSGI_APPLICATION = 'test_deleted_migration_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_fake_database_backends.backends.mysql',
-    }
+    },
+    'mysql': {
+        'ENGINE': 'django_fake_database_backends.backends.mysql',
+    },
+    'sqlite': {
+        'ENGINE': 'django_fake_database_backends.backends.sqlite3',
+    },
+    'postgresql': {
+        'ENGINE': 'django_fake_database_backends.backends.postgresql',
+    },
 }
 
 
