@@ -104,6 +104,11 @@ Contributing
 First, thank you very much if you want to contribute to the project.
 Please base your work on the ``master`` branch and also target this branch in your pull request.
 
+Blog post
+---------
+
+`Keeping Django database migrations backward compatible`_
+
 License
 -------
 
@@ -111,4 +116,5 @@ License
 
 
 .. _`tox`: https://pypi.python.org/pypi/tox
+.. _`Keeping Django database migrations backward compatible`: https://medium.com/3yourmind/keeping-django-database-migrations-backward-compatible-727820260dbb
 .. _`Apache 2.0 License`: https://github.com/3YOURMIND/django-migration-linter/blob/master/LICENSE
