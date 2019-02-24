@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import pprint
 import shutil
-import tempfile
 import unittest
 import sys
 
@@ -30,14 +28,6 @@ else:
 
 class CacheTest(unittest.TestCase):
     MIGRATION_FILE = os.path.join(fixtures.ALTER_COLUMN_PROJECT, 'test_app', 'migrations', '0001_initial.py')
-    fd, temp_path = tempfile.mkstemp()
-
-    def setUp(self):
-        shutil.copy2(self.MIGRATION_FILE, self.temp_path)
-
-    def tearDown(self):
-        shutil.copy2(self.temp_path, self.MIGRATION_FILE)
-        os.remove(self.temp_path)
 
     def test_cache_normal(self):
         cache_file = os.path.join(DEFAULT_CACHE_PATH, 'test_project_add_not_null_column.pickle')
@@ -146,8 +136,10 @@ class CacheTest(unittest.TestCase):
         )
 
         # Modify migration
+        backup_migration_file = self.MIGRATION_FILE + "_backup"
+        shutil.copy2(self.MIGRATION_FILE, backup_migration_file)
         with open(self.MIGRATION_FILE, "a") as f:
-            f.write("# modification at the end of the file\n")
+            f.write("# modification at the end of the file")
 
         # Start the Linter again -> Cache should look different now
         linter = MigrationLinter(fixtures.ALTER_COLUMN_PROJECT)
@@ -157,9 +149,8 @@ class CacheTest(unittest.TestCase):
             DEFAULT_CACHE_PATH
         )
         cache.load()
-
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(cache)
+        shutil.copy2(backup_migration_file, self.MIGRATION_FILE)
+        os.remove(backup_migration_file)
 
         self.assertNotIn('8589aa107b6da296c4b49cd2681d2230', cache)
-        self.assertEqual(cache['44f9d6d019d6f158946c2819b2bd8bf9']['result'], 'OK')
+        self.assertEqual(cache['fbee628b1ab4bd1c14f8a4b41123e7cf']['result'], 'OK')
