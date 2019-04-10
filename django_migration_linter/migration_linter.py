@@ -174,7 +174,7 @@ class MigrationLinter(object):
         it allows to seperate the instances correctly.
         """
         sqlmigrate_command = (
-            "cd {0} && {1} manage.py sqlmigrate {2} {3} --database {4}"
+            "cd {0} && {1} manage.py sqlmigrate {2} '{3}' --database {4}"
         ).format(
             self.django_path, sys.executable, app_name, migration_name, self.database
         )
