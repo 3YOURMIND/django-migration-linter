@@ -26,6 +26,14 @@ from .utils import is_directory, is_django_project, clean_bytes_to_str
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
+# https://github.com/django/django/commit/3c4ff2176323dd20507e35658599da220fbe1741#r33179523
+KNOWN_BUG_FAKE_SQL = """
+BEGIN;
+--
+-- Known bug workaround
+--
+COMMIT;
+"""
 
 
 class MigrationLinter(object):
@@ -189,6 +197,11 @@ class MigrationLinter(object):
         sqlmigrate_process.wait()
         if sqlmigrate_process.returncode != 0:
             _, err = sqlmigrate_process.communicate()
+            known_bug = re.search(
+                r'line \d+, in quote_value\s+quoted = quoted.decode\(\)', err.decode(), re.MULTILINE
+            )
+            if known_bug:
+                return [KNOWN_BUG_FAKE_SQL]
             raise RuntimeError(
                 "sqlmigrate command failed {0}".format(err.decode("utf-8"))
             )
