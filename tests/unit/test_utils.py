@@ -12,74 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import unittest
 
-from tests import fixtures
-from django_migration_linter.utils import is_django_project, is_directory, find_project_settings_module, \
-    split_path, split_migration_path
+from django_migration_linter.utils import split_path, split_migration_path
 
 
-class UtilityFunctionTest(unittest.TestCase):
-    def test_detect_django_project(self):
-        self.assertTrue(is_django_project(fixtures.ADD_NOT_NULL_COLUMN_PROJECT))
-
-    def test_detect_not_django_project(self):
-        self.assertFalse(is_django_project(fixtures._BASE_DIR))
-
-    def test_detect_directory(self):
-        self.assertTrue(is_directory(fixtures.ADD_NOT_NULL_COLUMN_PROJECT))
-
-    def test_detect_not_directory(self):
-        self.assertFalse(is_directory(
-            os.path.join(fixtures.ADD_NOT_NULL_COLUMN_PROJECT, 'manage.py')))
-
-    def test_find_project_settings_module_same_project_name(self):
-        expected = 'test_project_add_not_null_column.settings'
-        actual = find_project_settings_module(fixtures.ADD_NOT_NULL_COLUMN_PROJECT)
-        self.assertEqual(actual, expected)
-
-    def test_find_project_settings_module_different_project_name(self):
-        expected = 'test_project.settings'
-        actual = find_project_settings_module(fixtures.CORRECT_PROJECT)
-        self.assertEqual(actual, expected)
-
-
-class SplitPathTest(unittest.TestCase):
+class SplitPathTestCase(unittest.TestCase):
     def test_split_path(self):
-        split = split_path('foo/bar/fuz.py')
+        split = split_path("foo/bar/fuz.py")
         self.assertEqual(split, ["foo", "bar", "fuz.py"])
 
     def test_split_full_path(self):
-        split = split_path('/foo/bar/fuz.py')
+        split = split_path("/foo/bar/fuz.py")
         self.assertEqual(split, ["/", "foo", "bar", "fuz.py"])
 
     def test_split_folder_path(self):
-        split = split_path('/foo/bar')
+        split = split_path("/foo/bar")
         self.assertEqual(split, ["/", "foo", "bar"])
 
     def test_split_folder_path_trailing_slash(self):
-        split = split_path('/foo/bar/')
+        split = split_path("/foo/bar/")
         self.assertEqual(split, ["/", "foo", "bar"])
 
     def test_split_folder_path_trailing_slashes(self):
-        split = split_path('/foo/bar///')
+        split = split_path("/foo/bar///")
         self.assertEqual(split, ["/", "foo", "bar"])
 
     def test_split_migration_long_path(self):
-        input_path = 'apps/the_app/migrations/0001_stuff.py'
+        input_path = "apps/the_app/migrations/0001_stuff.py"
         app, mig = split_migration_path(input_path)
-        self.assertEqual(app, 'the_app')
-        self.assertEqual(mig, '0001_stuff')
+        self.assertEqual(app, "the_app")
+        self.assertEqual(mig, "0001_stuff")
 
     def test_split_migration_path(self):
-        input_path = 'the_app/migrations/0001_stuff.py'
+        input_path = "the_app/migrations/0001_stuff.py"
         app, mig = split_migration_path(input_path)
-        self.assertEqual(app, 'the_app')
-        self.assertEqual(mig, '0001_stuff')
+        self.assertEqual(app, "the_app")
+        self.assertEqual(mig, "0001_stuff")
 
     def test_split_migration_full_path(self):
-        input_path = '/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py'
+        input_path = "/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py"
         app, mig = split_migration_path(input_path)
-        self.assertEqual(app, 'the_app')
-        self.assertEqual(mig, '0001_stuff')
+        self.assertEqual(app, "the_app")
+        self.assertEqual(mig, "0001_stuff")
