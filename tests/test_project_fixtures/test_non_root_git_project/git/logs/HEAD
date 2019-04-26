@@ -1,6 +1,0 @@
-0000000000000000000000000000000000000000 30b505e031fc496c88d36be5ed7892337c640223 David Wobrock <david.wobrock@gmail.com> 1547980206 +0100	commit (initial): init
-30b505e031fc496c88d36be5ed7892337c640223 a3f20003e5407a44000854c41ba29c06a3bbba82 David Wobrock <david.wobrock@gmail.com> 1547980230 +0100	commit (amend): init
-a3f20003e5407a44000854c41ba29c06a3bbba82 0e52dc2380789e401cf385d3376af39f4bb6598f David Wobrock <david.wobrock@gmail.com> 1547980287 +0100	commit (amend): init
-0e52dc2380789e401cf385d3376af39f4bb6598f 0140e142724fc58944797f9ddc2ebf964146339a David Wobrock <david.wobrock@gmail.com> 1547980306 +0100	commit: init migration
-0140e142724fc58944797f9ddc2ebf964146339a 2c46f438a89972f9ce2d5151a825a5bfb7f7db4b David Wobrock <david.wobrock@gmail.com> 1547980356 +0100	commit: add ko migration
-2c46f438a89972f9ce2d5151a825a5bfb7f7db4b f122245e6a3ce63b99e0beeb8403031edd08ed50 David Wobrock <david.wobrock@gmail.com> 1547980398 +0100	commit: Add ok migration

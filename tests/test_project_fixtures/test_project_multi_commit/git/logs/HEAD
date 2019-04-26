@@ -1,3 +1,0 @@
-0000000000000000000000000000000000000000 dbd8d7899446de17d8cf8e57aa7eddb1433bc9c3 David-Wobrock <david.wobrock@gmail.com> 1511996012 +0100	commit (initial): Init
-dbd8d7899446de17d8cf8e57aa7eddb1433bc9c3 d7125d5f4f0cc9623f670a66c54f131acc50032d David-Wobrock <david.wobrock@gmail.com> 1511996033 +0100	commit: Not working stuff
-d7125d5f4f0cc9623f670a66c54f131acc50032d 1021d98b5943db56122c1f848f371ddc38788d0f David-Wobrock <david.wobrock@gmail.com> 1511996049 +0100	commit: Backward compatible migrations
