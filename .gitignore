@@ -10,5 +10,6 @@ dist/
 *.egg-info/
 .cache/
 env/
-tests/test_project_fixtures/*/.git/
 .tox/
+*.sqlite3
+*.pickle
