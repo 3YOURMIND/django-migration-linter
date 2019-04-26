@@ -15,36 +15,7 @@
 from __future__ import print_function
 
 import os
-import sys
-
-from .constants import MIGRATION_FOLDER_NAME
-
-
-def is_django_project(path):
-    django_manage_file = os.path.join(path, "manage.py")
-    return os.path.isfile(django_manage_file)
-
-
-def is_directory(path):
-    return os.path.isdir(path)
-
-
-def print_stderr(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-
-
-def find_project_settings_module(path):
-    """Explore path recursively to the first settings.py file
-    and translate the name to package notation 'mysite.settings'
-    """
-    for root, dirs, files in os.walk(path):
-        for file_name in files:
-            if file_name == "settings.py":
-                return (
-                    os.path.join(root.replace(path, ""), file_name)
-                    .replace(os.sep, ".")
-                    .rstrip(".py")
-                )
+from importlib import import_module
 
 
 def split_path(path):
@@ -67,17 +38,26 @@ def split_path(path):
 
 
 def split_migration_path(migration_path):
+    from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
+
     decomposed_path = split_path(migration_path)
     for i, p in enumerate(decomposed_path):
-        if p == MIGRATION_FOLDER_NAME:
+        if p == MIGRATIONS_MODULE_NAME:
             return decomposed_path[i - 1], os.path.splitext(decomposed_path[i + 1])[0]
-
-
-def compose_migration_path(django_folder, app_name, migration):
-    return os.path.join(
-        django_folder, app_name, MIGRATION_FOLDER_NAME, "{0}.py".format(migration)
-    )
 
 
 def clean_bytes_to_str(byte_input):
     return byte_input.decode("utf-8").strip()
+
+
+def get_migration_abspath(app_label, migration_name):
+    from django.db.migrations.loader import MigrationLoader
+
+    module_name, _ = MigrationLoader.migrations_module(app_label)
+    migration_path = "{}.{}".format(module_name, migration_name)
+    migration_module = import_module(migration_path)
+
+    migration_file = migration_module.__file__
+    if migration_file.endswith(".pyc"):
+        migration_file = migration_file[:-1]
+    return migration_file
