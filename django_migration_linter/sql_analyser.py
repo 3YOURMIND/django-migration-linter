@@ -86,10 +86,10 @@ def analyse_sql_statements(sql_statements):
         for test in migration_tests:
             if test["fn"](statement, errors=errors):
                 if test["code"] == IGNORED_MIGRATION:
-                    logger.info("Testing {0} -- IGNORING MIGRATION".format(statement))
+                    logger.debug("Testing {0} -- IGNORING MIGRATION".format(statement))
                     ignored = True
                 else:
-                    logger.info("Testing {0} -- ERROR".format(statement))
+                    logger.debug("Testing {0} -- ERROR".format(statement))
                     table_search = re.search(
                         "TABLE `([^`]*)`", statement, re.IGNORECASE
                     )
@@ -102,5 +102,5 @@ def analyse_sql_statements(sql_statements):
                     }
                     errors.append(err)
             else:
-                logger.info("Testing {0} -- PASSED".format(statement))
+                logger.debug("Testing {0} -- PASSED".format(statement))
     return {"errors": errors, "ignored": ignored}
