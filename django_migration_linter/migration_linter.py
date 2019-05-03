@@ -96,13 +96,13 @@ class MigrationLinter(object):
 
         md5hash = self.get_migration_hash(app_label, migration_name)
 
-        if self.should_use_cache() and md5hash in self.old_cache:
-            self.lint_cached_migration(md5hash)
-            return
-
         if self.should_ignore_migration(app_label, migration_name):
             print("IGNORE")
             self.nb_ignored += 1
+            return
+
+        if self.should_use_cache() and md5hash in self.old_cache:
+            self.lint_cached_migration(md5hash)
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
