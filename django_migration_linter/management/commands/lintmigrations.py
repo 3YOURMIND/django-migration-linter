@@ -5,8 +5,9 @@ from importlib import import_module
 
 from django.core.management.base import BaseCommand
 
-from django_migration_linter import MigrationLinter
-from django_migration_linter.constants import __version__
+from ...constants import __version__
+
+from ...migration_linter import MigrationLinter
 
 
 class Command(BaseCommand):
