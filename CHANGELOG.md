@@ -7,6 +7,8 @@ Additionally, the linter now needs to be added the to the `INSTALLED_APPS` in yo
 * The linter is now much faster: we don't setup django once for each migration
 * The linter is now more robust: we rely on Django internals to discover migrations
 * Clean up of the testing setup: it is cleaner, less brittle and we have more confidence that it works
+* Added support for Django 2.2
+* Dropped support for Python 3.4
 
 Fixed bugs:
 
