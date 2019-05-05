@@ -1,12 +1,17 @@
 ## 1.0.0
 
-*Breaking changes* of the linter usage. The linter now is a Django management command.
-It shoud be used with a `python manage.py lintmigrations` followed by the usual options.
+**Breaking changes** of the linter usage. The linter now is a Django management command.
+It should be used with a `python manage.py lintmigrations` followed by the usual options.
 Additionally, the linter now needs to be added the to the `INSTALLED_APPS` in your Django settings.
 
 * The linter is now much faster: we don't setup django once for each migration
 * The linter is now more robust: we rely on Django internals to discover migrations
 * Clean up of the testing setup: it is cleaner, less brittle and we have more confidence that it works
+
+Fixed bugs:
+
+* Made the cache database-dependent. Between multiple databases, some migrations would be considered correct while they are not on the used DB.
+* Adding an erroneous migration to the ignore list on the second run would get the migration content from the cache and not ignore it.
 
 ## 0.1.5
 
