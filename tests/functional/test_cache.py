@@ -235,3 +235,58 @@ class CacheTestCase(unittest.TestCase):
         self.assertNotIn("19fd3ea688fc05e2cc2a6e67c0b7aa17", cache)
         self.assertEqual(1, len(cache))
         self.assertEqual("ERR", cache["a25768641a0ad526fad199f97c303784"]["result"])
+
+    @mock.patch(
+        "django_migration_linter.MigrationLinter._gather_all_migrations",
+        return_value=[
+            Migration("0001_create_table", "app_add_not_null_column"),
+            Migration("0002_add_new_not_null_field", "app_add_not_null_column"),
+        ],
+    )
+    def test_ignore_cached_migration(self, *args):
+        linter = MigrationLinter(self.test_project_path)
+        linter.old_cache.clear()
+        linter.old_cache.save()
+
+        with mock.patch(
+            "django_migration_linter.migration_linter.analyse_sql_statements",
+            wraps=analyse_sql_statements,
+        ) as analyse_sql_statements_mock:
+            linter.lint_all_migrations()
+            self.assertEqual(2, analyse_sql_statements_mock.call_count)
+
+        cache = linter.new_cache
+        cache.load()
+
+        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
+        self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
+        self.assertListEqual(
+            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
+            [
+                {
+                    "err_msg": "RENAMING tables",
+                    "code": "RENAME_TABLE",
+                    "table": None,
+                    "column": None,
+                }
+            ],
+        )
+
+        # Start the Linter again -> should use cache now but ignore the erroneous
+        linter = MigrationLinter(
+            self.test_project_path, ignore_name_contains="0002_add_new_not_null_field"
+        )
+
+        with mock.patch(
+            "django_migration_linter.migration_linter.analyse_sql_statements",
+            wraps=analyse_sql_statements,
+        ) as analyse_sql_statements_mock:
+            linter.lint_all_migrations()
+            analyse_sql_statements_mock.assert_not_called()
+
+        self.assertFalse(linter.has_errors)
+
+        cache = linter.new_cache
+        cache.load()
+        self.assertEqual(1, len(cache))
+        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
