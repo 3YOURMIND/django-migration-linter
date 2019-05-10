@@ -236,7 +236,7 @@ class MigrationLinter(object):
         return (
             (self.include_apps and app_label not in self.include_apps)
             or (self.exclude_apps and app_label in self.exclude_apps)
-            or (any([isinstance(o, IgnoreMigration) for o in operations]))
+            or any(isinstance(o, IgnoreMigration) for o in operations)
             or (
                 self.ignore_name_contains
                 and self.ignore_name_contains in migration_name
