@@ -92,12 +92,13 @@ class MigrationLinter(object):
     def lint_migration(self, migration):
         app_label = migration.app_label
         migration_name = migration.name
+        operations = migration.operations
         print("({0}, {1})... ".format(app_label, migration_name), end="")
         self.nb_total += 1
 
         md5hash = self.get_migration_hash(app_label, migration_name)
 
-        if self.should_ignore_migration(app_label, migration_name, migration.operations):
+        if self.should_ignore_migration(app_label, migration_name, operations):
             print("IGNORE")
             self.nb_ignored += 1
             return
