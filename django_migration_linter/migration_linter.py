@@ -27,6 +27,7 @@ from django.db.migrations import Migration
 from .cache import Cache
 from .constants import DEFAULT_CACHE_PATH
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
+from .operations import IgnoreMigration
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ class MigrationLinter(object):
 
         md5hash = self.get_migration_hash(app_label, migration_name)
 
-        if self.should_ignore_migration(app_label, migration_name):
+        if self.should_ignore_migration(migration):
             print("IGNORE")
             self.nb_ignored += 1
             return
@@ -231,10 +232,13 @@ class MigrationLinter(object):
             if app_label not in DJANGO_APPS_WITH_MIGRATIONS:
                 yield migration
 
-    def should_ignore_migration(self, app_label, migration_name):
+    def should_ignore_migration(self, migration):
+        app_label = migration.app_label
+        migration_name = migration.name
         return (
             (self.include_apps and app_label not in self.include_apps)
             or (self.exclude_apps and app_label in self.exclude_apps)
+            or (any([isinstance(o, IgnoreMigration) for o in migration.operations]))
             or (
                 self.ignore_name_contains
                 and self.ignore_name_contains in migration_name
