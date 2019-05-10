@@ -97,7 +97,7 @@ class MigrationLinter(object):
 
         md5hash = self.get_migration_hash(app_label, migration_name)
 
-        if self.should_ignore_migration(migration):
+        if self.should_ignore_migration(app_label, migration_name, migration.operations):
             print("IGNORE")
             self.nb_ignored += 1
             return
@@ -232,13 +232,11 @@ class MigrationLinter(object):
             if app_label not in DJANGO_APPS_WITH_MIGRATIONS:
                 yield migration
 
-    def should_ignore_migration(self, migration):
-        app_label = migration.app_label
-        migration_name = migration.name
+    def should_ignore_migration(self, app_label, migration_name, operations=()):
         return (
             (self.include_apps and app_label not in self.include_apps)
             or (self.exclude_apps and app_label in self.exclude_apps)
-            or (any([isinstance(o, IgnoreMigration) for o in migration.operations]))
+            or (any([isinstance(o, IgnoreMigration) for o in operations]))
             or (
                 self.ignore_name_contains
                 and self.ignore_name_contains in migration_name
