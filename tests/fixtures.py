@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-_PROJ_TEST_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "tests/",
-    "test_project",
-)
-
 CREATE_TABLE_WITH_NOT_NULL_COLUMN = "app_create_table_with_not_null_column"
 ADD_NOT_NULL_COLUMN = "app_add_not_null_column"
 DROP_COLUMN = "app_drop_column"

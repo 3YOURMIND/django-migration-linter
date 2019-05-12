@@ -71,10 +71,6 @@ class Command(BaseCommand):
             help="ignore migrations that are in the specified django apps",
         )
 
-        # args = parser.parse_args()
-
-        # folder_name = args.django_folder[0]
-
     def handle(self, *args, **options):
         settings_path = os.path.dirname(
             import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
