@@ -40,6 +40,7 @@ setup(
     long_description=long_description,
     url="https://github.com/3YOURMIND/django-migration-linter",
     author="3YOURMIND GmbH",
+    author_email="david.wobrock@gmail.com",
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests/"]),
     install_requires=["django>=1.11", "appdirs==1.4.3"],
