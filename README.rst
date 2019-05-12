@@ -35,6 +35,7 @@ Usage
 Add the migration linter your ``INSTALLED_APPS``:
 
 .. code-block::
+
     INSTALLED_APPS = [
         ...,
         "django_migration_linter",
