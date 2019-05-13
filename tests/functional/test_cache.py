@@ -22,12 +22,17 @@ from django_migration_linter import (
     MigrationLinter,
     analyse_sql_statements,
     get_migration_abspath,
+    IgnoreMigration,
 )
 
 if sys.version_info >= (3, 3):
     import unittest.mock as mock
 else:
     import mock
+
+
+class OperationsIgnoreMigration(Migration):
+    operations = [IgnoreMigration()]
 
 
 class CacheTestCase(unittest.TestCase):
@@ -155,10 +160,10 @@ class CacheTestCase(unittest.TestCase):
         "django_migration_linter.MigrationLinter._gather_all_migrations",
         return_value=[
             Migration("0001_initial", "app_ignore_migration"),
-            Migration("0002_ignore_migration", "app_ignore_migration"),
+            OperationsIgnoreMigration("0002_ignore_migration", "app_ignore_migration"),
         ],
     )
-    def test_cache_ignored(self, *args):
+    def test_ignored_via_operation_not_analysed_or_cached(self, *args):
         linter = MigrationLinter(self.test_project_path, ignore_name_contains="0001")
         linter.old_cache.clear()
         linter.old_cache.save()
@@ -168,22 +173,12 @@ class CacheTestCase(unittest.TestCase):
             wraps=analyse_sql_statements,
         ) as analyse_sql_statements_mock:
             linter.lint_all_migrations()
-            self.assertEqual(1, analyse_sql_statements_mock.call_count)
+            analyse_sql_statements_mock.assert_not_called()
 
         cache = linter.new_cache
         cache.load()
 
-        self.assertEqual("IGNORE", cache["0fab48322ba76570da1a3c193abb77b5"]["result"])
-
-        # Start the Linter again -> should use cache now.
-        linter = MigrationLinter(self.test_project_path)
-
-        with mock.patch(
-            "django_migration_linter.migration_linter.analyse_sql_statements",
-            wraps=analyse_sql_statements,
-        ) as analyse_sql_statements_mock:
-            linter.lint_all_migrations()
-            self.assertEqual(1, analyse_sql_statements_mock.call_count)
+        self.assertFalse(cache)
 
     @mock.patch(
         "django_migration_linter.MigrationLinter._gather_all_migrations",
