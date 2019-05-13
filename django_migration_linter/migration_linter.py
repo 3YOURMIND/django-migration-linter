@@ -108,15 +108,7 @@ class MigrationLinter(object):
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
-        analysis_result = analyse_sql_statements(sql_statements)
-        errors = analysis_result["errors"]
-
-        if analysis_result["ignored"]:
-            print("IGNORE")
-            self.nb_ignored += 1
-            if self.should_use_cache():
-                self.new_cache[md5hash] = {"result": "IGNORE"}
-            return
+        errors = analyse_sql_statements(sql_statements)
 
         if not errors:
             print("OK")
