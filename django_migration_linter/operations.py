@@ -14,23 +14,20 @@
 
 from django.db.migrations.operations.base import Operation
 
-IGNORE_MIGRATION_SQL = "select 1; -- dml ignores this migration"
-
 
 class IgnoreMigration(Operation):
 
     reversible = True
-    # Must be true to be generated through the sqlmigrate command
-    reduces_to_sql = True
+    reduces_to_sql = False
 
     def state_forwards(self, app_label, state):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute(IGNORE_MIGRATION_SQL)
+        pass
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute(IGNORE_MIGRATION_SQL + " (reversed)")
+        pass
 
     def describe(self):
         return "The Django migration linter will ignore this migration"
