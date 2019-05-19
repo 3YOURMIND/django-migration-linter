@@ -16,6 +16,10 @@ from django.db.migrations.operations.base import Operation
 
 
 class IgnoreMigration(Operation):
+    """
+    No-op migration operation that will enable the Django Migration Linter
+    to detect if the entire migration should be ignored (through code).
+    """
 
     reversible = True
     reduces_to_sql = False
