@@ -126,6 +126,15 @@ Contributing
 First, thank you very much if you want to contribute to the project.
 Please base your work on the ``master`` branch and also target this branch in your pull request.
 
+Publishing the package
+----------------------
+
+A small note on how the linter is usually published to PyPi:
+
+- ``python setup.py check --restructuredtext``
+- ``python3 setup.py sdist bdist_wheel --universal``
+- ``twine upload dist/django_migration_linter-X.Y.Z-py2.py3-none-any.whl dist/django-migration-linter-X.Y.Z.tar.gz``
+
 Blog post
 ---------
 
