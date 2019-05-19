@@ -1,3 +1,11 @@
+## 1.1.0
+
+* Improve speed of ignored migration through the `IgnoreMigration`  operation.
+Instead of generating their SQL, we verify if the Operation class is present.
+Thus we don't have to wait for the SQL generation. Also improves the caching strategy.
+
+Breaks some internal APIs, so minor update to 1.1.0.
+
 ## 1.0.0
 
 **Breaking changes** of the linter usage. The linter now is a Django management command.
