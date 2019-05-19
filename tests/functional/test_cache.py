@@ -163,7 +163,7 @@ class CacheTestCase(unittest.TestCase):
             OperationsIgnoreMigration("0002_ignore_migration", "app_ignore_migration"),
         ],
     )
-    def test_ignored_via_operation_not_analysed_or_cached(self, *args):
+    def test_cache_ignored(self, *args):
         linter = MigrationLinter(self.test_project_path, ignore_name_contains="0001")
         linter.old_cache.clear()
         linter.old_cache.save()
