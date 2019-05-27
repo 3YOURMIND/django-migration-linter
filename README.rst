@@ -43,7 +43,7 @@ Add the migration linter your ``INSTALLED_APPS``:
     ]
 
 
-``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]]``
+``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--project-root-path DJANGO_PROJECT_FOLDER]``
 
 ================================================== ===========================================================================================================================
                    Parameter                                                                            Description
@@ -59,6 +59,7 @@ Add the migration linter your ``INSTALLED_APPS``:
 ``--no-cache``                                     Don't use a cache.
 ``--applied-migrations``                           Only lint migrations that are applied to the selected database. Other migrations are ignored.
 ``--unapplied-migrations``                         Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.
+``--project-root-path DJANGO_PROJECT_FOLDER``      An absolute or relative path to the django project.
 ================================================== ===========================================================================================================================
 
 Examples
