@@ -46,6 +46,9 @@ class Command(BaseCommand):
                 "Defaults to default"
             ),
         )
+        parser.add_argument(
+            "--project-root-path", type=str, nargs="?", help="django project root path"
+        )
 
         cache_group = parser.add_mutually_exclusive_group(required=False)
         cache_group.add_argument(
@@ -86,9 +89,12 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        settings_path = os.path.dirname(
-            import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
-        )
+        if options["project_root_path"]:
+            settings_path = options["project_root_path"]
+        else:
+            settings_path = os.path.dirname(
+                import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
+            )
 
         if options["verbosity"] > 1:
             logging.basicConfig(format="%(message)s", level=logging.DEBUG)
