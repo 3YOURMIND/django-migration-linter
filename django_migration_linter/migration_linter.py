@@ -21,8 +21,7 @@ import re
 from subprocess import Popen, PIPE
 
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS
-from django.db.migrations import Migration
+from django.db import DEFAULT_DB_ALIAS, connections
 
 from .cache import Cache
 from .constants import DEFAULT_CACHE_PATH
@@ -72,6 +71,13 @@ class MigrationLinter(object):
             self.old_cache = Cache(self.django_path, self.database, self.cache_path)
             self.new_cache = Cache(self.django_path, self.database, self.cache_path)
             self.old_cache.load()
+
+        # Initialise migrations
+        from django.db.migrations.loader import MigrationLoader
+
+        self.migration_loader = MigrationLoader(
+            connection=connections[self.database], load=True
+        )
 
     def should_use_cache(self):
         return self.django_path and not self.no_cache
@@ -207,7 +213,8 @@ class MigrationLinter(object):
                 and "__init__" not in line
             ):
                 app_label, name = split_migration_path(line)
-                migrations.append(Migration(name, app_label))
+                migration = self.migration_loader.disk_migrations[app_label, name]
+                migrations.append(migration)
         diff_process.wait()
 
         if diff_process.returncode != 0:
@@ -218,14 +225,9 @@ class MigrationLinter(object):
             raise Exception("Error while executing git diff command")
         return migrations
 
-    @staticmethod
-    def _gather_all_migrations():
-        from django.db.migrations.loader import MigrationLoader
-
-        migration_loader = MigrationLoader(connection=None, load=False)
-        migration_loader.load_disk()
+    def _gather_all_migrations(self):
         # Prune Django apps
-        for (app_label, _), migration in migration_loader.disk_migrations.items():
+        for (app_label, _), migration in self.migration_loader.disk_migrations.items():
             if app_label not in DJANGO_APPS_WITH_MIGRATIONS:
                 yield migration
 
