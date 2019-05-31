@@ -71,6 +71,20 @@ class Command(BaseCommand):
             help="ignore migrations that are in the specified django apps",
         )
 
+        applied_unapplied_migrations_group = parser.add_mutually_exclusive_group(
+            required=False
+        )
+        applied_unapplied_migrations_group.add_argument(
+            "--unapplied-migrations",
+            action="store_true",
+            help="check only migrations have not been applied to the database yet",
+        )
+        applied_unapplied_migrations_group.add_argument(
+            "--applied-migrations",
+            action="store_true",
+            help="check only migrations that have already been applied to the database",
+        )
+
     def handle(self, *args, **options):
         settings_path = os.path.dirname(
             import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
@@ -90,6 +104,8 @@ class Command(BaseCommand):
             database=options["database"],
             cache_path=options["cache_path"],
             no_cache=options["no_cache"],
+            only_applied_migrations=options["applied_migrations"],
+            only_unapplied_migrations=options["unapplied_migrations"],
         )
         linter.lint_all_migrations(git_commit_id=options["commit_id"])
         linter.print_summary()

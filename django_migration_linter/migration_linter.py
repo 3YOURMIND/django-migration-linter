@@ -46,6 +46,8 @@ class MigrationLinter(object):
         database=DEFAULT_DB_ALIAS,
         cache_path=DEFAULT_CACHE_PATH,
         no_cache=False,
+        only_applied_migrations=False,
+        only_unapplied_migrations=False,
     ):
         # Store parameters and options
         self.django_path = path
@@ -56,6 +58,8 @@ class MigrationLinter(object):
         self.database = database or DEFAULT_DB_ALIAS
         self.cache_path = cache_path or DEFAULT_CACHE_PATH
         self.no_cache = no_cache
+        self.only_applied_migrations = only_applied_migrations
+        self.only_unapplied_migrations = only_unapplied_migrations
 
         # Initialise counters
         self.nb_valid = 0
