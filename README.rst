@@ -57,6 +57,8 @@ Add the migration linter your ``INSTALLED_APPS``:
 ``--database DATABASE``                            Specify the database for which to generate the SQL. Defaults to *default*.
 ``--cache-path PATH``                              specify a directory that should be used to store cache-files in.
 ``--no-cache``                                     Don't use a cache.
+``--applied-migrations``                           Only lint migrations that are applied to the selected database. Other migrations are ignored.
+``--unapplied-migrations``                         Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.
 ================================================== ===========================================================================================================================
 
 Examples
