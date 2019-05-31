@@ -73,3 +73,17 @@ class LinterFunctionsTestCase(unittest.TestCase):
         linter = MigrationLinter()
         migrations = linter._gather_all_migrations()
         self.assertGreater(len(list(migrations)), 1)
+
+    def test_ignore_unapplied_migrations(self):
+        linter = MigrationLinter(only_applied_migrations=True)
+        linter.migration_loader.applied_migrations = {("app_correct", "0002_foo")}
+
+        self.assertTrue(linter.should_ignore_migration("app_correct", "0001_initial"))
+        self.assertFalse(linter.should_ignore_migration("app_correct", "0002_foo"))
+
+    def test_ignore_applied_migrations(self):
+        linter = MigrationLinter(only_unapplied_migrations=True)
+        linter.migration_loader.applied_migrations = {("app_correct", "0002_foo")}
+
+        self.assertFalse(linter.should_ignore_migration("app_correct", "0001_initial"))
+        self.assertTrue(linter.should_ignore_migration("app_correct", "0002_foo"))
