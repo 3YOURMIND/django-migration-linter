@@ -241,4 +241,14 @@ class MigrationLinter(object):
                 and self.ignore_name_contains in migration_name
             )
             or (migration_name in self.ignore_name)
+            or (
+                self.only_applied_migrations
+                and (app_label, migration_name)
+                not in self.migration_loader.applied_migrations
+            )
+            or (
+                self.only_unapplied_migrations
+                and (app_label, migration_name)
+                in self.migration_loader.applied_migrations
+            )
         )
