@@ -43,7 +43,7 @@ Add the migration linter your ``INSTALLED_APPS``:
     ]
 
 
-``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--project-root-path DJANGO_PROJECT_FOLDER]``
+``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--exclude-tests EXCLUDE_TESTS [EXCLUDE TESTS ...]] [--project-root-path DJANGO_PROJECT_FOLDER]``
 
 ================================================== ===========================================================================================================================
                    Parameter                                                                            Description
@@ -53,6 +53,7 @@ Add the migration linter your ``INSTALLED_APPS``:
 ``--ignore-name IGNORE_NAME [IGNORE_NAME ...]``    Ignore migrations with exactly one of these names.
 ``--include-apps INCLUDE_APPS [INCLUDE_APPS ...]`` Check only migrations that are in the specified django apps.
 ``--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]`` Ignore migrations that are in the specified django apps.
+``--exclude-tests EXCLUDE_TESTS [EXCLUDE TES...]`` Specify tests to be ignored (e.g. ALTER_COLUMN).
 ``--verbose or -v``                                Print more information during execution.
 ``--database DATABASE``                            Specify the database for which to generate the SQL. Defaults to *default*.
 ``--cache-path PATH``                              specify a directory that should be used to store cache-files in.
@@ -99,6 +100,52 @@ You can also ignore migrations by adding this to your migrations:
         ]
     # ...
 
+Ignoring tests
+-------------------
+
+You can also ignore tests by adding this option during execution:
+
+``python manage.py lintmigrations --exclude-tests EXCLUDE_TESTS``
+
+The tests list can be found in sql_analyzer (migration_tests):
+
+.. code-block::
+
+    migration_tests = (
+        {
+            "code": "NOT_NULL",
+            "fn": lambda sql, **kw: re.search("(?<!DROP) NOT NULL", sql)
+            and not re.search("CREATE TABLE", sql),
+            "err_msg": "NOT NULL constraint on columns",
+        },
+        {
+            "code": "DROP_COLUMN",
+            "fn": lambda sql, **kw: re.search("DROP COLUMN", sql),
+            "err_msg": "DROPPING columns",
+        },
+        {
+            "code": "RENAME_COLUMN",
+            "fn": lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
+            or re.search("ALTER TABLE .* RENAME COLUMN", sql),
+            "err_msg": "RENAMING columns",
+        },
+        {
+            "code": "RENAME_TABLE",
+            "fn": lambda sql, **kw: re.search("RENAME TABLE", sql)
+            or re.search("ALTER TABLE .* RENAME TO", sql),
+            "err_msg": "RENAMING tables",
+        },
+        {
+            "code": "ALTER_COLUMN",
+            "fn": lambda sql, **kw: re.search("ALTER TABLE .* MODIFY", sql)
+            or re.search("ALTER TABLE .* ALTER COLUMN .* TYPE", sql),
+            "err_msg": (
+                "ALTERING columns (Could be backward compatible. "
+                "You may ignore this migration.)"
+            ),
+        },
+        {"code": "", "fn": has_default, "err_msg": ""},
+    )
 
 Cache
 -----
