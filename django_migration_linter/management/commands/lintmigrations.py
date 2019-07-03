@@ -50,6 +50,10 @@ class Command(BaseCommand):
             "--project-root-path", type=str, nargs="?", help="django project root path"
         )
 
+        parser.add_argument(
+            "--exclude-tests", type=str, nargs="*", help="Specify tests to be ignored (e.g. ALTER_COLUMN)"
+        )
+
         cache_group = parser.add_mutually_exclusive_group(required=False)
         cache_group.add_argument(
             "--cache-path",
@@ -107,6 +111,7 @@ class Command(BaseCommand):
             ignore_name=options["ignore_name"],
             include_apps=options["include_apps"],
             exclude_apps=options["exclude_apps"],
+            exclude_tests=options["exclude_tests"],
             database=options["database"],
             cache_path=options["cache_path"],
             no_cache=options["no_cache"],

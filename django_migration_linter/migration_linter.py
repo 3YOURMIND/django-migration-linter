@@ -42,6 +42,7 @@ class MigrationLinter(object):
         ignore_name=None,
         include_apps=None,
         exclude_apps=None,
+        exclude_tests=None,
         database=DEFAULT_DB_ALIAS,
         cache_path=DEFAULT_CACHE_PATH,
         no_cache=False,
@@ -54,6 +55,7 @@ class MigrationLinter(object):
         self.ignore_name = ignore_name or tuple()
         self.include_apps = include_apps
         self.exclude_apps = exclude_apps
+        self.exclude_tests = exclude_tests
         self.database = database or DEFAULT_DB_ALIAS
         self.cache_path = cache_path or DEFAULT_CACHE_PATH
         self.no_cache = no_cache
@@ -118,7 +120,8 @@ class MigrationLinter(object):
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
-        errors = analyse_sql_statements(sql_statements)
+        exclude_tests = self.exclude_tests or []
+        errors = analyse_sql_statements(sql_statements, exclude_tests)
 
         if not errors:
             print("OK")
