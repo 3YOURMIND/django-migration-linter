@@ -1,3 +1,12 @@
+## 1.2.0
+
+* Add `--unapplied-migrations` and `--applied-migrations` mutually exclusive options
+in order to respectively lint only unapplied or applied migrations.
+* When loading migration starting from a git ref, cross the found migrations
+with the currently loaded migrations in the project.
+* Add `--project-root-path` which allows to specify the root path
+which is used for finding the `.git` folder. (thanks to @linuxmaniac)
+
 ## 1.1.0
 
 * Improve speed of ignored migration through the `IgnoreMigration`  operation.
