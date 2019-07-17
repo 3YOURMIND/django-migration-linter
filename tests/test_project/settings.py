@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "tests.test_project.app_add_not_null_column",
     "tests.test_project.app_add_not_null_column_followed_by_default",
     "tests.test_project.app_alter_column",
+    "tests.test_project.app_alter_column_drop_not_null",
     "tests.test_project.app_correct",
     "tests.test_project.app_create_table_with_not_null_column",
     "tests.test_project.app_drop_column",
