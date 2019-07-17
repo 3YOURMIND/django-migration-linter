@@ -81,6 +81,10 @@ class BaseBackwardCompatibilityDetection(object):
         app = fixtures.ALTER_COLUMN
         self._test_linter_finds_errors(app)
 
+    def test_accept_alter_column_drop_not_null(self):
+        app = fixtures.ALTER_COLUMN_DROP_NOT_NULL
+        self._test_linter_finds_no_errors(app)
+
     def test_with_git_ref(self):
         self._test_linter_finds_errors(commit_id="v0.1.4")
 
