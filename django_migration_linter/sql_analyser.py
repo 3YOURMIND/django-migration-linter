@@ -36,7 +36,7 @@ def has_default(sql, **kwargs):
 migration_tests = (
     {
         "code": "NOT_NULL",
-        "fn": lambda sql, **kw: re.search("NOT NULL", sql)
+        "fn": lambda sql, **kw: re.search("(?<!DROP )NOT NULL", sql)
         and not re.search("CREATE TABLE", sql),
         "err_msg": "NOT NULL constraint on columns",
     },
