@@ -15,6 +15,7 @@
 CREATE_TABLE_WITH_NOT_NULL_COLUMN = "app_create_table_with_not_null_column"
 ADD_NOT_NULL_COLUMN = "app_add_not_null_column"
 DROP_COLUMN = "app_drop_column"
+DROP_TABLE = "app_drop_table"
 RENAME_COLUMN = "app_rename_column"
 RENAME_TABLE = "app_rename_table"
 IGNORE_MIGRATION = "app_ignore_migration"
