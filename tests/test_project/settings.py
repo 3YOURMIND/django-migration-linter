@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "tests.test_project.app_correct",
     "tests.test_project.app_create_table_with_not_null_column",
     "tests.test_project.app_drop_column",
+    "tests.test_project.app_drop_table",
     "tests.test_project.app_ignore_migration",
     "tests.test_project.app_rename_column",
     "tests.test_project.app_rename_table",

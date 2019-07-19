@@ -61,6 +61,10 @@ class BaseBackwardCompatibilityDetection(object):
         app = fixtures.DROP_COLUMN
         self._test_linter_finds_errors(app)
 
+    def test_detect_drop_table(self):
+        app = fixtures.DROP_TABLE
+        self._test_linter_finds_errors(app)
+
     def test_detect_rename_column(self):
         app = fixtures.RENAME_COLUMN
         self._test_linter_finds_errors(app)
