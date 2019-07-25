@@ -51,7 +51,8 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--exclude-tests", type=str, nargs="*", help="Specify tests to be ignored (e.g. ALTER_COLUMN)"
+            "--exclude-tests", type=str, nargs="*", help="Specify tests to be ignored"
+                                                         " (e.g. ALTER_COLUMN)"
         )
 
         cache_group = parser.add_mutually_exclusive_group(required=False)
