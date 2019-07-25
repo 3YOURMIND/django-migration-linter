@@ -107,45 +107,7 @@ You can also ignore tests by adding this option during execution:
 
 ``python manage.py lintmigrations --exclude-tests EXCLUDE_TESTS``
 
-The tests list can be found in sql_analyzer (migration_tests):
-
-.. code-block::
-
-    migration_tests = (
-        {
-            "code": "NOT_NULL",
-            "fn": lambda sql, **kw: re.search("(?<!DROP) NOT NULL", sql)
-            and not re.search("CREATE TABLE", sql),
-            "err_msg": "NOT NULL constraint on columns",
-        },
-        {
-            "code": "DROP_COLUMN",
-            "fn": lambda sql, **kw: re.search("DROP COLUMN", sql),
-            "err_msg": "DROPPING columns",
-        },
-        {
-            "code": "RENAME_COLUMN",
-            "fn": lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
-            or re.search("ALTER TABLE .* RENAME COLUMN", sql),
-            "err_msg": "RENAMING columns",
-        },
-        {
-            "code": "RENAME_TABLE",
-            "fn": lambda sql, **kw: re.search("RENAME TABLE", sql)
-            or re.search("ALTER TABLE .* RENAME TO", sql),
-            "err_msg": "RENAMING tables",
-        },
-        {
-            "code": "ALTER_COLUMN",
-            "fn": lambda sql, **kw: re.search("ALTER TABLE .* MODIFY", sql)
-            or re.search("ALTER TABLE .* ALTER COLUMN .* TYPE", sql),
-            "err_msg": (
-                "ALTERING columns (Could be backward compatible. "
-                "You may ignore this migration.)"
-            ),
-        },
-        {"code": "", "fn": has_default, "err_msg": ""},
-    )
+The tests list can be found in sql_analyzer (migration_tests)
 
 Cache
 -----
