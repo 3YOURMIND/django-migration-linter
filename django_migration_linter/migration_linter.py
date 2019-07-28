@@ -121,10 +121,16 @@ class MigrationLinter(object):
 
         sql_statements = self.get_sql(app_label, migration_name)
         exclude_migration_tests = self.exclude_migration_tests or []
-        errors = analyse_sql_statements(sql_statements, exclude_migration_tests)
+        errors, ignored = analyse_sql_statements(
+            sql_statements, exclude_migration_tests
+        )
 
         if not errors:
-            print("OK")
+            if ignored:
+                print("OK (ignored)")
+                self.print_errors(ignored)
+            else:
+                print("OK")
             self.nb_valid += 1
             if self.should_use_cache():
                 self.new_cache[md5hash] = {"result": "OK"}
