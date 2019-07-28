@@ -87,3 +87,14 @@ class LinterFunctionsTestCase(unittest.TestCase):
 
         self.assertFalse(linter.should_ignore_migration("app_correct", "0001_initial"))
         self.assertTrue(linter.should_ignore_migration("app_correct", "0002_foo"))
+
+    def test_exclude_migration_tests(self):
+        m = Migration("0002_add_new_not_null_field", "app_add_not_null_column")
+
+        linter = MigrationLinter(exclude_migration_tests=[], database="mysql")
+        linter.lint_migration(m)
+        self.assertTrue(linter.has_errors)
+
+        linter = MigrationLinter(exclude_migration_tests=["NOT_NULL"], database="mysql")
+        linter.lint_migration(m)
+        self.assertFalse(linter.has_errors)
