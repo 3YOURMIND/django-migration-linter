@@ -42,12 +42,12 @@ class MigrationLinter(object):
         ignore_name=None,
         include_apps=None,
         exclude_apps=None,
-        exclude_tests=None,
         database=DEFAULT_DB_ALIAS,
         cache_path=DEFAULT_CACHE_PATH,
         no_cache=False,
         only_applied_migrations=False,
         only_unapplied_migrations=False,
+        exclude_migration_tests=None,
     ):
         # Store parameters and options
         self.django_path = path
@@ -55,7 +55,7 @@ class MigrationLinter(object):
         self.ignore_name = ignore_name or tuple()
         self.include_apps = include_apps
         self.exclude_apps = exclude_apps
-        self.exclude_tests = exclude_tests
+        self.exclude_migration_tests = exclude_migration_tests
         self.database = database or DEFAULT_DB_ALIAS
         self.cache_path = cache_path or DEFAULT_CACHE_PATH
         self.no_cache = no_cache
@@ -120,8 +120,8 @@ class MigrationLinter(object):
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
-        exclude_tests = self.exclude_tests or []
-        errors = analyse_sql_statements(sql_statements, exclude_tests)
+        exclude_migration_tests = self.exclude_migration_tests or []
+        errors = analyse_sql_statements(sql_statements, exclude_migration_tests)
 
         if not errors:
             print("OK")

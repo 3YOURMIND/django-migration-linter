@@ -70,12 +70,18 @@ migration_tests = (
 )
 
 
-def analyse_sql_statements(sql_statements, exclude_tests):
+def get_migration_tests(exclude_migration_tests):
+    for test in migration_tests:
+        if test["code"] in exclude_migration_tests:
+            continue
+        yield test
+
+
+def analyse_sql_statements(sql_statements, exclude_migration_tests):
     errors = []
     for statement in sql_statements:
-        for test in migration_tests:
-            if test["code"] not in exclude_tests and test["fn"](statement,
-                                                                errors=errors):
+        for test in get_migration_tests(exclude_migration_tests):
+            if test["fn"](statement, errors=errors):
                 logger.debug("Testing {0} -- ERROR".format(statement))
                 table_search = re.search("TABLE `([^`]*)`", statement, re.IGNORECASE)
                 col_search = re.search("COLUMN `([^`]*)`", statement, re.IGNORECASE)
