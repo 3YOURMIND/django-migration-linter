@@ -92,7 +92,8 @@ class Command(BaseCommand):
             "--exclude-migration-tests",
             type=str,
             nargs="*",
-            help="Specify backward incompatible migration tests to be ignored (e.g. ALTER_COLUMN)",
+            help="Specify backward incompatible migration tests "
+            "to be ignored (e.g. ALTER_COLUMN)",
         )
 
     def handle(self, *args, **options):
