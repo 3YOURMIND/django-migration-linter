@@ -70,6 +70,17 @@ migration_tests = (
 )
 
 
+def build_error_dict(migration_test, sql_statement):
+    table_search = re.search("TABLE `([^`]*)`", sql_statement, re.IGNORECASE)
+    col_search = re.search("COLUMN `([^`]*)`", sql_statement, re.IGNORECASE)
+    return {
+        "err_msg": migration_test["err_msg"],
+        "code": migration_test["code"],
+        "table": table_search.group(1) if table_search else None,
+        "column": col_search.group(1) if col_search else None,
+    }
+
+
 def analyse_sql_statements(sql_statements, exclude_migration_tests):
     errors, ignored = [], []
     for statement in sql_statements:
@@ -77,29 +88,11 @@ def analyse_sql_statements(sql_statements, exclude_migration_tests):
             if test["fn"](statement, errors=errors):
                 if test["code"] in exclude_migration_tests:
                     logger.debug("Testing {0} -- IGNORED".format(statement))
-                    table_search = re.search(
-                        "TABLE `([^`]*)`", statement, re.IGNORECASE
-                    )
-                    col_search = re.search("COLUMN `([^`]*)`", statement, re.IGNORECASE)
-                    err = {
-                        "err_msg": test["err_msg"],
-                        "code": test["code"],
-                        "table": table_search.group(1) if table_search else None,
-                        "column": col_search.group(1) if col_search else None,
-                    }
+                    err = build_error_dict(migration_test=test, sql_statement=statement)
                     ignored.append(err)
                 else:
                     logger.debug("Testing {0} -- ERROR".format(statement))
-                    table_search = re.search(
-                        "TABLE `([^`]*)`", statement, re.IGNORECASE
-                    )
-                    col_search = re.search("COLUMN `([^`]*)`", statement, re.IGNORECASE)
-                    err = {
-                        "err_msg": test["err_msg"],
-                        "code": test["code"],
-                        "table": table_search.group(1) if table_search else None,
-                        "column": col_search.group(1) if col_search else None,
-                    }
+                    err = build_error_dict(migration_test=test, sql_statement=statement)
                     errors.append(err)
             else:
                 logger.debug("Testing {0} -- PASSED".format(statement))
