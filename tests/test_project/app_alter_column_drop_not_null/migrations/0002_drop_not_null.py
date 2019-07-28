@@ -9,8 +9,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='a',
-            name='not_null_field',
-            field=models.IntegerField(null=True),
-        ),
+            model_name="a", name="not_null_field", field=models.IntegerField(null=True)
+        )
     ]
