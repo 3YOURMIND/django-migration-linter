@@ -5,6 +5,9 @@ services:
   - mysql
   - postgresql
 
+git:
+  depth: false
+
 matrix:
   include:
     - python: 2.7
