@@ -43,25 +43,25 @@ Add the migration linter your ``INSTALLED_APPS``:
     ]
 
 
-``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--exclude-tests EXCLUDE_TESTS [EXCLUDE TESTS ...]] [--project-root-path DJANGO_PROJECT_FOLDER]``
+``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--exclude-migration-tests MIGRATION_TEST_CODE [MIGRATION_TEST_CODE ...]] [--project-root-path DJANGO_PROJECT_FOLDER]``
 
-================================================== ===========================================================================================================================
+================================================================ ===========================================================================================================================
                    Parameter                                                                            Description
-================================================== ===========================================================================================================================
-``GIT_COMMIT_ID``                                  If specified, only migrations since this commit will be taken into account. If not specified, all migrations will be linted.
-``--ignore-name-contains IGNORE_NAME_CONTAINS``    Ignore migrations containing this name.
-``--ignore-name IGNORE_NAME [IGNORE_NAME ...]``    Ignore migrations with exactly one of these names.
-``--include-apps INCLUDE_APPS [INCLUDE_APPS ...]`` Check only migrations that are in the specified django apps.
-``--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]`` Ignore migrations that are in the specified django apps.
-``--exclude-tests EXCLUDE_TESTS [EXCLUDE TES...]`` Specify tests to be ignored (e.g. ALTER_COLUMN).
-``--verbose or -v``                                Print more information during execution.
-``--database DATABASE``                            Specify the database for which to generate the SQL. Defaults to *default*.
-``--cache-path PATH``                              specify a directory that should be used to store cache-files in.
-``--no-cache``                                     Don't use a cache.
-``--applied-migrations``                           Only lint migrations that are applied to the selected database. Other migrations are ignored.
-``--unapplied-migrations``                         Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.
-``--project-root-path DJANGO_PROJECT_FOLDER``      An absolute or relative path to the django project.
-================================================== ===========================================================================================================================
+================================================================ ===========================================================================================================================
+``GIT_COMMIT_ID``                                                If specified, only migrations since this commit will be taken into account. If not specified, all migrations will be linted.
+``--ignore-name-contains IGNORE_NAME_CONTAINS``                  Ignore migrations containing this name.
+``--ignore-name IGNORE_NAME [IGNORE_NAME ...]``                  Ignore migrations with exactly one of these names.
+``--include-apps INCLUDE_APPS [INCLUDE_APPS ...]``               Check only migrations that are in the specified django apps.
+``--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]``               Ignore migrations that are in the specified django apps.
+``--exclude-tests MIGRATION_TEST_CODE [MIGRATION_TEST_CODE...]`` Specify backward incompatible migration tests to be ignored using the code (e.g. ALTER_COLUMN).
+``--verbose or -v``                                              Print more information during execution.
+``--database DATABASE``                                          Specify the database for which to generate the SQL. Defaults to *default*.
+``--cache-path PATH``                                            specify a directory that should be used to store cache-files in.
+``--no-cache``                                                   Don't use a cache.
+``--applied-migrations``                                         Only lint migrations that are applied to the selected database. Other migrations are ignored.
+``--unapplied-migrations``                                       Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.
+``--project-root-path DJANGO_PROJECT_FOLDER``                    An absolute or relative path to the django project.
+================================================================ ===========================================================================================================================
 
 Examples
 --------
@@ -100,14 +100,14 @@ You can also ignore migrations by adding this to your migrations:
         ]
     # ...
 
-Ignoring tests
--------------------
+Ignoring migration tests
+------------------------
 
-You can also ignore tests by adding this option during execution:
+You can also ignore backward incompatible migration tests by adding this option during execution:
 
-``python manage.py lintmigrations --exclude-tests EXCLUDE_TESTS``
+``python manage.py lintmigrations --exclude-migration-tests ALTER_COLUMN``
 
-The tests list can be found in sql_analyzer (migration_tests)
+The migration test codes can be found in the file ``django_migration_linter/sql_analyser.py``.
 
 Cache
 -----

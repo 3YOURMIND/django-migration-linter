@@ -1,3 +1,7 @@
+## 1.3.0
+
+* Add `--exclude-migration-tests` option to ignore backward incompatible migration tests.
+
 ## 1.2.0
 
 * Add `--unapplied-migrations` and `--applied-migrations` mutually exclusive options
