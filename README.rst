@@ -53,7 +53,7 @@ Add the migration linter your ``INSTALLED_APPS``:
 ``--ignore-name IGNORE_NAME [IGNORE_NAME ...]``                  Ignore migrations with exactly one of these names.
 ``--include-apps INCLUDE_APPS [INCLUDE_APPS ...]``               Check only migrations that are in the specified django apps.
 ``--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]``               Ignore migrations that are in the specified django apps.
-``--exclude-tests MIGRATION_TEST_CODE [MIGRATION_TEST_CODE...]`` Specify backward incompatible migration tests to be ignored using the code (e.g. ALTER_COLUMN).
+``--exclude-migration-tests MIGRATION_TEST_CODE [...]``          Specify backward incompatible migration tests to be ignored using the code (e.g. ALTER_COLUMN).
 ``--verbose or -v``                                              Print more information during execution.
 ``--database DATABASE``                                          Specify the database for which to generate the SQL. Defaults to *default*.
 ``--cache-path PATH``                                            specify a directory that should be used to store cache-files in.
