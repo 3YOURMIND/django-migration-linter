@@ -1,6 +1,11 @@
 ## 1.3.0
 
 * Add `--exclude-migration-tests` option to ignore backward incompatible migration tests.
+* Do not falsely detect dropping `NOT NULL`  constraint.
+
+Internal change:
+
+* Differentiate different database vendors during SQL analysis.
 
 ## 1.2.0
 
