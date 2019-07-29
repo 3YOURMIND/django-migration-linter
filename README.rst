@@ -77,6 +77,7 @@ The linter analyses your migrations and checks the SQL for:
 
 - Added ``NOT NULL`` columns, which don't have a DEFAULT value
 - Dropping columns
+- Dropping tables
 - Renaming columns
 - Renaming tables
 - Altering columns (which can be backward compatible and potentially ignored)

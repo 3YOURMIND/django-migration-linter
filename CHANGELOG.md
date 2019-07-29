@@ -2,6 +2,7 @@
 
 * Add `--exclude-migration-tests` option to ignore backward incompatible migration tests.
 * Do not falsely detect dropping `NOT NULL`  constraint.
+* Detect `DROP TABLE` backward incompatible migration.
 
 Internal change:
 
