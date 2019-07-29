@@ -28,7 +28,7 @@ class LinterFunctionsTestCase(unittest.TestCase):
         self.assertEqual(sql_statements[-1], "COMMIT;")
 
     def test_has_errors(self):
-        linter = MigrationLinter()
+        linter = MigrationLinter(database="mysql")
         self.assertFalse(linter.has_errors)
 
         m = Migration("0001_create_table", "app_add_not_null_column")
