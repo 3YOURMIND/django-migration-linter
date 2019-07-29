@@ -50,6 +50,12 @@ class BaseAnalyser(object):
             "mode": "one_liner",
         },
         {
+            "code": "DROP_TABLE",
+            "fn": lambda sql, **kw: sql.startswith("DROP TABLE"),
+            "err_msg": "DROPPING table",
+            "mode": "one_liner",
+        },
+        {
             "code": "RENAME_COLUMN",
             "fn": lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
             or re.search("ALTER TABLE .* RENAME COLUMN", sql),

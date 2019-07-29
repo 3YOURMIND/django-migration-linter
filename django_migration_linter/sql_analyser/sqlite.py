@@ -26,6 +26,16 @@ class SqliteAnalyser(BaseAnalyser):
             and "new__" not in sql,
         },
         {
+            "code": "DROP_TABLE",
+            # TODO: improve to detect that the table names overlap
+            "fn": lambda sql_statements, **kw: any(
+                sql.startswith("DROP TABLE") for sql in sql_statements
+            )
+            and not any(sql.startswith("CREATE TABLE") for sql in sql_statements),
+            "err_msg": "DROPPING table",
+            "mode": "transaction",
+        },
+        {
             "code": "NOT_NULL",
             "fn": lambda sql_statements, **kw: any(
                 re.search("NOT NULL(?! PRIMARY)(?! DEFAULT)", sql)
