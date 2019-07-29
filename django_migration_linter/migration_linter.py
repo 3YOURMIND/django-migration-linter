@@ -20,6 +20,7 @@ import os
 import re
 from subprocess import Popen, PIPE
 
+from django.conf import settings
 from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connections
 
@@ -122,7 +123,9 @@ class MigrationLinter(object):
         sql_statements = self.get_sql(app_label, migration_name)
         exclude_migration_tests = self.exclude_migration_tests or []
         errors, ignored = analyse_sql_statements(
-            sql_statements, exclude_migration_tests
+            sql_statements,
+            settings.DATABASES[self.database]["ENGINE"],
+            exclude_migration_tests,
         )
 
         if not errors:

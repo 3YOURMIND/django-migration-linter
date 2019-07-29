@@ -79,7 +79,7 @@ class BaseBackwardCompatibilityDetection(object):
 
     def test_detect_alter_column(self):
         app = fixtures.ALTER_COLUMN
-        self._test_linter_finds_errors(app)
+        self._test_linter_finds_no_errors(app)
 
     def test_accept_alter_column_drop_not_null(self):
         app = fixtures.ALTER_COLUMN_DROP_NOT_NULL
@@ -109,3 +109,7 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
     BaseBackwardCompatibilityDetection, unittest.TestCase
 ):
     databases = ["postgresql"]
+
+    def test_detect_alter_column(self):
+        app = fixtures.ALTER_COLUMN
+        self._test_linter_finds_errors(app)

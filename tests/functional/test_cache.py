@@ -64,15 +64,15 @@ class CacheTestCase(unittest.TestCase):
         self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
         self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
         self.assertListEqual(
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
             [
                 {
-                    "err_msg": "RENAMING tables",
-                    "code": "RENAME_TABLE",
+                    "err_msg": "NOT NULL constraint on columns",
+                    "code": "NOT_NULL",
                     "table": None,
                     "column": None,
                 }
             ],
+            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
         )
 
         # Start the Linter again -> should use cache now.
@@ -116,15 +116,15 @@ class CacheTestCase(unittest.TestCase):
         self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
         self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
         self.assertListEqual(
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
             [
                 {
-                    "err_msg": "RENAMING tables",
-                    "code": "RENAME_TABLE",
+                    "err_msg": "NOT NULL constraint on columns",
+                    "code": "NOT_NULL",
                     "table": None,
                     "column": None,
                 }
             ],
+            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
         )
 
         # Start the Linter again but with different database, should not be the same cache
@@ -143,15 +143,15 @@ class CacheTestCase(unittest.TestCase):
         self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
         self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
         self.assertListEqual(
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
             [
                 {
                     "err_msg": "NOT NULL constraint on columns",
                     "code": "NOT_NULL",
-                    "table": "app_add_not_null_column_a",
-                    "column": "new_not_null_field",
+                    "table": None,
+                    "column": None,
                 }
             ],
+            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
         )
 
         self.assertTrue(linter.has_errors)
@@ -256,15 +256,15 @@ class CacheTestCase(unittest.TestCase):
         self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
         self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
         self.assertListEqual(
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
             [
                 {
-                    "err_msg": "RENAMING tables",
-                    "code": "RENAME_TABLE",
+                    "err_msg": "NOT NULL constraint on columns",
+                    "code": "NOT_NULL",
                     "table": None,
                     "column": None,
                 }
             ],
+            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
         )
 
         # Start the Linter again -> should use cache now but ignore the erroneous
