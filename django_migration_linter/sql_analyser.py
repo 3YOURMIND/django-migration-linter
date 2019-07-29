@@ -83,7 +83,8 @@ sqlite_migration_tests = [
     {
         "code": "RENAME_TABLE",
         "fn": lambda sql, **kw: re.search("ALTER TABLE .* RENAME TO", sql)
-        and "__old" not in sql,
+        and "__old" not in sql
+        and "new__" not in sql,
     },
     {
         "code": "NOT_NULL",
@@ -91,7 +92,8 @@ sqlite_migration_tests = [
             re.search("NOT NULL(?! PRIMARY)(?! DEFAULT)", sql) for sql in sql_statements
         )
         and any(
-            re.search("ALTER TABLE .* RENAME TO", sql) and "__old" in sql
+            re.search("ALTER TABLE .* RENAME TO", sql)
+            and ("__old" in sql or "new__" in sql)
             for sql in sql_statements
         ),
         "mode": "transaction",

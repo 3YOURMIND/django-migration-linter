@@ -101,6 +101,15 @@ class SqliteAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
 
+    def test_alter_column_after_django22(self):
+        sql = [
+            'CREATE TABLE "new__app_alter_column_a" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "field" varchar(10) NULL);',
+            'INSERT INTO "new__app_alter_column_a" ("id", "field") SELECT "id", "field" FROM "app_alter_column_a";',
+            'DROP TABLE "app_alter_column_a";',
+            'ALTER TABLE "new__app_alter_column_a" RENAME TO "app_alter_column_a";',
+        ]
+        self.assertValidSql(sql)
+
 
 class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
     database_vendor = "postgresql"
