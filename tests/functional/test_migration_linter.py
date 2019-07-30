@@ -85,6 +85,10 @@ class BaseBackwardCompatibilityDetection(object):
         app = fixtures.ALTER_COLUMN
         self._test_linter_finds_no_errors(app)
 
+    def test_drop_unique_together(self):
+        app = fixtures.DROP_UNIQUE_TOGETHER
+        self._test_linter_finds_errors(app)
+
     def test_accept_alter_column_drop_not_null(self):
         app = fixtures.ALTER_COLUMN_DROP_NOT_NULL
         self._test_linter_finds_no_errors(app)

@@ -62,6 +62,13 @@ class MySqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
 
+    def test_unique_together(self):
+        sql = "ALTER TABLE `app_unique_together_a` ADD CONSTRAINT `app_unique_together_a_int_field_char_field_979ac7d8_uniq` UNIQUE (`int_field`, `char_field`);"
+        self.assertBackwardIncompatibleSql(sql)
+
+        sql = "ALTER TABLE `app_unique_together_a` DROP INDEX `app_unique_together_a_int_field_char_field_979ac7d8_uniq`;"
+        self.assertValidSql(sql)
+
 
 class SqliteAnalyserTestCase(SqlAnalyserTestCase):
     database_vendor = "sqlite"
@@ -110,6 +117,13 @@ class SqliteAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
 
+    def test_unique_together(self):
+        sql = 'CREATE UNIQUE INDEX "app_unique_together_a_int_field_char_field_979ac7d8_uniq" ON "app_unique_together_a" ("int_field", "char_field");'
+        self.assertBackwardIncompatibleSql(sql)
+
+        sql = 'DROP INDEX "app_unique_together_a_int_field_char_field_979ac7d8_uniq";'
+        self.assertValidSql(sql)
+
 
 class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
     database_vendor = "postgresql"
@@ -128,4 +142,11 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
 
     def test_drop_not_null(self):
         sql = 'ALTER TABLE "app_alter_column_drop_not_null_a" ALTER COLUMN "not_null_field" DROP NOT NULL;'
+        self.assertValidSql(sql)
+
+    def test_unique_together(self):
+        sql = 'ALTER TABLE "app_unique_together_a" ADD CONSTRAINT "app_unique_together_a_int_field_char_field_979ac7d8_uniq" UNIQUE ("int_field", "char_field");'
+        self.assertBackwardIncompatibleSql(sql)
+
+        sql = 'ALTER TABLE "app_unique_together_a" DROP CONSTRAINT "app_unique_together_a_int_field_char_field_979ac7d8_uniq";'
         self.assertValidSql(sql)
