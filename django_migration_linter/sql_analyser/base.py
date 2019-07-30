@@ -73,6 +73,14 @@ class BaseAnalyser(object):
             ),
             "mode": "one_liner",
         },
+        {
+            "code": "ADD_UNIQUE",
+            "fn": lambda sql, **kw: re.search(
+                "ALTER TABLE .* ADD CONSTRAINT .* UNIQUE", sql
+            ),
+            "err_msg": "ADDING unique constraint",
+            "mode": "one_liner",
+        },
     ]
 
     migration_tests = []

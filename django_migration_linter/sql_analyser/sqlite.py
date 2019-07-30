@@ -48,4 +48,8 @@ class SqliteAnalyser(BaseAnalyser):
             ),
             "mode": "transaction",
         },
+        {
+            "code": "ADD_UNIQUE",
+            "fn": lambda sql, **kw: sql.startswith("CREATE UNIQUE INDEX"),
+        },
     ]
