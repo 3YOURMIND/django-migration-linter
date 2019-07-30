@@ -3,6 +3,9 @@
 * Add `--exclude-migration-tests` option to ignore backward incompatible migration tests.
 * Do not falsely detect dropping `NOT NULL`  constraint.
 * Detect `DROP TABLE` backward incompatible migration.
+* Detect adding a `UNIQUE` constraint as backward incompatible migration.
+* Handle when Django tries to generate the SQL of a migration but raises an exception because
+it cannot find the name of a certain constraint (because it has been dropped already).
 
 Internal change:
 
