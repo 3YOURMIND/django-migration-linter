@@ -22,7 +22,7 @@ from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
 
 from .cache import Cache
 from .constants import DEFAULT_CACHE_PATH
@@ -207,7 +207,7 @@ class MigrationLinter(object):
                 database=self.database,
                 stdout=dev_null,
             )
-        except ValueError:
+        except (ValueError, ProgrammingError):
             logger.warning(
                 (
                     "Error while executing sqlmigrate on (%s, %s). "
