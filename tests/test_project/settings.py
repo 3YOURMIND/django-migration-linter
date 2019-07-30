@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "tests.test_project.app_ignore_migration",
     "tests.test_project.app_rename_column",
     "tests.test_project.app_rename_table",
+    "tests.test_project.app_unique_together",
 ]
 
 MIDDLEWARE = [
