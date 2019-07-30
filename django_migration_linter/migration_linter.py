@@ -199,13 +199,24 @@ class MigrationLinter(object):
             "Calling sqlmigrate command {} {}".format(app_label, migration_name)
         )
         dev_null = open(os.devnull, "w")
-        sql_statement = call_command(
-            "sqlmigrate",
-            app_label,
-            migration_name,
-            database=self.database,
-            stdout=dev_null,
-        )
+        try:
+            sql_statement = call_command(
+                "sqlmigrate",
+                app_label,
+                migration_name,
+                database=self.database,
+                stdout=dev_null,
+            )
+        except ValueError:
+            logger.warning(
+                (
+                    "Error while executing sqlmigrate on (%s, %s). "
+                    "Continuing execution with empty SQL."
+                ),
+                app_label,
+                migration_name,
+            )
+            sql_statement = ""
         return sql_statement.splitlines()
 
     def _gather_migrations_git(self, git_commit_id):
