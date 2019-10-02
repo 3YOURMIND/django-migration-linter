@@ -26,6 +26,15 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
+            "--include-migrations-in-file",
+            metavar="FILE_PATH",
+            type=str,
+            nargs="?",
+            help=(
+                "if specified, only migrations inside the file " "will be considered",
+            ),
+        )
+        parser.add_argument(
             "--ignore-name-contains",
             type=str,
             nargs="?",
@@ -122,7 +131,10 @@ class Command(BaseCommand):
             only_unapplied_migrations=options["unapplied_migrations"],
             exclude_migration_tests=options["exclude_migration_tests"],
         )
-        linter.lint_all_migrations(git_commit_id=options["commit_id"])
+        linter.lint_all_migrations(
+            git_commit_id=options["commit_id"],
+            migrations_file_path=options["include_migrations_in_file"],
+        )
         linter.print_summary()
         if linter.has_errors:
             sys.exit(1)
