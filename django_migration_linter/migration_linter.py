@@ -85,10 +85,12 @@ class MigrationLinter(object):
     def should_use_cache(self):
         return self.django_path and not self.no_cache
 
-    def lint_all_migrations(self, git_commit_id=None):
+    def lint_all_migrations(self, git_commit_id=None, migrations_file_path=None):
         # Collect migrations
         if git_commit_id:
             migrations = self._gather_migrations_git(git_commit_id)
+        elif migrations_file_path:
+            migrations = self._gather_migrations_from_file(migrations_file_path)
         else:
             migrations = self._gather_all_migrations()
 
@@ -246,6 +248,23 @@ class MigrationLinter(object):
                 output.append(line)
             logger.error("Error while git diff command:\n{}".format("".join(output)))
             raise Exception("Error while executing git diff command")
+        return migrations
+
+    def _gather_migrations_from_file(self, migrations_file_path):
+        from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
+
+        migrations = []
+
+        with open(migrations_file_path, "r") as f:
+            lines = f.read()
+            for line in lines:
+                if (
+                    re.search(r"/{0}/.*\.py".format(MIGRATIONS_MODULE_NAME), line)
+                    and "__init__" not in line
+                ):
+                    app_label, name = split_migration_path(line)
+                    migration = self.migration_loader.disk_migrations[app_label, name]
+                    migrations.append(migration)
         return migrations
 
     def _gather_all_migrations(self):
