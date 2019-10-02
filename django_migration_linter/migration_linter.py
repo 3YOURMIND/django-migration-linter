@@ -256,8 +256,10 @@ class MigrationLinter(object):
         migrations = []
 
         with open(migrations_file_path, "r") as f:
-            lines = f.read()
-            for line in lines:
+            for line in f:
+                if not line:
+                    continue
+
                 if (
                     re.search(r"/{0}/.*\.py".format(MIGRATIONS_MODULE_NAME), line)
                     and "__init__" not in line
