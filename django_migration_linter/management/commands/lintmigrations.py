@@ -26,15 +26,6 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
-            "--include-migrations-in-file",
-            metavar="FILE_PATH",
-            type=str,
-            nargs="?",
-            help=(
-                "if specified, only migrations inside the file " "will be considered",
-            ),
-        )
-        parser.add_argument(
             "--ignore-name-contains",
             type=str,
             nargs="?",
@@ -58,7 +49,13 @@ class Command(BaseCommand):
         parser.add_argument(
             "--project-root-path", type=str, nargs="?", help="django project root path"
         )
-
+        parser.add_argument(
+            "--include-migrations-from",
+            metavar="FILE_PATH",
+            type=str,
+            nargs="?",
+            help="if specified, only migrations listed in the file will be considered",
+        )
         cache_group = parser.add_mutually_exclusive_group(required=False)
         cache_group.add_argument(
             "--cache-path",
@@ -133,7 +130,7 @@ class Command(BaseCommand):
         )
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],
-            migrations_file_path=options["include_migrations_in_file"],
+            migrations_file_path=options["include_migrations_from"],
         )
         linter.print_summary()
         if linter.has_errors:
