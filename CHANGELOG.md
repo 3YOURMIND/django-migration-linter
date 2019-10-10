@@ -1,3 +1,8 @@
+## 1.4.0
+
+* Add `--include-migrations-from` option to only consider migrations specified in a given file.
+No matter if the migrations are selected from a git commit or not, we only select the ones in the given file.
+
 ## 1.3.0
 
 * Add `--exclude-migration-tests` option to ignore backward incompatible migration tests.

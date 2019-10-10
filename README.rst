@@ -43,7 +43,7 @@ Add the migration linter your ``INSTALLED_APPS``:
     ]
 
 
-``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--exclude-migration-tests MIGRATION_TEST_CODE [MIGRATION_TEST_CODE ...]] [--project-root-path DJANGO_PROJECT_FOLDER]``
+``python manage.py lintmigrations [GIT_COMMIT_ID] [--ignore-name-contains IGNORE_NAME_CONTAINS] [--include-apps INCLUDE_APPS [INCLUDE_APPS ...] | --exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]] [--exclude-migration-tests MIGRATION_TEST_CODE [MIGRATION_TEST_CODE ...]] [--project-root-path DJANGO_PROJECT_FOLDER] [--include-migrations-from FILE_PATH]``
 
 ================================================================ ===========================================================================================================================
                    Parameter                                                                            Description
@@ -61,6 +61,7 @@ Add the migration linter your ``INSTALLED_APPS``:
 ``--applied-migrations``                                         Only lint migrations that are applied to the selected database. Other migrations are ignored.
 ``--unapplied-migrations``                                       Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.
 ``--project-root-path DJANGO_PROJECT_FOLDER``                    An absolute or relative path to the django project.
+``--include-migrations-from FILE_PATH``                          If specified, only migrations listed in the given file will be considered.
 ================================================================ ===========================================================================================================================
 
 Examples
@@ -101,6 +102,8 @@ You can also ignore migrations by adding this to your migrations:
             # ...
         ]
     # ...
+
+Or you can restrict the migrations that should be selected by a file containing there paths with the ``--include-migrations-from`` option.
 
 Ignoring migration tests
 ------------------------
