@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import unittest
+import tempfile
 
 from django.db.migrations import Migration
 
@@ -98,3 +99,42 @@ class LinterFunctionsTestCase(unittest.TestCase):
         linter = MigrationLinter(exclude_migration_tests=["NOT_NULL"], database="mysql")
         linter.lint_migration(m)
         self.assertFalse(linter.has_errors)
+
+    def test_read_migrations_unknown_file(self):
+        file_path = "unknown_file"
+        migration_list = MigrationLinter.read_migrations_list(file_path)
+        self.assertEqual([], migration_list)
+
+    def test_read_migrations_empty_file(self):
+        with tempfile.NamedTemporaryFile() as tmp:
+            migration_list = MigrationLinter.read_migrations_list(tmp.name)
+            self.assertEqual([], migration_list)
+
+    def test_read_migrations_from_file(self):
+        tmp = tempfile.NamedTemporaryFile(mode="w", delete=False)
+        tmp.write(
+            "test_project/app_add_not_null_column/migrations/0001_create_table.py\n"
+        )
+        tmp.write("unknown\n")
+        tmp.write(
+            "test_project/app_add_not_null_column/migrations/0002_add_new_not_null_field.py\n"
+        )
+        tmp.close()
+        migration_list = MigrationLinter.read_migrations_list(tmp.name)
+        self.assertEqual(
+            [
+                ("app_add_not_null_column", "0001_create_table"),
+                ("app_add_not_null_column", "0002_add_new_not_null_field"),
+            ],
+            migration_list,
+        )
+
+    def test_gather_migrations_with_list(self):
+        linter = MigrationLinter()
+        migrations = linter._gather_all_migrations(
+            migrations_list=[
+                ("app_add_not_null_column", "0001_create_table"),
+                ("app_add_not_null_column", "0002_add_new_not_null_field"),
+            ]
+        )
+        self.assertEqual(2, len(list(migrations)))

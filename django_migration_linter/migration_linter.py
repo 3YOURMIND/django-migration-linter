@@ -87,12 +87,11 @@ class MigrationLinter(object):
 
     def lint_all_migrations(self, git_commit_id=None, migrations_file_path=None):
         # Collect migrations
+        migrations_list = self.read_migrations_list(migrations_file_path)
         if git_commit_id:
-            migrations = self._gather_migrations_git(git_commit_id)
-        elif migrations_file_path:
-            migrations = self._gather_migrations_from_file(migrations_file_path)
+            migrations = self._gather_migrations_git(git_commit_id, migrations_list)
         else:
-            migrations = self._gather_all_migrations()
+            migrations = self._gather_all_migrations(migrations_list)
 
         # Lint those migrations
         sorted_migrations = sorted(
@@ -221,9 +220,32 @@ class MigrationLinter(object):
             sql_statement = ""
         return sql_statement.splitlines()
 
-    def _gather_migrations_git(self, git_commit_id):
+    @staticmethod
+    def is_migration_file(filename):
         from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
 
+        return (
+            re.search(r"/{0}/.*\.py".format(MIGRATIONS_MODULE_NAME), filename)
+            and "__init__" not in filename
+        )
+
+    @classmethod
+    def read_migrations_list(cls, migrations_file_path):
+        if not migrations_file_path:
+            return []
+
+        migrations = []
+        try:
+            with open(migrations_file_path, "r") as file:
+                for line in file:
+                    if cls.is_migration_file(line):
+                        app_label, name = split_migration_path(line)
+                        migrations.append((app_label, name))
+        except IOError:
+            logger.warning("Migrations list path not found %s", migrations_file_path)
+        return migrations
+
+    def _gather_migrations_git(self, git_commit_id, migrations_list=None):
         migrations = []
         # Get changes since specified commit
         git_diff_command = (
@@ -233,13 +255,11 @@ class MigrationLinter(object):
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
-            if (
-                re.search(r"/{0}/.*\.py".format(MIGRATIONS_MODULE_NAME), line)
-                and "__init__" not in line
-            ):
+            if self.is_migration_file(line):
                 app_label, name = split_migration_path(line)
-                migration = self.migration_loader.disk_migrations[app_label, name]
-                migrations.append(migration)
+                if not migrations_list or (app_label, name) in migrations_list:
+                    migration = self.migration_loader.disk_migrations[app_label, name]
+                    migrations.append(migration)
         diff_process.wait()
 
         if diff_process.returncode != 0:
@@ -250,30 +270,14 @@ class MigrationLinter(object):
             raise Exception("Error while executing git diff command")
         return migrations
 
-    def _gather_migrations_from_file(self, migrations_file_path):
-        from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
-
-        migrations = []
-
-        with open(migrations_file_path, "r") as f:
-            for line in f:
-                if not line:
-                    continue
-
-                if (
-                    re.search(r"/{0}/.*\.py".format(MIGRATIONS_MODULE_NAME), line)
-                    and "__init__" not in line
-                ):
-                    app_label, name = split_migration_path(line)
-                    migration = self.migration_loader.disk_migrations[app_label, name]
-                    migrations.append(migration)
-        return migrations
-
-    def _gather_all_migrations(self):
-        # Prune Django apps
-        for (app_label, _), migration in self.migration_loader.disk_migrations.items():
-            if app_label not in DJANGO_APPS_WITH_MIGRATIONS:
-                yield migration
+    def _gather_all_migrations(self, migrations_list=None):
+        for (
+            (app_label, name),
+            migration,
+        ) in self.migration_loader.disk_migrations.items():
+            if app_label not in DJANGO_APPS_WITH_MIGRATIONS:  # Prune Django apps
+                if not migrations_list or (app_label, name) in migrations_list:
+                    yield migration
 
     def should_ignore_migration(self, app_label, migration_name, operations=()):
         return (
