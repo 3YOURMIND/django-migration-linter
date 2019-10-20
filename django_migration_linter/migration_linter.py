@@ -121,18 +121,19 @@ class MigrationLinter(object):
         app_label = migration.app_label
         migration_name = migration.name
         operations = migration.operations
-        print("({0}, {1})... ".format(app_label, migration_name), end="")
         self.nb_total += 1
 
         md5hash = self.get_migration_hash(app_label, migration_name)
 
         if self.should_ignore_migration(app_label, migration_name, operations):
-            print("IGNORE")
+            self.print_linting_msg(
+                app_label, migration_name, "IGNORE", MessageType.IGNORE
+            )
             self.nb_ignored += 1
             return
 
         if self.should_use_cache() and md5hash in self.old_cache:
-            self.lint_cached_migration(md5hash)
+            self.lint_cached_migration(app_label, migration_name, md5hash)
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
@@ -145,16 +146,18 @@ class MigrationLinter(object):
 
         if not errors:
             if ignored:
-                print("OK (ignored)")
+                self.print_linting_msg(
+                    app_label, migration_name, "OK (ignored)", MessageType.IGNORE
+                )
                 self.print_errors(ignored)
             else:
-                print("OK")
+                self.print_linting_msg(app_label, migration_name, "OK", MessageType.OK)
             self.nb_valid += 1
             if self.should_use_cache():
                 self.new_cache[md5hash] = {"result": "OK"}
             return
 
-        print("ERR")
+        self.print_linting_msg(app_label, migration_name, "ERR", MessageType.ERROR)
         self.nb_erroneous += 1
         self.print_errors(errors)
         if self.should_use_cache():
@@ -168,24 +171,36 @@ class MigrationLinter(object):
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
 
-    def lint_cached_migration(self, md5hash):
+    def lint_cached_migration(self, app_label, migration_name, md5hash):
         cached_value = self.old_cache[md5hash]
         if cached_value["result"] == "IGNORE":
-            print("IGNORE (cached)")
+            self.print_linting_msg(
+                app_label, migration_name, "IGNORE (cached)", MessageType.IGNORE
+            )
             self.nb_ignored += 1
         elif cached_value["result"] == "OK":
-            print("OK (cached)")
+            self.print_linting_msg(
+                app_label, migration_name, "OK (cached)", MessageType.OK
+            )
             self.nb_valid += 1
         else:
-            print("ERR (cached)")
+            self.print_linting_msg(
+                app_label, migration_name, "ERR (cached)", MessageType.ERROR
+            )
             self.nb_erroneous += 1
             if "errors" in cached_value:
                 self.print_errors(cached_value["errors"])
 
         self.new_cache[md5hash] = cached_value
 
-    @staticmethod
-    def print_errors(errors):
+    def print_linting_msg(self, app_label, migration_name, msg, lint_result):
+        if lint_result.value in self.quiet:
+            return
+        print("({0}, {1})... {2}".format(app_label, migration_name, msg))
+
+    def print_errors(self, errors):
+        if MessageType.ERROR.value in self.quiet:
+            return
         for err in errors:
             error_str = "\t{0}".format(err["err_msg"])
             if err["table"]:
