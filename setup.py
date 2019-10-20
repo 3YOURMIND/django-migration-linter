@@ -43,7 +43,11 @@ setup(
     author_email="david.wobrock@gmail.com",
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests/"]),
-    install_requires=["django>=1.11", "appdirs==1.4.3"],
+    install_requires=[
+        "django>=1.11",
+        "appdirs==1.4.3",
+        'enum34==1.1.6;python_version<"3.4"',
+    ],
     extras_require={
         "test": [
             "tox==3.9.0",
