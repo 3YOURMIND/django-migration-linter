@@ -61,6 +61,7 @@ class MigrationLinter(object):
         only_applied_migrations=False,
         only_unapplied_migrations=False,
         exclude_migration_tests=None,
+        quiet=None,
     ):
         # Store parameters and options
         self.django_path = path
@@ -74,6 +75,7 @@ class MigrationLinter(object):
         self.no_cache = no_cache
         self.only_applied_migrations = only_applied_migrations
         self.only_unapplied_migrations = only_unapplied_migrations
+        self.quiet = quiet or []
 
         # Initialise counters
         self.nb_valid = 0

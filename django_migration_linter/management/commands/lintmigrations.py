@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 from ...constants import __version__
 
-from ...migration_linter import MigrationLinter
+from ...migration_linter import MigrationLinter, MessageType
 
 
 class Command(BaseCommand):
@@ -102,6 +102,14 @@ class Command(BaseCommand):
             "to be ignored (e.g. ALTER_COLUMN)",
         )
 
+        parser.add_argument(
+            "-q",
+            "--quiet",
+            nargs="+",
+            choices=MessageType.values(),
+            help="don't print linting messages to stdout",
+        )
+
     def handle(self, *args, **options):
         if options["project_root_path"]:
             settings_path = options["project_root_path"]
@@ -127,6 +135,7 @@ class Command(BaseCommand):
             only_applied_migrations=options["applied_migrations"],
             only_unapplied_migrations=options["unapplied_migrations"],
             exclude_migration_tests=options["exclude_migration_tests"],
+            quiet=options["quiet"],
         )
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],
