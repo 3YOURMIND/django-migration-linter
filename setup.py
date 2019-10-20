@@ -51,9 +51,9 @@ setup(
     extras_require={
         "test": [
             "tox==3.14.0",
-            "mysqlclient==1.4.2",
-            "psycopg2-binary==2.8.2",
-            "django_add_default_value==0.3.1",
+            "mysqlclient==1.4.4",
+            "psycopg2-binary==2.8.4",
+            "django_add_default_value==0.3.2",
         ]
     },
     keywords="django migration lint linter database backward compatibility",
