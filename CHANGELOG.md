@@ -2,6 +2,7 @@
 
 * Add `--include-migrations-from` option to only consider migrations specified in a given file.
 No matter if the migrations are selected from a git commit or not, we only select the ones in the given file.
+* Add ``--quiet {ok,ignore,error}`` option to remove different or multiple types of messages from being printed to stdout.
 
 ## 1.3.0
 
