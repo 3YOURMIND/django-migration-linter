@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_migration_linter",
+    "tests.test_project.app_add_manytomany_field",
     "tests.test_project.app_add_not_null_column",
     "tests.test_project.app_add_not_null_column_followed_by_default",
     "tests.test_project.app_alter_column",
