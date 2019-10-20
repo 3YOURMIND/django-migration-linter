@@ -136,21 +136,26 @@ class BaseAnalyser(object):
         else:
             logger.debug("Testing %s -- PASSED", sql)
 
-    @staticmethod
-    def build_error_dict(migration_test, sql_statement):
-        table_search = (
-            re.search("TABLE `([^`]*)`", sql_statement, re.IGNORECASE)
-            if isinstance(sql_statement, str)
-            else None
-        )
-        col_search = (
-            re.search("COLUMN `([^`]*)`", sql_statement, re.IGNORECASE)
-            if isinstance(sql_statement, str)
-            else None
-        )
+    def build_error_dict(self, migration_test, sql_statement):
+        table = self.detect_table(sql_statement)
+        col = self.detect_column(sql_statement)
         return {
             "err_msg": migration_test["err_msg"],
             "code": migration_test["code"],
-            "table": table_search.group(1) if table_search else None,
-            "column": col_search.group(1) if col_search else None,
+            "table": table,
+            "column": col,
         }
+
+    @staticmethod
+    def detect_table(sql):
+        if isinstance(sql, str):
+            regex_result = re.search("TABLE [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            if regex_result:
+                return regex_result.group(1)
+
+    @staticmethod
+    def detect_column(sql):
+        if isinstance(sql, str):
+            regex_result = re.search("COLUMN [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            if regex_result:
+                return regex_result.group(1)
