@@ -93,6 +93,10 @@ class BaseBackwardCompatibilityDetection(object):
         app = fixtures.ALTER_COLUMN_DROP_NOT_NULL
         self._test_linter_finds_no_errors(app)
 
+    def test_accept_adding_manytomany_field(self):
+        app = fixtures.ADD_MANYTOMANY_FIELD
+        self._test_linter_finds_no_errors(app)
+
     def test_with_git_ref(self):
         self._test_linter_finds_errors(commit_id="v0.1.4")
 
