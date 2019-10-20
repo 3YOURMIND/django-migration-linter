@@ -27,3 +27,13 @@ class MySqlAnalyser(BaseAnalyser):
             "mode": "one_liner",
         }
     ]
+
+    @staticmethod
+    def detect_column(sql):
+        if isinstance(sql, str):
+            regex_result = re.search("COLUMN [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            if regex_result:
+                return regex_result.group(1)
+            regex_result = re.search("MODIFY [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            if regex_result:
+                return regex_result.group(1)
