@@ -126,13 +126,12 @@ class BaseAnalyser(object):
 
     def _test_sql(self, test, sql):
         if test["fn"](sql, errors=self.errors):
+            err = build_error_dict(migration_test=test, sql_statement=sql)
             if test["code"] in self.exclude_migration_tests:
                 logger.debug("Testing %s -- IGNORED", sql)
-                err = build_error_dict(migration_test=test, sql_statement=sql)
                 self.ignored.append(err)
             else:
                 logger.debug("Testing %s -- ERROR", sql)
-                err = build_error_dict(migration_test=test, sql_statement=sql)
                 self.errors.append(err)
         else:
             logger.debug("Testing %s -- PASSED", sql)
