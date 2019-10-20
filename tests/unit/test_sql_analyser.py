@@ -69,6 +69,15 @@ class MySqlAnalyserTestCase(SqlAnalyserTestCase):
         sql = "ALTER TABLE `app_unique_together_a` DROP INDEX `app_unique_together_a_int_field_char_field_979ac7d8_uniq`;"
         self.assertValidSql(sql)
 
+    def test_add_many_to_many_field(self):
+        sql = [
+            "CREATE TABLE `app_add_manytomany_field_b_many_to_many`(`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `b_id` integer NOT NULL, `a_id` integer NOT NULL);",
+            "ALTER TABLE `app_add_manytomany_field_b_many_to_many` ADD CONSTRAINT `app_add_manytomany_f_b_id_953b185b_fk_app_add_m` FOREIGN KEY(`b_id`) REFERENCES `app_add_manytomany_field_b`(`id`);",
+            "ALTER TABLE `app_add_manytomany_field_b_many_to_many` ADD CONSTRAINT `app_add_manytomany_f_a_id_4b44832a_fk_app_add_m` FOREIGN KEY(`a_id`) REFERENCES `app_add_manytomany_field_a`(`id`);",
+            "ALTER TABLE `app_add_manytomany_field_b_many_to_many` ADD CONSTRAINT `app_add_manytomany_field_b_many_to_many_b_id_a_id_3e15251d_uniq` UNIQUE(`b_id`, `a_id`);",
+        ]
+        self.assertValidSql(sql)
+
 
 class SqliteAnalyserTestCase(SqlAnalyserTestCase):
     database_vendor = "sqlite"
@@ -124,6 +133,15 @@ class SqliteAnalyserTestCase(SqlAnalyserTestCase):
         sql = 'DROP INDEX "app_unique_together_a_int_field_char_field_979ac7d8_uniq";'
         self.assertValidSql(sql)
 
+    def test_add_many_to_many_field(self):
+        sql = [
+            'CREATE TABLE "app_add_manytomany_field_b_many_to_many"("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "b_id" integer NOT NULL REFERENCES "app_add_manytomany_field_b"("id") DEFERRABLE INITIALLY DEFERRED, "a_id" integer NOT NULL REFERENCES "app_add_manytomany_field_a"("id") DEFERRABLE INITIALLY DEFERRED);',
+            'CREATE UNIQUE INDEX "app_add_manytomany_field_b_many_to_many_b_id_a_id_3e15251d_uniq" ON "app_add_manytomany_field_b_many_to_many"("b_id", "a_id");',
+            'CREATE INDEX "app_add_manytomany_field_b_many_to_many_b_id_953b185b" ON "app_add_manytomany_field_b_many_to_many"("b_id");',
+            'CREATE INDEX "app_add_manytomany_field_b_many_to_many_a_id_4b44832a" ON "app_add_manytomany_field_b_many_to_many"("a_id");',
+        ]
+        self.assertValidSql(sql)
+
 
 class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
     database_vendor = "postgresql"
@@ -149,4 +167,15 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         self.assertBackwardIncompatibleSql(sql)
 
         sql = 'ALTER TABLE "app_unique_together_a" DROP CONSTRAINT "app_unique_together_a_int_field_char_field_979ac7d8_uniq";'
+        self.assertValidSql(sql)
+
+    def test_add_many_to_many_field(self):
+        sql = [
+            'CREATE TABLE "app_add_manytomany_field_b_many_to_many"("id" serial NOT NULL PRIMARY KEY, "b_id" integer NOT NULL, "a_id" integer NOT NULL);',
+            'ALTER TABLE "app_add_manytomany_field_b_many_to_many" ADD CONSTRAINT "app_add_manytomany_f_b_id_953b185b_fk_app_add_m" FOREIGN KEY("b_id") REFERENCES "app_add_manytomany_field_b"("id") DEFERRABLE INITIALLY DEFERRED;',
+            'ALTER TABLE "app_add_manytomany_field_b_many_to_many" ADD CONSTRAINT "app_add_manytomany_f_a_id_4b44832a_fk_app_add_m" FOREIGN KEY("a_id") REFERENCES "app_add_manytomany_field_a"("id") DEFERRABLE INITIALLY DEFERRED;',
+            'ALTER TABLE "app_add_manytomany_field_b_many_to_many" ADD CONSTRAINT "app_add_manytomany_field_b_many_to_many_b_id_a_id_3e15251d_uniq" UNIQUE("b_id", "a_id");',
+            'CREATE INDEX "app_add_manytomany_field_b_many_to_many_b_id_953b185b" ON "app_add_manytomany_field_b_many_to_many"("b_id");',
+            'CREATE INDEX "app_add_manytomany_field_b_many_to_many_a_id_4b44832a" ON "app_add_manytomany_field_b_many_to_many"("a_id");',
+        ]
         self.assertValidSql(sql)
