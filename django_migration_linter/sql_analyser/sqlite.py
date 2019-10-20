@@ -67,3 +67,13 @@ class SqliteAnalyser(BaseAnalyser):
         },
         {"code": "ADD_UNIQUE", "fn": has_add_unique, "mode": "transaction"},
     ]
+
+    @staticmethod
+    def detect_table(sql):
+        if isinstance(sql, str):
+            regex_result = re.search("TABLE [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            if regex_result:
+                return regex_result.group(1)
+            regex_result = re.search("ON [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            if regex_result:
+                return regex_result.group(1)
