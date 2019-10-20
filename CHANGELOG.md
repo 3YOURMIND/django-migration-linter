@@ -4,6 +4,7 @@
 No matter if the migrations are selected from a git commit or not, we only select the ones in the given file.
 * Add ``--quiet {ok,ignore,error}`` option to remove different or multiple types of messages from being printed to stdout.
 * Make detection of problematic table and column a bit more resilient for UX.
+* Add Python 3.8 to test matrix and update test dependencies.
 
 Fixed bugs:
 
