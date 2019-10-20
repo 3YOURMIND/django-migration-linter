@@ -15,7 +15,7 @@
 import logging
 import re
 
-from .utils import update_migration_tests, build_error_dict
+from .utils import update_migration_tests
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,7 @@ class BaseAnalyser(object):
 
     def _test_sql(self, test, sql):
         if test["fn"](sql, errors=self.errors):
-            err = build_error_dict(migration_test=test, sql_statement=sql)
+            err = self.build_error_dict(migration_test=test, sql_statement=sql)
             if test["code"] in self.exclude_migration_tests:
                 logger.debug("Testing %s -- IGNORED", sql)
                 self.ignored.append(err)
@@ -135,3 +135,22 @@ class BaseAnalyser(object):
                 self.errors.append(err)
         else:
             logger.debug("Testing %s -- PASSED", sql)
+
+    @staticmethod
+    def build_error_dict(migration_test, sql_statement):
+        table_search = (
+            re.search("TABLE `([^`]*)`", sql_statement, re.IGNORECASE)
+            if isinstance(sql_statement, str)
+            else None
+        )
+        col_search = (
+            re.search("COLUMN `([^`]*)`", sql_statement, re.IGNORECASE)
+            if isinstance(sql_statement, str)
+            else None
+        )
+        return {
+            "err_msg": migration_test["err_msg"],
+            "code": migration_test["code"],
+            "table": table_search.group(1) if table_search else None,
+            "column": col_search.group(1) if col_search else None,
+        }
