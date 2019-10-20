@@ -17,6 +17,23 @@ import re
 from .base import BaseAnalyser
 
 
+def has_add_unique(sql_statements, **kwargs):
+    regex_result = None
+    for sql in sql_statements:
+        regex_result = re.search('CREATE UNIQUE INDEX .* ON (".*?")', sql)
+        if regex_result:
+            break
+    if not regex_result:
+        return False
+
+    concerned_table = regex_result.group(1)
+    table_is_added_in_transaction = any(
+        sql.startswith("CREATE TABLE {}".format(concerned_table))
+        for sql in sql_statements
+    )
+    return not table_is_added_in_transaction
+
+
 class SqliteAnalyser(BaseAnalyser):
     migration_tests = [
         {
@@ -48,8 +65,5 @@ class SqliteAnalyser(BaseAnalyser):
             ),
             "mode": "transaction",
         },
-        {
-            "code": "ADD_UNIQUE",
-            "fn": lambda sql, **kw: sql.startswith("CREATE UNIQUE INDEX"),
-        },
+        {"code": "ADD_UNIQUE", "fn": has_add_unique, "mode": "transaction"},
     ]

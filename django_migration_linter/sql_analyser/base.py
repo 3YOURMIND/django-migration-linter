@@ -28,6 +28,23 @@ def has_not_null_column(sql_statements, **kwargs):
     ) and not any("SET DEFAULT" in sql for sql in sql_statements)
 
 
+def has_add_unique(sql_statements, **kwargs):
+    regex_result = None
+    for sql in sql_statements:
+        regex_result = re.search("ALTER TABLE (.*) ADD CONSTRAINT .* UNIQUE", sql)
+        if regex_result:
+            break
+    if not regex_result:
+        return False
+
+    concerned_table = regex_result.group(1)
+    table_is_added_in_transaction = any(
+        sql.startswith("CREATE TABLE {}".format(concerned_table))
+        for sql in sql_statements
+    )
+    return not table_is_added_in_transaction
+
+
 class BaseAnalyser(object):
     base_migration_tests = [
         {
@@ -75,11 +92,9 @@ class BaseAnalyser(object):
         },
         {
             "code": "ADD_UNIQUE",
-            "fn": lambda sql, **kw: re.search(
-                "ALTER TABLE .* ADD CONSTRAINT .* UNIQUE", sql
-            ),
+            "fn": has_add_unique,
             "err_msg": "ADDING unique constraint",
-            "mode": "one_liner",
+            "mode": "transaction",
         },
     ]
 
