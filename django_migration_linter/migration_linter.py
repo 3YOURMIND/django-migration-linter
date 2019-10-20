@@ -23,6 +23,7 @@ from subprocess import Popen, PIPE
 from django.conf import settings
 from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
+from enum import Enum, unique
 
 from .cache import Cache
 from .constants import DEFAULT_CACHE_PATH
@@ -33,6 +34,17 @@ from .sql_analyser import analyse_sql_statements
 logger = logging.getLogger(__name__)
 
 DJANGO_APPS_WITH_MIGRATIONS = ("admin", "auth", "contenttypes", "sessions")
+
+
+@unique
+class MessageType(Enum):
+    OK = "ok"
+    IGNORE = "ignore"
+    ERROR = "error"
+
+    @staticmethod
+    def values():
+        return list(map(lambda c: c.value, MessageType))
 
 
 class MigrationLinter(object):
