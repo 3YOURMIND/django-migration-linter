@@ -40,6 +40,15 @@ matrix:
     - python: 3.7
       env: TOXENV=py37-django22
 
+    - python: 3.8
+      env: TOXENV=py38-django111
+    - python: 3.8
+      env: TOXENV=py38-django20
+    - python: 3.8
+      env: TOXENV=py38-django21
+    - python: 3.8
+      env: TOXENV=py38-django22
+
     - python: 3.6
       env: TOXENV=lint
 
