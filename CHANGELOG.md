@@ -1,3 +1,7 @@
+## 1.4.1
+
+* Update testing dependencies (``mysqlclient``, Django 2.2 and ``black``)
+
 ## 1.4.0
 
 * Add `--include-migrations-from` option to only consider migrations specified in a given file.
