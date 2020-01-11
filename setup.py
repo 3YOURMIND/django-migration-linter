@@ -16,7 +16,7 @@ def get_version():
     return str(ast.literal_eval(version))
 
 
-with open(path.join(PROJECT_DIR, "README.rst")) as f:
+with open(path.join(PROJECT_DIR, "README.md")) as f:
     long_description = f.read()
 
 
@@ -25,6 +25,7 @@ setup(
     version=get_version(),
     description="Detect backward incompatible migrations for your django project",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url="https://github.com/3YOURMIND/django-migration-linter",
     author="3YOURMIND GmbH",
     author_email="david.wobrock@gmail.com",
