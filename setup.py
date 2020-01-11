@@ -38,7 +38,7 @@ setup(
     version=get_version(),
     description="Detect backward incompatible migrations for your django project",
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     url="https://github.com/3YOURMIND/django-migration-linter",
     author="3YOURMIND GmbH",
     author_email="david.wobrock@gmail.com",
