@@ -1,3 +1,9 @@
+## 1.5.0
+
+* Rework documentation.
+Make README smaller and clearer.
+Move detailed documentation to docs/ folder.
+
 ## 1.4.1
 
 * Update testing dependencies (``mysqlclient``, Django 2.2 and ``black``)
