@@ -3,6 +3,7 @@
 * Rework documentation.
 Make README smaller and clearer.
 Move detailed documentation to docs/ folder.
+* Add Django 3.0 to test matrix.
 
 ## 1.4.1
 
