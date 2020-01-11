@@ -1,0 +1,41 @@
+# Usage
+
+## Command line usage
+
+The linter is installed as a Django app and is integrated through the Django management command system. 
+
+`python manage.py lintmigrations [GIT_COMMIT_ID] ...`
+
+Detailed command line options:
+
+|                   Parameter                                  |                                        Description                                                                          |
+|--------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+|`GIT_COMMIT_ID`                                               | If specified, only migrations since this commit will be taken into account. If not specified, all migrations will be linted.|
+|`--ignore-name-contains IGNORE_NAME_CONTAINS`                 | Ignore migrations containing this name.                                                                                     |
+|`--ignore-name IGNORE_NAME [IGNORE_NAME ...]`                 | Ignore migrations with exactly one of these names.                                                                          |
+|`--include-apps INCLUDE_APPS [INCLUDE_APPS ...]`              | Check only migrations that are in the specified django apps.                                                                |
+|`--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]`              | Ignore migrations that are in the specified django apps.                                                                    |
+|`--exclude-migration-tests MIGRATION_TEST_CODE [...]`         | Specify backward incompatible migration tests to be ignored using the code (e.g. ALTER_COLUMN).                             |
+|`--verbosity or -v {0,1,2,3}`                                 | Print more information during execution.                                                                                    |
+|`--database DATABASE`                                         | Specify the database for which to generate the SQL. Defaults to *default*.                                                  |
+|`--cache-path PATH`                                           | specify a directory that should be used to store cache-files in.                                                            |
+|`--no-cache`                                                  | Don't use a cache.                                                                                                          |
+|`--applied-migrations`                                        | Only lint migrations that are applied to the selected database. Other migrations are ignored.                               |
+|`--unapplied-migrations`                                      | Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.                       |
+|`--project-root-path DJANGO_PROJECT_FOLDER`                   | An absolute or relative path to the django project.                                                                         |
+|`--include-migrations-from FILE_PATH`                         | If specified, only migrations listed in the given file will be considered.                                                  |
+|`--quiet or -q {ok,ignore,error}`                             | Suppress certain output messages, instead of writing them to stdout.                                                        |
+
+## Ignoring migration tests
+
+You can also ignore backward incompatible migration tests by adding this option during execution:
+
+`python manage.py lintmigrations --exclude-migration-tests ALTER_COLUMN`
+
+The migration test codes can be found in the [corresponding source code files](../django_migration_linter/sql_analyser/base.py).
+
+## Production usage example
+
+[3YOURMIND](https://www.3yourmind.com/) is running the linter on every build getting pushed through CI.
+That enables to be sure that the migrations will allow A/B testing, Blue/Green deployment and they won't break your development environment.
+A non-zero error code is returned to express that at least one invalid migration has been found.
