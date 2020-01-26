@@ -130,7 +130,12 @@ class MigrationLinter(object):
             exclude_migration_tests,
         )
 
-        if not errors:
+        if errors:
+            self.print_linting_msg(app_label, migration_name, "ERR", MessageType.ERROR)
+            self.nb_erroneous += 1
+            self.print_errors(errors)
+            value_to_cache = {"result": "ERR", "errors": errors}
+        else:
             if ignored:
                 self.print_linting_msg(
                     app_label, migration_name, "OK (ignored)", MessageType.IGNORE
@@ -139,15 +144,10 @@ class MigrationLinter(object):
             else:
                 self.print_linting_msg(app_label, migration_name, "OK", MessageType.OK)
             self.nb_valid += 1
-            if self.should_use_cache():
-                self.new_cache[md5hash] = {"result": "OK"}
-            return
+            value_to_cache = {"result": "OK"}
 
-        self.print_linting_msg(app_label, migration_name, "ERR", MessageType.ERROR)
-        self.nb_erroneous += 1
-        self.print_errors(errors)
         if self.should_use_cache():
-            self.new_cache[md5hash] = {"result": "ERR", "errors": errors}
+            self.new_cache[md5hash] = value_to_cache
 
     @staticmethod
     def get_migration_hash(app_label, migration_name):
