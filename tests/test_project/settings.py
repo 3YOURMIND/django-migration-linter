@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "tests.test_project.app_rename_column",
     "tests.test_project.app_rename_table",
     "tests.test_project.app_unique_together",
+    "tests.test_project.app_data_migrations",
 ]
 
 MIDDLEWARE = [
