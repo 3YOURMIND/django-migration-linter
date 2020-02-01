@@ -1,14 +1,16 @@
 from __future__ import print_function
 
 import hashlib
+import inspect
 import logging
 import os
 import re
+from collections import defaultdict
 from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
+from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError, migrations
 from enum import Enum, unique
 
 from .cache import Cache
@@ -20,12 +22,14 @@ from .sql_analyser import analyse_sql_statements
 logger = logging.getLogger(__name__)
 
 DJANGO_APPS_WITH_MIGRATIONS = ("admin", "auth", "contenttypes", "sessions")
+EXPECTED_DATA_MIGRATION_ARGS = ("apps", "schema_editor")
 
 
 @unique
 class MessageType(Enum):
     OK = "ok"
     IGNORE = "ignore"
+    WARNING = "warning"
     ERROR = "error"
 
     @staticmethod
@@ -55,7 +59,7 @@ class MigrationLinter(object):
         self.ignore_name = ignore_name or tuple()
         self.include_apps = include_apps
         self.exclude_apps = exclude_apps
-        self.exclude_migration_tests = exclude_migration_tests
+        self.exclude_migration_tests = exclude_migration_tests or []
         self.database = database or DEFAULT_DB_ALIAS
         self.cache_path = cache_path or DEFAULT_CACHE_PATH
         self.no_cache = no_cache
@@ -66,6 +70,7 @@ class MigrationLinter(object):
         # Initialise counters
         self.nb_valid = 0
         self.nb_ignored = 0
+        self.nb_warnings = 0
         self.nb_erroneous = 0
         self.nb_total = 0
 
@@ -123,18 +128,32 @@ class MigrationLinter(object):
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
-        exclude_migration_tests = self.exclude_migration_tests or []
         errors, ignored = analyse_sql_statements(
             sql_statements,
             settings.DATABASES[self.database]["ENGINE"],
-            exclude_migration_tests,
+            self.exclude_migration_tests,
         )
+
+        err, warnings = self.analyse_data_migration(
+            app_label, migration_name, self.exclude_migration_tests
+        )
+        if err:
+            errors += err
 
         if errors:
             self.print_linting_msg(app_label, migration_name, "ERR", MessageType.ERROR)
             self.nb_erroneous += 1
             self.print_errors(errors)
-            value_to_cache = {"result": "ERR", "errors": errors}
+            if warnings:
+                self.print_warnings(warnings)
+            value_to_cache = {"result": "ERR", "errors": errors, "warnings": warnings}
+        elif warnings:
+            self.print_linting_msg(
+                app_label, migration_name, "WARNING", MessageType.WARNING
+            )
+            self.nb_warnings += 1
+            self.print_warnings(warnings)
+            value_to_cache = {"result": "WARNING", "warnings": warnings}
         else:
             if ignored:
                 self.print_linting_msg(
@@ -169,6 +188,12 @@ class MigrationLinter(object):
                 app_label, migration_name, "OK (cached)", MessageType.OK
             )
             self.nb_valid += 1
+        elif cached_value["result"] == "WARNING":
+            self.print_linting_msg(
+                app_label, migration_name, "WARNING (cached)", MessageType.WARNING
+            )
+            self.nb_warnings += 1
+            self.print_warnings(cached_value["warnings"])
         else:
             self.print_linting_msg(
                 app_label, migration_name, "ERR (cached)", MessageType.ERROR
@@ -176,6 +201,8 @@ class MigrationLinter(object):
             self.nb_erroneous += 1
             if "errors" in cached_value:
                 self.print_errors(cached_value["errors"])
+            if "warnings" in cached_value and cached_value["warnings"]:
+                self.print_warnings(cached_value["warnings"])
 
         self.new_cache[md5hash] = cached_value
 
@@ -196,14 +223,32 @@ class MigrationLinter(object):
                 error_str += ")"
             print(error_str)
 
+    def print_warnings(self, warnings):
+        if MessageType.WARNING.value in self.quiet:
+            return
+
+        for function_name, warning_details in warnings.items():
+            for warn_detail in warning_details:
+                warn_str = "\tWARN '{}': {}".format(
+                    function_name, warn_detail["warn_msg"]
+                )
+                print(warn_str)
+
     def print_summary(self):
         print("*** Summary:")
         print(
             (
                 "Valid migrations: {1}/{0} - "
                 "erroneous migrations: {2}/{0} - "
-                "ignored migrations: {3}/{0}"
-            ).format(self.nb_total, self.nb_valid, self.nb_erroneous, self.nb_ignored)
+                "migrations with warnings: {3}/{0} - "
+                "ignored migrations: {4}/{0}"
+            ).format(
+                self.nb_total,
+                self.nb_valid,
+                self.nb_erroneous,
+                self.nb_warnings,
+                self.nb_ignored,
+            )
         )
 
     @property
@@ -315,3 +360,46 @@ class MigrationLinter(object):
                 in self.migration_loader.applied_migrations
             )
         )
+
+    def analyse_data_migration(
+        self, app_label, migration_name, exclude_migration_tests
+    ):
+        migration = self.migration_loader.disk_migrations[(app_label, migration_name)]
+        errors = []
+        warnings = defaultdict(list)
+
+        for operation in migration.operations:
+            if isinstance(operation, migrations.RunPython):
+                function_name = operation.code.__name__
+                op_errors, op_warnings = self.lint_runpython(operation)
+                if op_errors:
+                    errors += op_errors
+                if op_warnings:
+                    warnings[function_name] = op_warnings
+
+        return errors, warnings
+
+    @staticmethod
+    def lint_runpython(runpython):
+        error = []
+        warning = []
+
+        if not runpython.reversible:
+            warning.append(
+                {
+                    "code": "REVERSIBLE_DATA_MIGRATION",
+                    "warn_msg": "RunPython data migration is not reversible",
+                }
+            )
+
+        args_spec = inspect.getfullargspec(runpython.code)
+        if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
+            warning.append(
+                {
+                    "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
+                    "warn_msg": "By convention, RunPython names the two arguments: apps, schema_editor",
+                }
+            )
+
+        # TODO: test if importing model directly or correctly using "get_model()"
+        return error, warning
