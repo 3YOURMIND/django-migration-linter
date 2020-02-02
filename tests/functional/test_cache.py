@@ -53,7 +53,7 @@ class CacheTestCase(unittest.TestCase):
         self.assertListEqual(
             [
                 {
-                    "err_msg": "NOT NULL constraint on columns",
+                    "msg": "NOT NULL constraint on columns",
                     "code": "NOT_NULL",
                     "table": None,
                     "column": None,
@@ -105,7 +105,7 @@ class CacheTestCase(unittest.TestCase):
         self.assertListEqual(
             [
                 {
-                    "err_msg": "NOT NULL constraint on columns",
+                    "msg": "NOT NULL constraint on columns",
                     "code": "NOT_NULL",
                     "table": None,
                     "column": None,
@@ -132,7 +132,7 @@ class CacheTestCase(unittest.TestCase):
         self.assertListEqual(
             [
                 {
-                    "err_msg": "NOT NULL constraint on columns",
+                    "msg": "NOT NULL constraint on columns",
                     "code": "NOT_NULL",
                     "table": None,
                     "column": None,
@@ -245,7 +245,7 @@ class CacheTestCase(unittest.TestCase):
         self.assertListEqual(
             [
                 {
-                    "err_msg": "NOT NULL constraint on columns",
+                    "msg": "NOT NULL constraint on columns",
                     "code": "NOT_NULL",
                     "table": None,
                     "column": None,

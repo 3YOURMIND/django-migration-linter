@@ -52,6 +52,7 @@ class MigrationLinter(object):
         only_unapplied_migrations=False,
         exclude_migration_tests=None,
         quiet=None,
+        warning_as_error=False,
     ):
         # Store parameters and options
         self.django_path = path
@@ -66,6 +67,7 @@ class MigrationLinter(object):
         self.only_applied_migrations = only_applied_migrations
         self.only_unapplied_migrations = only_unapplied_migrations
         self.quiet = quiet or []
+        self.warning_as_error = warning_as_error
 
         # Initialise counters
         self.nb_valid = 0
@@ -134,12 +136,17 @@ class MigrationLinter(object):
             self.exclude_migration_tests,
         )
 
-        err, warnings = self.analyse_data_migration(
-            app_label, migration_name, self.exclude_migration_tests
-        )
+        err, ignored_data, warnings = self.analyse_data_migration(app_label, migration_name)
         if err:
             errors += err
+        if ignored_data:
+            ignored += ignored_data
 
+        if self.warning_as_error:
+            errors += warnings
+            warnings = []
+
+        # Fixme: have a more generic approach to handling errors/warnings/ignored/ok?
         if errors:
             self.print_linting_msg(app_label, migration_name, "ERR", MessageType.ERROR)
             self.nb_erroneous += 1
@@ -154,6 +161,7 @@ class MigrationLinter(object):
             self.nb_warnings += 1
             self.print_warnings(warnings)
             value_to_cache = {"result": "WARNING", "warnings": warnings}
+            # Fixme: not displaying ignored errors, when
         else:
             if ignored:
                 self.print_linting_msg(
@@ -215,10 +223,10 @@ class MigrationLinter(object):
         if MessageType.ERROR.value in self.quiet:
             return
         for err in errors:
-            error_str = "\t{0}".format(err["err_msg"])
-            if err["table"]:
+            error_str = "\t{0}".format(err["msg"])
+            if err.get("table"):
                 error_str += " (table: {0}".format(err["table"])
-                if err["column"]:
+                if err.get("column"):
                     error_str += ", column: {0}".format(err["column"])
                 error_str += ")"
             print(error_str)
@@ -227,12 +235,9 @@ class MigrationLinter(object):
         if MessageType.WARNING.value in self.quiet:
             return
 
-        for function_name, warning_details in warnings.items():
-            for warn_detail in warning_details:
-                warn_str = "\tWARN '{}': {}".format(
-                    function_name, warn_detail["warn_msg"]
-                )
-                print(warn_str)
+        for warning_details in warnings:
+            warn_str = "\tWARN {}".format(warning_details["msg"])
+            print(warn_str)
 
     def print_summary(self):
         print("*** Summary:")
@@ -361,45 +366,54 @@ class MigrationLinter(object):
             )
         )
 
-    def analyse_data_migration(
-        self, app_label, migration_name, exclude_migration_tests
-    ):
+    def analyse_data_migration(self, app_label, migration_name):
         migration = self.migration_loader.disk_migrations[(app_label, migration_name)]
         errors = []
-        warnings = defaultdict(list)
+        ignored = []
+        warnings = []
 
         for operation in migration.operations:
             if isinstance(operation, migrations.RunPython):
-                function_name = operation.code.__name__
-                op_errors, op_warnings = self.lint_runpython(operation)
+                op_errors, op_ignored, op_warnings = self.lint_runpython(operation)
                 if op_errors:
                     errors += op_errors
+                if op_ignored:
+                    ignored += op_ignored
                 if op_warnings:
-                    warnings[function_name] = op_warnings
+                    warnings += op_warnings
 
-        return errors, warnings
+        return errors, ignored, warnings
 
-    @staticmethod
-    def lint_runpython(runpython):
+    def lint_runpython(self, runpython):
+        function_name = runpython.code.__name__
         error = []
+        ignored = []
         warning = []
 
         if not runpython.reversible:
-            warning.append(
-                {
-                    "code": "REVERSIBLE_DATA_MIGRATION",
-                    "warn_msg": "RunPython data migration is not reversible",
-                }
-            )
+            issue = {
+                "code": "REVERSIBLE_DATA_MIGRATION",
+                "msg": "'{}': RunPython data migration is not reversible".format(
+                    function_name
+                ),
+            }
+            if issue["code"] in self.exclude_migration_tests:
+                ignored.append(issue)
+            else:
+                warning.append(issue)
 
         args_spec = inspect.getfullargspec(runpython.code)
         if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
-            warning.append(
-                {
-                    "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
-                    "warn_msg": "By convention, RunPython names the two arguments: apps, schema_editor",
-                }
-            )
+            issue = {
+                "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
+                "msg": "'{}': By convention, RunPython names the two arguments: apps, schema_editor".format(
+                    function_name
+                ),
+            }
+            if issue["code"] in self.exclude_migration_tests:
+                ignored.append(issue)
+            else:
+                warning.append(issue)
 
         # TODO: test if importing model directly or correctly using "get_model()"
-        return error, warning
+        return error, ignored, warning

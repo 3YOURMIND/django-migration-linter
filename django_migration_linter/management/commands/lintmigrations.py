@@ -109,6 +109,9 @@ class Command(BaseCommand):
             choices=MessageType.values(),
             help="don't print linting messages to stdout",
         )
+        parser.add_argument(
+            "--warning-as-error", action="store_true", help="handle warnings as errors",
+        )
 
     def handle(self, *args, **options):
         if options["project_root_path"]:
@@ -136,6 +139,7 @@ class Command(BaseCommand):
             only_unapplied_migrations=options["unapplied_migrations"],
             exclude_migration_tests=options["exclude_migration_tests"],
             quiet=options["quiet"],
+            warning_as_error=options["warning_as_error"],
         )
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],

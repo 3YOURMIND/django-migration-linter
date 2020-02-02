@@ -35,7 +35,7 @@ class SqliteAnalyser(BaseAnalyser):
                 sql.startswith("DROP TABLE") for sql in sql_statements
             )
             and not any(sql.startswith("CREATE TABLE") for sql in sql_statements),
-            "err_msg": "DROPPING table",
+            "msg": "DROPPING table",
             "mode": "transaction",
         },
         {

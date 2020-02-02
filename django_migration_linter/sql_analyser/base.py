@@ -37,32 +37,32 @@ class BaseAnalyser(object):
             "code": "RENAME_TABLE",
             "fn": lambda sql, **kw: re.search("RENAME TABLE", sql)
             or re.search("ALTER TABLE .* RENAME TO", sql),
-            "err_msg": "RENAMING tables",
+            "msg": "RENAMING tables",
             "mode": "one_liner",
         },
         {
             "code": "NOT_NULL",
             "fn": has_not_null_column,
-            "err_msg": "NOT NULL constraint on columns",
+            "msg": "NOT NULL constraint on columns",
             "mode": "transaction",
         },
         {
             "code": "DROP_COLUMN",
             "fn": lambda sql, **kw: re.search("DROP COLUMN", sql),
-            "err_msg": "DROPPING columns",
+            "msg": "DROPPING columns",
             "mode": "one_liner",
         },
         {
             "code": "DROP_TABLE",
             "fn": lambda sql, **kw: sql.startswith("DROP TABLE"),
-            "err_msg": "DROPPING table",
+            "msg": "DROPPING table",
             "mode": "one_liner",
         },
         {
             "code": "RENAME_COLUMN",
             "fn": lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
             or re.search("ALTER TABLE .* RENAME COLUMN", sql),
-            "err_msg": "RENAMING columns",
+            "msg": "RENAMING columns",
             "mode": "one_liner",
         },
         {
@@ -70,7 +70,7 @@ class BaseAnalyser(object):
             "fn": lambda sql, **kw: re.search(
                 "ALTER TABLE .* ALTER COLUMN .* TYPE", sql
             ),
-            "err_msg": (
+            "msg": (
                 "ALTERING columns (Could be backward compatible. "
                 "You may ignore this migration.)"
             ),
@@ -79,7 +79,7 @@ class BaseAnalyser(object):
         {
             "code": "ADD_UNIQUE",
             "fn": has_add_unique,
-            "err_msg": "ADDING unique constraint",
+            "msg": "ADDING unique constraint",
             "mode": "transaction",
         },
     ]
@@ -126,7 +126,7 @@ class BaseAnalyser(object):
         table = self.detect_table(sql_statement)
         col = self.detect_column(sql_statement)
         return {
-            "err_msg": migration_test["err_msg"],
+            "msg": migration_test["msg"],
             "code": migration_test["code"],
             "table": table,
             "column": col,
