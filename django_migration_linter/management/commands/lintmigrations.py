@@ -110,7 +110,9 @@ class Command(BaseCommand):
             help="don't print linting messages to stdout",
         )
         parser.add_argument(
-            "--warnings-as-errors", action="store_true", help="handle warnings as errors",
+            "--warnings-as-errors",
+            action="store_true",
+            help="handle warnings as errors",
         )
 
     def handle(self, *args, **options):
