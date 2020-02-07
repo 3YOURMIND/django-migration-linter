@@ -49,11 +49,11 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.assertEqual(1, self.linter.nb_valid)
         self.assertFalse(self.linter.has_errors)
 
-    def test_warning_as_error(self):
+    def test_warnings_as_errors(self):
         self.linter = MigrationLinter(
             self.test_project_path,
             include_apps=fixtures.DATA_MIGRATIONS,
-            warning_as_error=True,
+            warnings_as_errors=True,
         )
 
         reverse_migration = self.linter.migration_loader.disk_migrations[

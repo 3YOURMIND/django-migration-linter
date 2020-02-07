@@ -12,3 +12,10 @@ The linter analyses your migrations and checks the SQL for:
 
 Those are the most important and frequent backward incompatible migrations.
 We are happy to add more if you can specify them to us.
+
+
+## Warnings
+
+On data migrations, the linter will show a warning when:
+* you are missing a reverse migration
+* the RunPython arguments do not respect the naming convention `apps, schema_editor`
