@@ -14,7 +14,11 @@ from django.db.migrations import RunPython
 from enum import Enum, unique
 
 from .cache import Cache
-from .constants import DEFAULT_CACHE_PATH, EXPECTED_DATA_MIGRATION_ARGS, DJANGO_APPS_WITH_MIGRATIONS
+from .constants import (
+    DEFAULT_CACHE_PATH,
+    EXPECTED_DATA_MIGRATION_ARGS,
+    DJANGO_APPS_WITH_MIGRATIONS,
+)
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 from .operations import IgnoreMigration
 from .sql_analyser import analyse_sql_statements
@@ -133,7 +137,9 @@ class MigrationLinter(object):
             self.exclude_migration_tests,
         )
 
-        err, ignored_data, warnings = self.analyse_data_migration(app_label, migration_name)
+        err, ignored_data, warnings = self.analyse_data_migration(
+            app_label, migration_name
+        )
         if err:
             errors += err
         if ignored_data:
@@ -403,9 +409,10 @@ class MigrationLinter(object):
         if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
             issue = {
                 "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
-                "msg": "'{}': By convention, RunPython names the two arguments: apps, schema_editor".format(
-                    function_name
-                ),
+                "msg": (
+                    "'{}': By convention, "
+                    "RunPython names the two arguments: apps, schema_editor"
+                ).format(function_name),
             }
             if issue["code"] in self.exclude_migration_tests:
                 ignored.append(issue)
