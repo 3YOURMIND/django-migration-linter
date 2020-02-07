@@ -47,7 +47,7 @@ setup(
     },
     keywords="django migration lint linter database backward compatibility",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Environment :: Web Environment",
         "Framework :: Django",
