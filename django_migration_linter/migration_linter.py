@@ -137,9 +137,7 @@ class MigrationLinter(object):
             self.exclude_migration_tests,
         )
 
-        err, ignored_data, warnings = self.analyse_data_migration(
-            app_label, migration_name
-        )
+        err, ignored_data, warnings = self.analyse_data_migration(migration)
         if err:
             errors += err
         if ignored_data:
@@ -369,8 +367,7 @@ class MigrationLinter(object):
             )
         )
 
-    def analyse_data_migration(self, app_label, migration_name):
-        migration = self.migration_loader.disk_migrations[(app_label, migration_name)]
+    def analyse_data_migration(self, migration):
         errors = []
         ignored = []
         warnings = []
