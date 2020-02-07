@@ -12,6 +12,7 @@ from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
 from django.db.migrations import RunPython
 from enum import Enum, unique
+from six import PY2
 
 from .cache import Cache
 from .constants import (
@@ -402,7 +403,11 @@ class MigrationLinter(object):
             else:
                 warning.append(issue)
 
-        args_spec = inspect.getfullargspec(runpython.code)
+        if PY2:
+            args_spec = inspect.getargspec(runpython.code)
+        else:
+            args_spec = inspect.getfullargspec(runpython.code)
+
         if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
             issue = {
                 "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
