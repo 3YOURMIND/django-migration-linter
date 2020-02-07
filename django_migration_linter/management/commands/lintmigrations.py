@@ -110,7 +110,7 @@ class Command(BaseCommand):
             help="don't print linting messages to stdout",
         )
         parser.add_argument(
-            "--warning-as-error", action="store_true", help="handle warnings as errors",
+            "--warnings-as-errors", action="store_true", help="handle warnings as errors",
         )
 
     def handle(self, *args, **options):
@@ -139,7 +139,7 @@ class Command(BaseCommand):
             only_unapplied_migrations=options["unapplied_migrations"],
             exclude_migration_tests=options["exclude_migration_tests"],
             quiet=options["quiet"],
-            warning_as_error=options["warning_as_error"],
+            warnings_as_errors=options["warnings_as_errors"],
         )
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],

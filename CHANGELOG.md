@@ -1,3 +1,9 @@
+## 2.0.0
+
+* Add linting on data migrations that will raise warnings
+* Add `--quiet warning` option to suppress warning messages
+* Add `--warnings-as-errors` option to handle warnings as errors
+
 ## 1.5.0
 
 * Rework documentation.
