@@ -5,7 +5,6 @@ import inspect
 import logging
 import os
 import re
-from collections import defaultdict
 from subprocess import Popen, PIPE
 
 from django.conf import settings
@@ -14,15 +13,12 @@ from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError, migration
 from enum import Enum, unique
 
 from .cache import Cache
-from .constants import DEFAULT_CACHE_PATH
+from .constants import DEFAULT_CACHE_PATH, EXPECTED_DATA_MIGRATION_ARGS, DJANGO_APPS_WITH_MIGRATIONS
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 from .operations import IgnoreMigration
 from .sql_analyser import analyse_sql_statements
 
 logger = logging.getLogger(__name__)
-
-DJANGO_APPS_WITH_MIGRATIONS = ("admin", "auth", "contenttypes", "sessions")
-EXPECTED_DATA_MIGRATION_ARGS = ("apps", "schema_editor")
 
 
 @unique
