@@ -9,7 +9,8 @@ from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError, migrations
+from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
+from django.db.migrations import RunPython
 from enum import Enum, unique
 
 from .cache import Cache
@@ -369,7 +370,7 @@ class MigrationLinter(object):
         warnings = []
 
         for operation in migration.operations:
-            if isinstance(operation, migrations.RunPython):
+            if isinstance(operation, RunPython):
                 op_errors, op_ignored, op_warnings = self.lint_runpython(operation)
                 if op_errors:
                     errors += op_errors
