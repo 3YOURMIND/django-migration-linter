@@ -233,7 +233,7 @@ class MigrationLinter(object):
             return
 
         for warning_details in warnings:
-            warn_str = "\tWARN {}".format(warning_details["msg"])
+            warn_str = "\t{}".format(warning_details["msg"])
             print(warn_str)
 
     def print_summary(self):
