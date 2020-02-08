@@ -64,3 +64,25 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.assertEqual(0, self.linter.nb_warnings)
         self.assertEqual(1, self.linter.nb_erroneous)
         self.assertTrue(self.linter.has_errors)
+
+    def test_missing_get_model_import(self):
+        def incorrect_importing_model_forward(apps, schema_editor):
+            from tests.test_project.app_data_migrations.models import MyModel
+
+            MyModel.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_data_migration_model_import_issues(
+            incorrect_importing_model_forward
+        )
+        self.assertEqual(1, len(issues))
+
+    def test_correct_get_model_import(self):
+        def correct_importing_model_forward(apps, schema_editor):
+            MyModel = apps.get_model("app_data_migrations", "MyModel")
+
+            MyModel.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_data_migration_model_import_issues(
+            correct_importing_model_forward
+        )
+        self.assertEqual(0, len(issues))
