@@ -421,5 +421,50 @@ class MigrationLinter(object):
             else:
                 warning.append(issue)
 
-        # TODO: test if importing model directly or correctly using "get_model()"
+        # Detect wrong model imports
+        # Forward
+        issues = self.get_data_migration_model_import_issues(runpython.code)
+        for issue in issues:
+            if issue["code"] in self.exclude_migration_tests:
+                ignored.append(issue)
+            else:
+                error.append(issue)
+
+        # Backward
+        if runpython.reversible:
+            issues = self.get_data_migration_model_import_issues(runpython.reverse_code)
+            for issue in issues:
+                if issue and issue["code"] in self.exclude_migration_tests:
+                    ignored.append(issue)
+                else:
+                    error.append(issue)
         return error, ignored, warning
+
+    @staticmethod
+    def get_data_migration_model_import_issues(code):
+        model_object_regex = re.compile(r"[^a-zA-Z]?([a-zA-Z0-9]+?)\.objects")
+
+        function_name = code.__name__
+        reverse_code_source = inspect.getsource(code)
+
+        called_models = model_object_regex.findall(reverse_code_source)
+        issues = []
+        for model in called_models:
+            has_get_model_call = (
+                re.search(
+                    r"get_model\(.*?,.*?{}.+?\)".format(model), reverse_code_source
+                )
+                is not None
+            )
+            if not has_get_model_call:
+                issues.append(
+                    {
+                        "code": "DATA_MIGRATION_MODEL_IMPORT",
+                        "msg": (
+                            "'{}': Could not find an 'apps.get_model(\"...\", \"{}\")' "
+                            "call. Importing the model directly is incorrect for "
+                            "data migrations."
+                        ).format(function_name, model),
+                    }
+                )
+        return issues
