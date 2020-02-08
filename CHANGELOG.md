@@ -1,3 +1,7 @@
+## 2.1.0
+
+* Detect in data migrations if models are imported the correct way or not
+
 ## 2.0.0
 
 * Add linting on data migrations that will raise warnings
