@@ -1,3 +1,7 @@
+## 2.2.0
+
+* Make summary output more friendly (thanks @vald-phoenix)
+
 ## 2.1.0
 
 * Detect in data migrations if models are imported the correct way or not
