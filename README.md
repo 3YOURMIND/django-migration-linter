@@ -40,8 +40,12 @@ $ python manage.py lintmigrations
 (app_rename_table, 0001_initial)... OK
 (app_rename_table, 0002_auto_20190414_1500)... ERR
         RENAMING tables
-*** Summary:
-Valid migrations: 4/8 - erroneous migrations: 3/8 - ignored migrations: 1/8
+
+*** Summary ***
+Valid migrations: 4/8
+Erroneous migrations: 3/8
+Migrations with warnings: 0/8
+Ignored migrations: 1/8
 ```
 
 The linter analysed all migrations from the Django project.
