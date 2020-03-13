@@ -250,8 +250,7 @@ class MigrationLinter(object):
                 "Erroneous migrations: {2}/{0} \n"
                 "Migrations with warnings: {3}/{0} \n"
                 "Ignored migrations: {4}/{0}"
-            )
-            .format(
+            ).format(
                 self.nb_total,
                 self.nb_valid,
                 self.nb_erroneous,
