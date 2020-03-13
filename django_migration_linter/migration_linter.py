@@ -242,22 +242,12 @@ class MigrationLinter(object):
             print(warn_str)
 
     def print_summary(self):
-        print("")
+        print()
         print("*** Summary ***")
-        print(
-            (
-                "Valid migrations: {1}/{0} \n"
-                "Erroneous migrations: {2}/{0} \n"
-                "Migrations with warnings: {3}/{0} \n"
-                "Ignored migrations: {4}/{0}"
-            ).format(
-                self.nb_total,
-                self.nb_valid,
-                self.nb_erroneous,
-                self.nb_warnings,
-                self.nb_ignored,
-            )
-        )
+        print("Valid migrations: {}/{}".format(self.nb_valid, self.nb_total))
+        print("Erroneous migrations: {}/{}".format(self.nb_erroneous, self.nb_total))
+        print("Migrations with warnings: {}/{}".format(self.nb_warnings, self.nb_total))
+        print("Ignored migrations: {}/{}".format(self.nb_ignored, self.nb_total))
 
     @property
     def has_errors(self):
