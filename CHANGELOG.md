@@ -1,6 +1,7 @@
 ## 2.2.0
 
-* Make summary output more friendly (thanks @vald-phoenix)
+* Make summary output more friendly (Thanks to @vald-phoenix)
+* Add forgotten documentation about `IgnoreMigration`
 
 ## 2.1.0
 

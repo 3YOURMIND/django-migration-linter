@@ -27,6 +27,23 @@ Detailed command line options:
 |`--quiet or -q {ok,ignore,warning,error}`                     | Suppress certain output messages, instead of writing them to stdout.                                                        |
 |`--warnings-as-errors`                                        | Handle warnings as errors and therefore return an error status code if we should.                                           |
 
+## Ignoring migrations
+
+You can also ignore migrations by adding an `IgnoreMigration()` to your migration operations:
+```
+from django.db import migrations, models
+import django_migration_linter as linter
+
+class Migration(migrations.Migration):
+    dependencies = [...]
+    operations = [
+        linter.IgnoreMigration(),
+        # ...
+    ]
+```
+
+Or you can restrict the migrations that should be selected by a file containing there paths with the `--include-migrations-from` option.
+
 ## Ignoring migration tests
 
 You can also ignore backward incompatible migration tests by adding this option during execution:
