@@ -2,6 +2,7 @@
 
 * Make summary output more friendly (Thanks to @vald-phoenix)
 * Add forgotten documentation about `IgnoreMigration`
+* Don't pin the `appdirs` strictly to 1.4.3, but allow higher versions
 
 ## 2.1.0
 

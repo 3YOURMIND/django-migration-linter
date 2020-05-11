@@ -33,7 +33,7 @@ setup(
     packages=find_packages(exclude=["tests/"]),
     install_requires=[
         "django>=1.11",
-        "appdirs==1.4.3",
+        "appdirs>=1.4.3",
         'enum34==1.1.6;python_version<"3.4"',
         "six==1.14.0",
     ],
