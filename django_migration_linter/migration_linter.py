@@ -443,7 +443,8 @@ class MigrationLinter(object):
         for model in called_models:
             has_get_model_call = (
                 re.search(
-                    r"get_model\(\s*?.*?,.*?{}.+?\s*?\)".format(model), reverse_code_source
+                    r"get_model\(\s*?.*?,.*?{}.+?\s*?\)".format(model),
+                    reverse_code_source,
                 )
                 is not None
             )
