@@ -24,5 +24,5 @@ class Migration(migrations.Migration):
                 ),
                 ("myfield", models.IntegerField()),
             ],
-        ),
+        )
     ]

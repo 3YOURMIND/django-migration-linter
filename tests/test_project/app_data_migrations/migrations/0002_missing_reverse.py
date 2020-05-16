@@ -9,10 +9,6 @@ def update_things(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("app_data_migrations", "0001_initial"),
-    ]
+    dependencies = [("app_data_migrations", "0001_initial")]
 
-    operations = [
-        migrations.RunPython(update_things),
-    ]
+    operations = [migrations.RunPython(update_things)]

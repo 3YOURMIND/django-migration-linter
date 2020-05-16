@@ -1,3 +1,8 @@
+## 2.2.1
+
+Fixed bug:
+* Correctly detect `apps.get_models` when on multiple lines in data migration
+
 ## 2.2.0
 
 * Make summary output more friendly (Thanks to @vald-phoenix)

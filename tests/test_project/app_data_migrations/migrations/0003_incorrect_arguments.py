@@ -13,10 +13,6 @@ def forward_weird_name(arg1, arg2):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("app_data_migrations", "0002_missing_reverse"),
-    ]
+    dependencies = [("app_data_migrations", "0002_missing_reverse")]
 
-    operations = [
-        migrations.RunPython(forward_weird_name, backward_weirdly_named),
-    ]
+    operations = [migrations.RunPython(forward_weird_name, backward_weirdly_named)]

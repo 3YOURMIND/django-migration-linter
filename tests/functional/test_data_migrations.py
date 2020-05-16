@@ -79,8 +79,12 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
     def test_correct_get_model_import(self):
         def correct_importing_model_forward(apps, schema_editor):
             MyModel = apps.get_model("app_data_migrations", "MyModel")
+            MyVeryLongLongLongModel = apps.get_model(
+                "app_data_migrations", "MyVeryLongLongLongModel"
+            )
 
             MyModel.objects.filter(id=1).first()
+            MyVeryLongLongLongModel.objects.filter(id=1).first()
 
         issues = MigrationLinter.get_data_migration_model_import_issues(
             correct_importing_model_forward
