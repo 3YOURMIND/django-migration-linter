@@ -1,3 +1,7 @@
+## 2.2.2
+
+* Don't pin dependencies but only define minimal versions
+
 ## 2.2.1
 
 Fixed bug:
