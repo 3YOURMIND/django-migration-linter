@@ -88,8 +88,12 @@ class LinterFunctionsTestCase(unittest.TestCase):
 
     def test_read_migrations_unknown_file(self):
         file_path = "unknown_file"
-        migration_list = MigrationLinter.read_migrations_list(file_path)
-        self.assertEqual([], migration_list)
+        with self.assertRaises(Exception):
+            MigrationLinter.read_migrations_list(file_path)
+
+    def test_read_migrations_no_file(self):
+        migration_list = MigrationLinter.read_migrations_list(None)
+        self.assertIsNone(migration_list)
 
     def test_read_migrations_empty_file(self):
         with tempfile.NamedTemporaryFile() as tmp:
