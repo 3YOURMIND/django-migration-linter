@@ -44,6 +44,14 @@ class BaseBackwardCompatibilityDetection(object):
         app = fixtures.ADD_NOT_NULL_COLUMN
         self._test_linter_finds_errors(app)
 
+    def test_detect_make_column_not_null_with_django_default(self):
+        app = fixtures.MAKE_NOT_NULL_WITH_DJANGO_DEFAULT
+        self._test_linter_finds_errors(app)
+
+    def test_detect_make_column_not_null_with_lib_default(self):
+        app = fixtures.MAKE_NOT_NULL_WITH_LIB_DEFAULT
+        self._test_linter_finds_no_errors(app)
+
     def test_detect_drop_column(self):
         app = fixtures.DROP_COLUMN
         self._test_linter_finds_errors(app)
@@ -95,6 +103,15 @@ class SqliteBackwardCompatibilityDetectionTestCase(
 
     def test_accept_not_null_column_followed_by_adding_default(self):
         app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT
+        self._test_linter_finds_errors(app)
+
+    def test_detect_make_column_not_null_with_django_default(self):
+        app = fixtures.MAKE_NOT_NULL_WITH_DJANGO_DEFAULT
+        self._test_linter_finds_errors(app)
+
+    def test_detect_make_column_not_null_with_lib_default(self):
+        # The 'django-add-default-value' doesn't handle sqlite correctly
+        app = fixtures.MAKE_NOT_NULL_WITH_LIB_DEFAULT
         self._test_linter_finds_errors(app)
 
 
