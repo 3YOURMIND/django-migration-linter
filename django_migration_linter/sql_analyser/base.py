@@ -8,10 +8,19 @@ logger = logging.getLogger(__name__)
 
 def has_not_null_column(sql_statements, **kwargs):
     # TODO: improve to detect that the same column is concerned
-    return any(
-        re.search("(?<!DROP )NOT NULL", sql) and not sql.startswith("CREATE TABLE")
-        for sql in sql_statements
-    ) and not any("SET DEFAULT" in sql for sql in sql_statements)
+    ends_with_default = None
+    for sql in sql_statements:
+        if "SET DEFAULT" in sql:
+            ends_with_default = True
+        elif "DROP DEFAULT" in sql:
+            ends_with_default = False
+    return (
+        any(
+            re.search("(?<!DROP )NOT NULL", sql) and not sql.startswith("CREATE TABLE")
+            for sql in sql_statements
+        )
+        and ends_with_default is False
+    )
 
 
 def has_add_unique(sql_statements, **kwargs):
