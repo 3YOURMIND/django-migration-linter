@@ -72,11 +72,7 @@ class MigrationLinter(object):
         self.warnings_as_errors = warnings_as_errors
 
         # Initialise counters
-        self.nb_valid = 0
-        self.nb_ignored = 0
-        self.nb_warnings = 0
-        self.nb_erroneous = 0
-        self.nb_total = 0
+        self.reset_counters()
 
         # Initialise cache. Read from old, write to new to prune old entries.
         if self.should_use_cache():
@@ -90,6 +86,13 @@ class MigrationLinter(object):
         self.migration_loader = MigrationLoader(
             connection=connections[self.database], load=True
         )
+
+    def reset_counters(self):
+        self.nb_valid = 0
+        self.nb_ignored = 0
+        self.nb_warnings = 0
+        self.nb_erroneous = 0
+        self.nb_total = 0
 
     def should_use_cache(self):
         return self.django_path and not self.no_cache
