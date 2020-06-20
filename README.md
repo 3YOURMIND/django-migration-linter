@@ -54,6 +54,25 @@ The list of incompatibilities that the linter analyses [can be found at docs/inc
 
 More advanced usages of the linter and options [can be found at docs/usage.md](./docs/usage.md).
 
+## Integration
+
+One can either integrate the linter in the CI and the `lintmigrations` command, or detect incompatibilities during generation with
+```
+$ python manage.py makemigrations --lint
+
+Migrations for 'app_correct':
+  tests/test_project/app_correct/migrations/0003_a_column.py
+    - Add field column to a
+Linting for 'app_correct':
+(app_correct, 0003_a_column)... ERR
+        NOT NULL constraint on columns
+Deleted tests/test_project/app_correct/migrations/0003_a_column.py
+```
+
+The linter found that the newly created migration is not backward compatible and deletes the files.
+This behaviour can be the default of the `makemigrations` command through the `MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS` Django settings.
+Find out more about the [makemigrations command at docs/makemigrations.md](./docs/makemigrations.md).
+
 ### More information
 
 Please find more documentation generally [in the docs/ folder](./docs/).
