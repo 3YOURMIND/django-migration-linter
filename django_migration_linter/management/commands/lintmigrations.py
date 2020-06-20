@@ -5,6 +5,7 @@ from importlib import import_module
 
 from django.core.management.base import BaseCommand
 
+from ..utils import register_linting_configuration_options
 from ...constants import __version__
 
 from ...migration_linter import MigrationLinter, MessageType
@@ -95,25 +96,13 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--exclude-migration-tests",
-            type=str,
-            nargs="*",
-            help="Specify backward incompatible migration tests "
-            "to be ignored (e.g. ALTER_COLUMN)",
-        )
-
-        parser.add_argument(
             "-q",
             "--quiet",
             nargs="+",
             choices=MessageType.values(),
             help="don't print linting messages to stdout",
         )
-        parser.add_argument(
-            "--warnings-as-errors",
-            action="store_true",
-            help="handle warnings as errors",
-        )
+        register_linting_configuration_options(parser)
 
     def handle(self, *args, **options):
         if options["project_root_path"]:
