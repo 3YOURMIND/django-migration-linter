@@ -1,3 +1,13 @@
+## 2.3.0
+
+* Handle making a column NOT NULL with a  Django default value as backward incompatible.
+This should have been the case from the beginning, but it was not.
+When one uses the `django-add-default-value` lib, the operation should still be compatible.
+* Improve behaviour of the `--include-migrations-from` option.
+When the given filename is missplelled, fail instead of linting all migrations.
+When the file is empty, lint no migrations instead of linting all migrations.
+* Update libraries used for testing (`tox`, `flake8`, etc.)
+
 ## 2.2.2
 
 * Don't pin dependencies but only define minimal versions
