@@ -30,10 +30,13 @@ class Command(MakeMigrationsCommand):
 
     def write_migration_files(self, changes):
         super(Command, self).write_migration_files(changes)
+
         if (
             not getattr(settings, "MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS", False)
             and not self.lint
         ):
+            return
+        if self.dry_run:
             return
 
         # Lint migrations
