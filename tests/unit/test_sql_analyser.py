@@ -64,6 +64,25 @@ class MySqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
 
+    def test_make_column_not_null_with_django_default(self):
+        sql = [
+            "ALTER TABLE `app_drop_default_a` ALTER COLUMN `col` SET DEFAULT 'empty';",
+            "UPDATE `app_drop_default_a` SET `col` = 'empty' WHERE `col` IS NULL;",
+            "ALTER TABLE `app_drop_default_a` MODIFY `col` varchar(10) NOT NULL;",
+            "ALTER TABLE `app_drop_default_a` ALTER COLUMN `col` DROP DEFAULT;",
+        ]
+        self.assertBackwardIncompatibleSql(sql)
+
+    def test_make_column_not_null_with_lib_default(self):
+        sql = [
+            "ALTER TABLE `app_drop_default_a` ALTER COLUMN `col` SET DEFAULT 'empty';",
+            "UPDATE `app_drop_default_a` SET `col` = 'empty' WHERE `col` IS NULL;",
+            "ALTER TABLE `app_drop_default_a` MODIFY `col` varchar(10) NOT NULL;",
+            "ALTER TABLE `app_drop_default_a` ALTER COLUMN `col` DROP DEFAULT;",
+            "ALTER TABLE `app_drop_default_a` ALTER COLUMN `col` SET DEFAULT 'empty';",
+        ]
+        self.assertValidSql(sql)
+
 
 class SqliteAnalyserTestCase(SqlAnalyserTestCase):
     database_vendor = "sqlite"
@@ -163,5 +182,24 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
             'ALTER TABLE "app_add_manytomany_field_b_many_to_many" ADD CONSTRAINT "app_add_manytomany_field_b_many_to_many_b_id_a_id_3e15251d_uniq" UNIQUE("b_id", "a_id");',
             'CREATE INDEX "app_add_manytomany_field_b_many_to_many_b_id_953b185b" ON "app_add_manytomany_field_b_many_to_many"("b_id");',
             'CREATE INDEX "app_add_manytomany_field_b_many_to_many_a_id_4b44832a" ON "app_add_manytomany_field_b_many_to_many"("a_id");',
+        ]
+        self.assertValidSql(sql)
+
+    def test_make_column_not_null_with_django_default(self):
+        sql = [
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" SET DEFAULT \'empty\';',
+            'UPDATE "app_drop_default_a" SET "col" = \'empty\' WHERE "col" IS NULL;',
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" SET NOT NULL;',
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" DROP DEFAULT;',
+        ]
+        self.assertBackwardIncompatibleSql(sql)
+
+    def test_make_column_not_null_with_lib_default(self):
+        sql = [
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" SET DEFAULT \'empty\';',
+            'UPDATE "app_drop_default_a" SET "col" = \'empty\' WHERE "col" IS NULL;',
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" SET NOT NULL;',
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" DROP DEFAULT;',
+            'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" SET DEFAULT `\'empty\';',
         ]
         self.assertValidSql(sql)
