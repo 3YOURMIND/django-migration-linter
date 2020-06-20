@@ -1,3 +1,7 @@
+## 2.4.0
+
+* Add possibility to lint newly generated migrations through the `makemigrations` command
+
 ## 2.3.0
 
 * Handle making a column NOT NULL with a  Django default value as backward incompatible.
