@@ -39,15 +39,6 @@ class Command(BaseCommand):
             help="ignore migrations with exactly one of these names",
         )
         parser.add_argument(
-            "--database",
-            type=str,
-            nargs="?",
-            help=(
-                "specify the database for which to generate the SQL. "
-                "Defaults to default"
-            ),
-        )
-        parser.add_argument(
             "--project-root-path", type=str, nargs="?", help="django project root path"
         )
         parser.add_argument(
