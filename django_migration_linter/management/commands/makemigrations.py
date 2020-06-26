@@ -4,11 +4,25 @@ from django.conf import settings
 from django.core.management.commands.makemigrations import (
     Command as MakeMigrationsCommand,
 )
+from django.db.migrations.questioner import InteractiveMigrationQuestioner
 from django.db.migrations.writer import MigrationWriter
 
 from django_migration_linter import MigrationLinter
 
 from ..utils import register_linting_configuration_options
+
+
+def ask_should_keep_migration():
+    questioner = InteractiveMigrationQuestioner()
+    msg = """\nThe migration linter detected that this migration is not be backward compatible.
+- If you keep the migration, you will want to fix the issue or ignore the migration.
+- By default, the newly created migration file will be deleted.
+Do you want to keep the migration? [y/N]"""
+    return questioner._boolean_input(msg, False)
+
+
+def default_should_keep_migration():
+    return False
 
 
 class Command(MakeMigrationsCommand):
@@ -36,8 +50,20 @@ class Command(MakeMigrationsCommand):
             and not self.lint
         ):
             return
+
         if self.dry_run:
+            """
+            Since we rely on the 'sqlmigrate' to lint the migrations, we can only
+            lint if the migration files have been generated. Since the 'dry-run'
+            option won't generate the files, we cannot lint migrations.
+            """
             return
+
+        should_keep_migration = (
+            ask_should_keep_migration
+            if self.interactive
+            else default_should_keep_migration
+        )
 
         # Lint migrations
         linter = MigrationLinter(
@@ -53,21 +79,25 @@ class Command(MakeMigrationsCommand):
                 self.stdout.write(
                     self.style.MIGRATE_HEADING("Linting for '%s':" % app_label) + "\n"
                 )
+
             for migration in app_migrations:
                 linter.lint_migration(migration)
                 if linter.has_errors:
-                    writer = MigrationWriter(migration)
-                    os.remove(writer.path)
-
-                    if self.verbosity >= 1:
-                        try:
-                            migration_string = os.path.relpath(writer.path)
-                        except ValueError:
-                            migration_string = writer.path
-                        if migration_string.startswith(".."):
-                            migration_string = writer.path
-                        self.stdout.write(
-                            "Deleted %s\n"
-                            % (self.style.MIGRATE_LABEL(migration_string))
-                        )
+                    if not should_keep_migration():
+                        self.delete_migration(migration)
                 linter.reset_counters()
+
+    def delete_migration(self, migration):
+        writer = MigrationWriter(migration)
+        os.remove(writer.path)
+
+        if self.verbosity >= 1:
+            try:
+                migration_string = os.path.relpath(writer.path)
+            except ValueError:
+                migration_string = writer.path
+            if migration_string.startswith(".."):
+                migration_string = writer.path
+            self.stdout.write(
+                "Deleted %s\n" % (self.style.MIGRATE_LABEL(migration_string))
+            )
