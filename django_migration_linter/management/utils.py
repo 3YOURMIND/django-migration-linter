@@ -4,7 +4,7 @@ def register_linting_configuration_options(parser):
         type=str,
         nargs="?",
         help=(
-            "specify the database for which to generate the SQL. " "Defaults to default"
+            "specify the database for which to generate the SQL. Defaults to default"
         ),
     )
 
