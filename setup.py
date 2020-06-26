@@ -44,6 +44,7 @@ setup(
             "psycopg2-binary>=2.8.5",
             "django_add_default_value>=0.4.0",
             'mock>=3.0.5;python_version<"3.3"',
+            'backports.tempfile>=1.0;python_version<="2.7"',
         ]
     },
     keywords="django migration lint linter database backward compatibility",

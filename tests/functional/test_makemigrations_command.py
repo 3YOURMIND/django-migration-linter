@@ -1,8 +1,6 @@
-import io
 import os
 import shutil
 import sys
-import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 
@@ -10,6 +8,13 @@ if sys.version_info >= (3, 3):
     import unittest.mock as mock
 else:
     import mock
+
+if sys.version_info.major >= 3:
+    import tempfile
+    from io import StringIO as StringIO
+else:
+    from backports import tempfile
+    from io import BytesIO as StringIO
 
 from django.apps import apps
 from django.conf import settings
@@ -68,7 +73,7 @@ class MakeMigrationsCorrectTestCase(BaseMakeMigrationsTestCase):
     databases = {"default", "postgresql"}
 
     def test_correct_linted_makemigrations(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_correct_migration_missing"
         ) as migration_dir:
@@ -80,7 +85,7 @@ class MakeMigrationsCorrectTestCase(BaseMakeMigrationsTestCase):
 
     @override_settings(MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS=True)
     def test_correct_linted_makemigrations_using_settings(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_correct_migration_missing"
         ) as migration_dir:
@@ -91,7 +96,7 @@ class MakeMigrationsCorrectTestCase(BaseMakeMigrationsTestCase):
         self.assertIn("Linting for 'makemigrations_correct_migration_missing':", output)
 
     def test_no_linting_when_no_option(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_correct_migration_missing"
         ) as migration_dir:
@@ -102,7 +107,7 @@ class MakeMigrationsCorrectTestCase(BaseMakeMigrationsTestCase):
         self.assertNotIn("Linting", output)
 
     def test_correct_linted_makemigrations_dry_run(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_correct_migration_missing"
         ) as migration_dir:
@@ -128,7 +133,7 @@ class MakeMigrationsBackwardIncompatibleTestCase(BaseMakeMigrationsTestCase):
     databases = {"default", "sqlite", "mysql", "postgresql"}
 
     def test_backward_incompatible_migration_postgresql(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_backward_incompatible_migration_missing"
         ) as migration_dir:
@@ -141,7 +146,7 @@ class MakeMigrationsBackwardIncompatibleTestCase(BaseMakeMigrationsTestCase):
         self.assertIn("Deleted", output)
 
     def test_backward_incompatible_migration_mysql(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_backward_incompatible_migration_missing"
         ) as migration_dir:
@@ -154,7 +159,7 @@ class MakeMigrationsBackwardIncompatibleTestCase(BaseMakeMigrationsTestCase):
         self.assertIn("Deleted", output)
 
     def test_backward_incompatible_migration_sqlite(self):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_backward_incompatible_migration_missing"
         ) as migration_dir:
@@ -166,9 +171,9 @@ class MakeMigrationsBackwardIncompatibleTestCase(BaseMakeMigrationsTestCase):
         output = out.getvalue()
         self.assertIn("Deleted", output)
 
-    @mock.patch("builtins.input", return_value="yes")
+    @mock.patch("django.db.migrations.questioner.input", return_value="yes")
     def test_backward_incompatible_migration_interactive_keep_migration(self, *args):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_backward_incompatible_migration_missing"
         ) as migration_dir:
@@ -180,9 +185,9 @@ class MakeMigrationsBackwardIncompatibleTestCase(BaseMakeMigrationsTestCase):
         output = out.getvalue()
         self.assertNotIn("Deleted", output)
 
-    @mock.patch("builtins.input", return_value="no")
+    @mock.patch("django.db.migrations.questioner.input", return_value="no")
     def test_backward_incompatible_migration_interactive_delete_migration(self, *args):
-        out = io.StringIO()
+        out = StringIO()
         with self.temporary_migration_module(
             app_label="makemigrations_backward_incompatible_migration_missing"
         ) as migration_dir:
