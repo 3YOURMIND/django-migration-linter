@@ -331,8 +331,18 @@ class MigrationLinter(object):
             if self.is_migration_file(line):
                 app_label, name = split_migration_path(line)
                 if migrations_list is None or (app_label, name) in migrations_list:
-                    migration = self.migration_loader.disk_migrations[app_label, name]
-                    migrations.append(migration)
+                    if (app_label, name) in self.migration_loader.disk_migrations:
+                        migration = self.migration_loader.disk_migrations[
+                            app_label, name
+                        ]
+                        migrations.append(migration)
+                    else:
+                        logger.info(
+                            "Found migration file (%s, %s) "
+                            "that is not present in loaded migration.",
+                            app_label,
+                            name,
+                        )
         diff_process.wait()
 
         if diff_process.returncode != 0:
