@@ -1,6 +1,7 @@
 ## 2.4.0
 
-* Add possibility to lint newly generated migrations through the `makemigrations` command
+* Add possibility to lint newly generated migrations through the `makemigrations` command.
+You can activate it through the `--lint` command option, or by default with the `MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS = True`  Django settings.
 
 ## 2.3.0
 

@@ -66,6 +66,12 @@ Migrations for 'app_correct':
 Linting for 'app_correct':
 (app_correct, 0003_a_column)... ERR
         NOT NULL constraint on columns
+
+The migration linter detected that this migration is not be backward compatible.
+- If you keep the migration, you will want to fix the issue or ignore the migration.
+- By default, the newly created migration file will be deleted.
+Do you want to keep the migration? [y/N]
+[...]
 Deleted tests/test_project/app_correct/migrations/0003_a_column.py
 ```
 
