@@ -87,7 +87,8 @@ Some implementation details [can found in the ./docs/internals/ folder](./docs/i
 
 ### Blog post
 
-[Keeping Django database migrations backward compatible](https://medium.com/3yourmind/keeping-django-database-migrations-backward-compatible-727820260dbb)
+* [Keeping Django database migrations backward compatible](https://medium.com/3yourmind/keeping-django-database-migrations-backward-compatible-727820260dbb)
+* [Django and its default values](https://medium.com/botify-labs/django-and-its-default-values-c21a13cff9f)
 
 ### License
 
