@@ -90,6 +90,12 @@ Some implementation details [can found in the ./docs/internals/ folder](./docs/i
 * [Keeping Django database migrations backward compatible](https://medium.com/3yourmind/keeping-django-database-migrations-backward-compatible-727820260dbb)
 * [Django and its default values](https://medium.com/botify-labs/django-and-its-default-values-c21a13cff9f)
 
+### They talk about the linter
+
+* [Django News](https://django-news.com/issues/6?m=web#uMmosw7)
+* [wemake-django-template](https://wemake-django-template.readthedocs.io/en/latest/pages/template/linters.html#django-migration-linter)
+* [Testing Django migrations on sobolevn's blog](https://sobolevn.me/2019/10/testing-django-migrations#existing-setup)
+
 ### License
 
 *django-migration-linter* is released under the [Apache 2.0 License](./LICENSE).
