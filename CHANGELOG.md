@@ -1,3 +1,8 @@
+## 2.4.1
+
+* Add Django 3.1 support
+* Upgrade linter versions of `flake8` and `black` to the latest
+
 ## 2.4.0
 
 * Add possibility to lint newly generated migrations through the `makemigrations` command.

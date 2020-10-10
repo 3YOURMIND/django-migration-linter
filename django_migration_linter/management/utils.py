@@ -17,5 +17,7 @@ def register_linting_configuration_options(parser):
     )
 
     parser.add_argument(
-        "--warnings-as-errors", action="store_true", help="handle warnings as errors",
+        "--warnings-as-errors",
+        action="store_true",
+        help="handle warnings as errors",
     )

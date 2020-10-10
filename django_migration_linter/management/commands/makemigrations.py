@@ -31,7 +31,9 @@ class Command(MakeMigrationsCommand):
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
         parser.add_argument(
-            "--lint", action="store_true", help="Lint newly generated migrations.",
+            "--lint",
+            action="store_true",
+            help="Lint newly generated migrations.",
         )
         register_linting_configuration_options(parser)
 
