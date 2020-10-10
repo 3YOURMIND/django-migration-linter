@@ -11,7 +11,8 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
     def setUp(self, *args, **kwargs):
         self.test_project_path = os.path.dirname(settings.BASE_DIR)
         self.linter = MigrationLinter(
-            self.test_project_path, include_apps=fixtures.DATA_MIGRATIONS,
+            self.test_project_path,
+            include_apps=fixtures.DATA_MIGRATIONS,
         )
 
     def test_reverse_data_migration(self):
