@@ -38,3 +38,4 @@ You can ignore check through the `--exclude-migration-test` option and specifyin
 |`NAMING_CONVENTION_RUNPYTHON_ARGS`   | By convention, RunPython names two arguments: apps, schema_editor
 |`DATA_MIGRATION_MODEL_IMPORT`        | Missing apps.get_model() calls for model
 |`DATA_MIGRATION_MODEL_VARIABLE_NAME` | The model variable name is different from the model class itself
+|`REVERSIBLE_RUNSQL_DATA_MIGRATION`   | RunSQL data migration is not reversible (missing reverse SQL)
