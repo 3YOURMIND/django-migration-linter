@@ -9,8 +9,8 @@ from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
-from django.db.migrations import RunPython
+from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError, connection
+from django.db.migrations import RunPython, RunSQL
 from enum import Enum, unique
 from six import PY2
 
@@ -392,12 +392,17 @@ class MigrationLinter(object):
         for operation in migration.operations:
             if isinstance(operation, RunPython):
                 op_errors, op_ignored, op_warnings = self.lint_runpython(operation)
-                if op_errors:
-                    errors += op_errors
-                if op_ignored:
-                    ignored += op_ignored
-                if op_warnings:
-                    warnings += op_warnings
+            elif isinstance(operation, RunSQL):
+                op_errors, op_ignored, op_warnings = self.lint_runsql(operation)
+            else:
+                op_errors, op_ignored, op_warnings = [], [], []
+
+            if op_errors:
+                errors += op_errors
+            if op_ignored:
+                ignored += op_ignored
+            if op_warnings:
+                warnings += op_warnings
 
         return errors, ignored, warnings
 
@@ -546,3 +551,77 @@ class MigrationLinter(object):
                     }
                 )
         return issues
+
+    def lint_runsql(self, runsql):
+        error = []
+        ignored = []
+        warning = []
+
+        # Detect warning on missing reverse operation
+        if not runsql.reversible:
+            issue = {
+                "code": "REVERSIBLE_RUNSQL_DATA_MIGRATION",
+                "msg": "RunSQL data migration is not reversible",
+            }
+            if issue["code"] in self.exclude_migration_tests:
+                ignored.append(issue)
+            else:
+                warning.append(issue)
+
+        # Put the SQL in our SQL analyser
+        if runsql.sql != RunSQL.noop:
+            sql_statements = []
+            if isinstance(runsql.sql, (list, tuple)):
+                for sql in runsql.sql:
+                    params = None
+                    if isinstance(sql, (list, tuple)):
+                        elements = len(sql)
+                        if elements == 2:
+                            sql, params = sql
+                        else:
+                            raise ValueError("Expected a 2-tuple but got %d" % elements)
+                        sql_statements.append(sql % params)
+                    else:
+                        sql_statements.append(sql)
+            else:
+                sql_statements.append(runsql.sql)
+
+            sql_errors, sql_ignored = analyse_sql_statements(
+                sql_statements,
+                settings.DATABASES[self.database]["ENGINE"],
+                self.exclude_migration_tests,
+            )
+            if sql_errors:
+                error += sql_errors
+            if sql_ignored:
+                ignored += sql_ignored
+
+        # And analysse the reverse SQL
+        if runsql.reversible and runsql.reverse_sql != RunSQL.noop:
+            sql_statements = []
+            if isinstance(runsql.reverse_sql, (list, tuple)):
+                for sql in runsql.reverse_sql:
+                    params = None
+                    if isinstance(sql, (list, tuple)):
+                        elements = len(sql)
+                        if elements == 2:
+                            sql, params = sql
+                        else:
+                            raise ValueError("Expected a 2-tuple but got %d" % elements)
+                        sql_statements.append(sql % params)
+                    else:
+                        sql_statements.append(sql)
+            else:
+                sql_statements.append(runsql.reverse_sql)
+
+            sql_errors, sql_ignored = analyse_sql_statements(
+                sql_statements,
+                settings.DATABASES[self.database]["ENGINE"],
+                self.exclude_migration_tests,
+            )
+            if sql_errors:
+                error += sql_errors
+            if sql_ignored:
+                ignored += sql_ignored
+
+        return error, ignored, warning
