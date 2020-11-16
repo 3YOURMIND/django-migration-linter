@@ -66,6 +66,8 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.assertEqual(1, self.linter.nb_erroneous)
         self.assertTrue(self.linter.has_errors)
 
+
+class DataMigrationModelImportTestCase(unittest.TestCase):
     def test_missing_get_model_import(self):
         def incorrect_importing_model_forward(apps, schema_editor):
             from tests.test_project.app_data_migrations.models import MyModel
@@ -83,11 +85,51 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
             MyVeryLongLongLongModel = apps.get_model(
                 "app_data_migrations", "MyVeryLongLongLongModel"
             )
+            MultiLineModel = apps.get_model(
+                "app_data_migrations",
+                "MultiLineModel",
+            )
 
             MyModel.objects.filter(id=1).first()
             MyVeryLongLongLongModel.objects.filter(id=1).first()
+            MultiLineModel.objects.all()
 
         issues = MigrationLinter.get_data_migration_model_import_issues(
             correct_importing_model_forward
         )
+        self.assertEqual(0, len(issues))
+
+    def test_not_overlapping_model_name(self):
+        """
+        Correct for the import error, but should raise a warning
+        """
+
+        def forward_method(apps, schema_editor):
+            User = apps.get_model("auth", "CustomUserModel")
+
+            User.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_data_migration_model_import_issues(forward_method)
+        self.assertEqual(0, len(issues))
+
+    def test_correct_one_param_get_model_import(self):
+        def forward_method(apps, schema_editor):
+            User = apps.get_model("auth.User")
+
+            User.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_data_migration_model_import_issues(forward_method)
+        self.assertEqual(0, len(issues))
+
+    def test_not_overlapping_one_param(self):
+        """
+        Not an error, but should raise a warning
+        """
+
+        def forward_method(apps, schema_editor):
+            User = apps.get_model("auth.CustomUserModel")
+
+            User.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_data_migration_model_import_issues(forward_method)
         self.assertEqual(0, len(issues))
