@@ -407,6 +407,7 @@ class MigrationLinter(object):
         ignored = []
         warning = []
 
+        # Detect warning on missing reverse operation
         if not runpython.reversible:
             issue = {
                 "code": "REVERSIBLE_DATA_MIGRATION",
@@ -419,11 +420,12 @@ class MigrationLinter(object):
             else:
                 warning.append(issue)
 
-        if PY2:
-            args_spec = inspect.getargspec(runpython.code)
-        else:
-            args_spec = inspect.getfullargspec(runpython.code)
-
+        # Detect warning for argument naming convention
+        args_spec = (
+            inspect.getargspec(runpython.code)
+            if PY2
+            else inspect.getfullargspec(runpython.code)
+        )
         if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
             issue = {
                 "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
@@ -439,7 +441,7 @@ class MigrationLinter(object):
 
         # Detect wrong model imports
         # Forward
-        issues = self.get_data_migration_model_import_issues(runpython.code)
+        issues = self.get_runpython_model_import_issues(runpython.code)
         for issue in issues:
             if issue["code"] in self.exclude_migration_tests:
                 ignored.append(issue)
@@ -448,7 +450,7 @@ class MigrationLinter(object):
 
         # Backward
         if runpython.reversible:
-            issues = self.get_data_migration_model_import_issues(runpython.reverse_code)
+            issues = self.get_runpython_model_import_issues(runpython.reverse_code)
             for issue in issues:
                 if issue and issue["code"] in self.exclude_migration_tests:
                     ignored.append(issue)
@@ -457,7 +459,7 @@ class MigrationLinter(object):
         return error, ignored, warning
 
     @staticmethod
-    def get_data_migration_model_import_issues(code):
+    def get_runpython_model_import_issues(code):
         model_object_regex = re.compile(r"[^a-zA-Z]?([a-zA-Z0-9]+?)\.objects")
 
         function_name = code.__name__

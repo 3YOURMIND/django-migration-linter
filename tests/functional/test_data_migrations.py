@@ -74,7 +74,7 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
             MyModel.objects.filter(id=1).first()
 
-        issues = MigrationLinter.get_data_migration_model_import_issues(
+        issues = MigrationLinter.get_runpython_model_import_issues(
             incorrect_importing_model_forward
         )
         self.assertEqual(1, len(issues))
@@ -94,7 +94,7 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
             MyVeryLongLongLongModel.objects.filter(id=1).first()
             MultiLineModel.objects.all()
 
-        issues = MigrationLinter.get_data_migration_model_import_issues(
+        issues = MigrationLinter.get_runpython_model_import_issues(
             correct_importing_model_forward
         )
         self.assertEqual(0, len(issues))
@@ -109,7 +109,7 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
             User.objects.filter(id=1).first()
 
-        issues = MigrationLinter.get_data_migration_model_import_issues(forward_method)
+        issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
         self.assertEqual(0, len(issues))
 
     def test_correct_one_param_get_model_import(self):
@@ -118,7 +118,7 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
             User.objects.filter(id=1).first()
 
-        issues = MigrationLinter.get_data_migration_model_import_issues(forward_method)
+        issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
         self.assertEqual(0, len(issues))
 
     def test_not_overlapping_one_param(self):
@@ -131,5 +131,5 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
             User.objects.filter(id=1).first()
 
-        issues = MigrationLinter.get_data_migration_model_import_issues(forward_method)
+        issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
         self.assertEqual(0, len(issues))
