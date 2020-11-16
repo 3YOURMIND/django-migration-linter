@@ -133,3 +133,109 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
         issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
         self.assertEqual(0, len(issues))
+
+
+class DataMigrationModelVariableNamingTestCase(unittest.TestCase):
+    def test_same_variable_name(self):
+        def forward_op(apps, schema_editor):
+            MyModel = apps.get_model("app", "MyModel")
+
+            MyModel.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(0, len(issues))
+
+    def test_same_variable_name_multiline(self):
+        def forward_op(apps, schema_editor):
+            MyModelVeryLongLongLongLongLong = apps.get_model(
+                "app", "MyModelVeryLongLongLongLongLong"
+            )
+
+            MyModelVeryLongLongLongLongLong.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(0, len(issues))
+
+    def test_same_variable_name_multiline2(self):
+        def forward_op(apps, schema_editor):
+            MyModelVeryLongLongLongLongLong = apps.get_model(
+                "app_name_longlonglonglongapp",
+                "MyModelVeryLongLongLongLongLong",
+            )
+
+            MyModelVeryLongLongLongLongLong.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(0, len(issues))
+
+    def test_different_variable_name(self):
+        def forward_op(apps, schema_editor):
+            some_model = apps.get_model("app", "MyModel")
+
+            some_model.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(1, len(issues))
+
+    def test_diff_variable_name_multiline(self):
+        def forward_op(apps, schema_editor):
+            MyModelVeryLongLongLongLongLongNot = apps.get_model(
+                "app", "MyModelVeryLongLongLongLongLong"
+            )
+
+            MyModelVeryLongLongLongLongLongNot.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(1, len(issues))
+
+    def test_diff_variable_name_multiline2(self):
+        def forward_op(apps, schema_editor):
+            MyModelVeryLongLongLongLongLongNot = apps.get_model(
+                "app_name_longlonglonglongapp",
+                "MyModelVeryLongLongLongLongLong",
+            )
+
+            MyModelVeryLongLongLongLongLongNot.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(1, len(issues))
+
+    def test_same_variable_name_one_param(self):
+        def forward_op(apps, schema_editor):
+            MyModel = apps.get_model("app.MyModel")
+
+            MyModel.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(0, len(issues))
+
+    def test_different_variable_name_one_param(self):
+        def forward_op(apps, schema_editor):
+            mymodel = apps.get_model("app.MyModel")
+
+            mymodel.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(1, len(issues))
+
+    def test_correct_variable_name_one_param_multiline(self):
+        def forward_op(apps, schema_editor):
+            AVeryLongModelName = apps.get_model(
+                "quite_long_app_name.AVeryLongModelName"
+            )
+
+            AVeryLongModelName.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(0, len(issues))
+
+    def test_different_variable_name_one_param_multiline(self):
+        def forward_op(apps, schema_editor):
+            m = apps.get_model(
+                "quite_long_app_name_name_name.AVeryLongModelNameNameName"
+            )
+
+            m.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
+        self.assertEqual(1, len(issues))

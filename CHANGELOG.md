@@ -2,6 +2,7 @@
 
 * Add Python 3.9 support
 * Make data migration model import error less strict (issue #121)
+* Add warning detection on RunPython call when model variable name is not the same as model class name
 
 Switched from Travis CI to GitHub Actions for tests
 
