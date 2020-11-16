@@ -456,6 +456,25 @@ class MigrationLinter(object):
                     ignored.append(issue)
                 else:
                     error.append(issue)
+
+        # Detect warning if model variable name is not the same as model class
+        issues = self.get_runpython_model_variable_naming_issues(runpython.code)
+        for issue in issues:
+            if issue and issue["code"] in self.exclude_migration_tests:
+                ignored.append(issue)
+            else:
+                warning.append(issue)
+
+        if runpython.reversible:
+            issues = self.get_runpython_model_variable_naming_issues(
+                runpython.reverse_code
+            )
+            for issue in issues:
+                if issue and issue["code"] in self.exclude_migration_tests:
+                    ignored.append(issue)
+                else:
+                    warning.append(issue)
+
         return error, ignored, warning
 
     @staticmethod
@@ -483,6 +502,46 @@ class MigrationLinter(object):
                             "'{}': Could not find an 'apps.get_model(\"...\", \"{}\")' "
                             "call. Importing the model directly is incorrect for "
                             "data migrations."
+                        ).format(function_name, model),
+                    }
+                )
+        return issues
+
+    @staticmethod
+    def get_runpython_model_variable_naming_issues(code):
+        model_object_regex = re.compile(r"[^a-zA-Z]?([a-zA-Z0-9]+?)\.objects")
+
+        function_name = code.__name__
+        source_code = inspect.getsource(code)
+
+        called_models = model_object_regex.findall(source_code)
+        issues = []
+        for model in called_models:
+            has_same_model_name = (
+                re.search(
+                    "{model}.*= +\w+?\.get_model\([^\)]+?\.{model}.*?\)".format(
+                        model=model
+                    ),
+                    source_code,
+                    re.MULTILINE | re.DOTALL,
+                )
+                is not None
+                or re.search(
+                    "{model}.*= +\w+?\.get_model\([^\)]+?,[^\)]*?{model}.*?\)".format(
+                        model=model
+                    ),
+                    source_code,
+                    re.MULTILINE | re.DOTALL,
+                )
+                is not None
+            )
+            if not has_same_model_name:
+                issues.append(
+                    {
+                        "code": "DATA_MIGRATION_MODEL_VARIABLE_NAME",
+                        "msg": (
+                            "'{}': Model variable name {} is different from the "
+                            "model class name that was found in the apps.get_model(...) call."
                         ).format(function_name, model),
                     }
                 )
