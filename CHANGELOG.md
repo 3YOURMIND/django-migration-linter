@@ -1,6 +1,7 @@
 ## 2.5.0
 
 * Add Python 3.9 support
+* Make data migration model import error less strict (issue #121)
 
 Switched from Travis CI to GitHub Actions for tests
 

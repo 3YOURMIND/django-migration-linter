@@ -461,15 +461,15 @@ class MigrationLinter(object):
         model_object_regex = re.compile(r"[^a-zA-Z]?([a-zA-Z0-9]+?)\.objects")
 
         function_name = code.__name__
-        reverse_code_source = inspect.getsource(code)
+        source_code = inspect.getsource(code)
 
-        called_models = model_object_regex.findall(reverse_code_source)
+        called_models = model_object_regex.findall(source_code)
         issues = []
         for model in called_models:
             has_get_model_call = (
                 re.search(
-                    r"get_model\(\s*?.*?,.*?{}.+?\s*?\)".format(model),
-                    reverse_code_source,
+                    r"{}.*= +\w+\.get_model\(".format(model),
+                    source_code,
                 )
                 is not None
             )
