@@ -2,6 +2,7 @@ import os
 import unittest
 
 from django.conf import settings
+from django.db import migrations
 
 from django_migration_linter import MigrationLinter
 from tests import fixtures
@@ -239,3 +240,39 @@ class DataMigrationModelVariableNamingTestCase(unittest.TestCase):
 
         issues = MigrationLinter.get_runpython_model_variable_naming_issues(forward_op)
         self.assertEqual(1, len(issues))
+
+
+class RunSQLMigrationTestCase(unittest.TestCase):
+    def setUp(self):
+        test_project_path = os.path.dirname(settings.BASE_DIR)
+        self.linter = MigrationLinter(
+            test_project_path,
+            include_apps=fixtures.DATA_MIGRATIONS,
+        )
+
+    def test_missing_reserve_migration(self):
+        runsql = migrations.RunSQL("sql;")
+
+        error, ignored, warning = self.linter.lint_runsql(runsql)
+        self.assertEqual("REVERSIBLE_RUNSQL_DATA_MIGRATION", warning[0]["code"])
+
+    def test_sql_linting_error(self):
+        runsql = migrations.RunSQL("ALTER TABLE t DROP COLUMN t;")
+
+        error, ignored, warning = self.linter.lint_runsql(runsql)
+        self.assertEqual("DROP_COLUMN", error[0]["code"])
+
+    def test_sql_linting_error_array(self):
+        runsql = migrations.RunSQL(
+            ["ALTER TABLE t DROP COLUMN c;", "ALTER TABLE t RENAME COLUMN c;"]
+        )
+
+        error, ignored, warning = self.linter.lint_runsql(runsql)
+        self.assertEqual("DROP_COLUMN", error[0]["code"])
+        self.assertEqual("RENAME_COLUMN", error[1]["code"])
+
+    def test_sql_linting_error_args(self):
+        runsql = migrations.RunSQL([("ALTER TABLE %s DROP COLUMN %s;", ("t", "c"))])
+
+        error, ignored, warning = self.linter.lint_runsql(runsql)
+        self.assertEqual("DROP_COLUMN", error[0]["code"])
