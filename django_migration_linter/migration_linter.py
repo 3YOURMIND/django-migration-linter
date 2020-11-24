@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError, connection
+from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
 from django.db.migrations import RunPython, RunSQL
 from enum import Enum, unique
 from six import PY2
@@ -524,7 +524,7 @@ class MigrationLinter(object):
         for model in called_models:
             has_same_model_name = (
                 re.search(
-                    "{model}.*= +\w+?\.get_model\([^\)]+?\.{model}.*?\)".format(
+                    r"{model}.*= +\w+?\.get_model\([^)]+?\.{model}.*?\)".format(
                         model=model
                     ),
                     source_code,
@@ -532,7 +532,7 @@ class MigrationLinter(object):
                 )
                 is not None
                 or re.search(
-                    "{model}.*= +\w+?\.get_model\([^\)]+?,[^\)]*?{model}.*?\)".format(
+                    r"{model}.*= +\w+?\.get_model\([^)]+?,[^)]*?{model}.*?\)".format(
                         model=model
                     ),
                     source_code,
@@ -546,7 +546,8 @@ class MigrationLinter(object):
                         "code": "DATA_MIGRATION_MODEL_VARIABLE_NAME",
                         "msg": (
                             "'{}': Model variable name {} is different from the "
-                            "model class name that was found in the apps.get_model(...) call."
+                            "model class name that was found in the "
+                            "apps.get_model(...) call."
                         ).format(function_name, model),
                     }
                 )
