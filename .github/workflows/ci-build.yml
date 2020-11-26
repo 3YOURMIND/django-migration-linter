@@ -45,3 +45,20 @@ jobs:
         run: python -m pip install tox tox-gh-actions
       - name: Test with tox ${{ matrix.python-version }}
         run: tox
+
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install dependencies
+        run: python -m pip install tox
+      - name: Lint with tox
+        run: tox
+        env:
+          TOXENV: lint
