@@ -1,3 +1,9 @@
+## 2.5.0
+
+* Add Python 3.9 support
+
+Switched from Travis CI to GitHub Actions for tests
+
 ## 2.4.1
 
 * Add Django 3.1 support
