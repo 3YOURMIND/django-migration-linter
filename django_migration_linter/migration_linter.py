@@ -415,7 +415,7 @@ class MigrationLinter(object):
         # Detect warning on missing reverse operation
         if not runpython.reversible:
             issue = {
-                "code": "REVERSIBLE_DATA_MIGRATION",
+                "code": "RUNPYTHON_REVERSIBLE",
                 "msg": "'{}': RunPython data migration is not reversible".format(
                     function_name
                 ),
@@ -433,7 +433,7 @@ class MigrationLinter(object):
         )
         if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
             issue = {
-                "code": "NAMING_CONVENTION_RUNPYTHON_ARGS",
+                "code": "RUNPYTHON_ARGS_NAMING_CONVENTION",
                 "msg": (
                     "'{}': By convention, "
                     "RunPython names the two arguments: apps, schema_editor"
@@ -502,7 +502,7 @@ class MigrationLinter(object):
             if not has_get_model_call:
                 issues.append(
                     {
-                        "code": "DATA_MIGRATION_MODEL_IMPORT",
+                        "code": "RUNPYTHON_MODEL_IMPORT",
                         "msg": (
                             "'{}': Could not find an 'apps.get_model(\"...\", \"{}\")' "
                             "call. Importing the model directly is incorrect for "
@@ -543,7 +543,7 @@ class MigrationLinter(object):
             if not has_same_model_name:
                 issues.append(
                     {
-                        "code": "DATA_MIGRATION_MODEL_VARIABLE_NAME",
+                        "code": "RUNPYTHON_MODEL_VARIABLE_NAME",
                         "msg": (
                             "'{}': Model variable name {} is different from the "
                             "model class name that was found in the "
@@ -561,7 +561,7 @@ class MigrationLinter(object):
         # Detect warning on missing reverse operation
         if not runsql.reversible:
             issue = {
-                "code": "REVERSIBLE_RUNSQL_DATA_MIGRATION",
+                "code": "RUNSQL_REVERSIBLE",
                 "msg": "RunSQL data migration is not reversible",
             }
             if issue["code"] in self.exclude_migration_tests:

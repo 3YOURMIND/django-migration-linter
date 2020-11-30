@@ -39,7 +39,7 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.linter = MigrationLinter(
             self.test_project_path,
             include_apps=fixtures.DATA_MIGRATIONS,
-            exclude_migration_tests=("REVERSIBLE_DATA_MIGRATION",),
+            exclude_migration_tests=("RUNPYTHON_REVERSIBLE",),
         )
 
         reverse_migration = self.linter.migration_loader.disk_migrations[
@@ -254,7 +254,7 @@ class RunSQLMigrationTestCase(unittest.TestCase):
         runsql = migrations.RunSQL("sql;")
 
         error, ignored, warning = self.linter.lint_runsql(runsql)
-        self.assertEqual("REVERSIBLE_RUNSQL_DATA_MIGRATION", warning[0]["code"])
+        self.assertEqual("RUNSQL_REVERSIBLE", warning[0]["code"])
 
     def test_sql_linting_error(self):
         runsql = migrations.RunSQL("ALTER TABLE t DROP COLUMN t;")

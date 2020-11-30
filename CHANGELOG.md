@@ -1,11 +1,21 @@
 ## 2.5.0
 
+**Renamed lint checks**:
+* `REVERSIBLE_DATA_MIGRATION` -> `RUNPYTHON_REVERSIBLE`
+* `NAMING_CONVENTION_RUNPYTHON_ARGS` -> `RUNPYTHON_ARGS_NAMING_CONVENTION`
+* `DATA_MIGRATION_MODEL_IMPORT` -> `RUNPYTHON_MODEL_IMPORT`
+* `DATA_MIGRATION_MODEL_VARIABLE_NAME` -> `RUNPYTHON_MODEL_VARIABLE_NAME`
+* `REVERSIBLE_RUNSQL_DATA_MIGRATION` -> `RUNSQL_REVERSIBLE`
+
+Features/fixes:
 * Add Python 3.9 support
 * Make data migration model import error less strict (issue #121)
 * Add warning detection on RunPython call when model variable name is not the same as model class name
 * Run checks on RunSQL migration operations
+* Rename the RunPython data migration lint checks for improved consistency
 
-Switched from Travis CI to GitHub Actions for tests
+Others:
+* Switched from Travis CI to GitHub Actions for tests
 
 ## 2.4.1
 
