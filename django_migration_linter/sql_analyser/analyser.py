@@ -7,7 +7,7 @@ from django_migration_linter.sql_analyser import (
     SqliteAnalyser,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django_migration_linter")
 
 
 def get_sql_analyser(database_vendor, exclude_migration_tests=None):

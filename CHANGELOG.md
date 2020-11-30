@@ -13,6 +13,7 @@ Features/fixes:
 * Add warning detection on RunPython call when model variable name is not the same as model class name
 * Run checks on RunSQL migration operations
 * Rename the RunPython data migration lint checks for improved consistency
+* Refactor and commonise the loggers, so that all modules the `django_migration_linter` logger
 
 Others:
 * Switched from Travis CI to GitHub Actions for tests

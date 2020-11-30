@@ -24,7 +24,7 @@ from .operations import IgnoreMigration
 from .sql_analyser import analyse_sql_statements
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django_migration_linter")
 
 
 @unique

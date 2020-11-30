@@ -3,7 +3,7 @@ import re
 
 from .utils import update_migration_tests
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django_migration_linter")
 
 
 def has_not_null_column(sql_statements, **kwargs):
