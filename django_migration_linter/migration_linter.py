@@ -5,24 +5,24 @@ import inspect
 import logging
 import os
 import re
-from subprocess import Popen, PIPE
+from enum import Enum, unique
+from subprocess import PIPE, Popen
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, connections, ProgrammingError
+from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connections
 from django.db.migrations import RunPython, RunSQL
-from enum import Enum, unique
 from six import PY2
 
 from .cache import Cache
 from .constants import (
     DEFAULT_CACHE_PATH,
-    EXPECTED_DATA_MIGRATION_ARGS,
     DJANGO_APPS_WITH_MIGRATIONS,
+    EXPECTED_DATA_MIGRATION_ARGS,
 )
-from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 from .operations import IgnoreMigration
 from .sql_analyser import analyse_sql_statements
+from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 
 logger = logging.getLogger(__name__)
 

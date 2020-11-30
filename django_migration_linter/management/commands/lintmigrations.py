@@ -5,10 +5,9 @@ from importlib import import_module
 
 from django.core.management.base import BaseCommand
 
-from ..utils import register_linting_configuration_options
 from ...constants import __version__
-
-from ...migration_linter import MigrationLinter, MessageType
+from ...migration_linter import MessageType, MigrationLinter
+from ..utils import register_linting_configuration_options
 
 
 class Command(BaseCommand):

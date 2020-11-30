@@ -1,5 +1,5 @@
-import unittest
 import tempfile
+import unittest
 
 from django.db.migrations import Migration
 

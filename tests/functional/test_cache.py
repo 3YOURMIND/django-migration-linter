@@ -6,10 +6,10 @@ from django.conf import settings
 from django.db.migrations import Migration
 
 from django_migration_linter import (
+    IgnoreMigration,
     MigrationLinter,
     analyse_sql_statements,
     get_migration_abspath,
-    IgnoreMigration,
 )
 
 if sys.version_info >= (3, 3):

@@ -16,6 +16,7 @@ Features/fixes:
 
 Others:
 * Switched from Travis CI to GitHub Actions for tests
+* Apply `isort` to the project
 
 ## 2.4.1
 

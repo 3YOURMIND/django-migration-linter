@@ -1,6 +1,6 @@
 import unittest
 
-from django_migration_linter.utils import split_path, split_migration_path
+from django_migration_linter.utils import split_migration_path, split_path
 
 
 class SplitPathTestCase(unittest.TestCase):
