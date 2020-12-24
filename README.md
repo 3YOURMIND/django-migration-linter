@@ -96,6 +96,10 @@ Some implementation details [can found in the ./docs/internals/ folder](./docs/i
 * [wemake-django-template](https://wemake-django-template.readthedocs.io/en/latest/pages/template/linters.html#django-migration-linter)
 * [Testing Django migrations on sobolevn's blog](https://sobolevn.me/2019/10/testing-django-migrations#existing-setup)
 
+### Related
+
+* [django-test-migrations](https://github.com/wemake-services/django-test-migrations) - Test django schema and data migrations, including migrations' order and best practices.
+
 ### License
 
 *django-migration-linter* is released under the [Apache 2.0 License](./LICENSE).
