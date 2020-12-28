@@ -1,3 +1,4 @@
+import configparser
 import logging
 import os
 import sys
@@ -8,6 +9,15 @@ from django.core.management.base import BaseCommand
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ..utils import register_linting_configuration_options
+
+CONFIG_NAME = "django_migration_linter"
+DEFAULT_CONFIG_FILES = (
+    ".{}.cfg".format(CONFIG_NAME),
+    "pyproject.toml",
+    "setup.cfg",
+    "tox.ini",
+    ".editorconfig",
+)
 
 
 class Command(BaseCommand):
@@ -107,20 +117,60 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
+        config_parser = configparser.ConfigParser()
+        config_parser.read(DEFAULT_CONFIG_FILES)
+
+        ignore_name_contains = options["ignore_name_contains"] or config_parser.get(
+            CONFIG_NAME, "ignore_name_contains", fallback=None
+        )
+        ignore_name = options["ignore_name"] or config_parser.get(
+            CONFIG_NAME, "ignore_name", fallback=None
+        )
+        include_apps = options["include_apps"] or config_parser.get(
+            CONFIG_NAME, "include_apps", fallback=None
+        )
+        exclude_apps = options["exclude_apps"] or config_parser.get(
+            CONFIG_NAME, "exclude_apps", fallback=None
+        )
+        database = options["database"] or config_parser.get(
+            CONFIG_NAME, "database", fallback=None
+        )
+        cache_path = options["cache_path"] or config_parser.get(
+            CONFIG_NAME, "cache_path", fallback=None
+        )
+        no_cache = options["no_cache"] or config_parser.get(
+            CONFIG_NAME, "no_cache", fallback=None
+        )
+        applied_migrations = options["applied_migrations"] or config_parser.get(
+            CONFIG_NAME, "applied_migrations", fallback=None
+        )
+        unapplied_migrations = options["unapplied_migrations"] or config_parser.get(
+            CONFIG_NAME, "unapplied_migrations", fallback=None
+        )
+        exclude_migration_tests = options[
+            "exclude_migration_tests"
+        ] or config_parser.get(CONFIG_NAME, "exclude_migration_tests", fallback=None)
+        quiet = options["quiet"] or config_parser.get(
+            CONFIG_NAME, "quiet", fallback=None
+        )
+        warnings_as_errors = options["warnings_as_errors"] or config_parser.get(
+            CONFIG_NAME, "warnings_as_errors", fallback=None
+        )
+
         linter = MigrationLinter(
             settings_path,
-            ignore_name_contains=options["ignore_name_contains"],
-            ignore_name=options["ignore_name"],
-            include_apps=options["include_apps"],
-            exclude_apps=options["exclude_apps"],
-            database=options["database"],
-            cache_path=options["cache_path"],
-            no_cache=options["no_cache"],
-            only_applied_migrations=options["applied_migrations"],
-            only_unapplied_migrations=options["unapplied_migrations"],
-            exclude_migration_tests=options["exclude_migration_tests"],
-            quiet=options["quiet"],
-            warnings_as_errors=options["warnings_as_errors"],
+            ignore_name_contains=ignore_name_contains,
+            ignore_name=ignore_name,
+            include_apps=include_apps,
+            exclude_apps=exclude_apps,
+            database=database,
+            cache_path=cache_path,
+            no_cache=no_cache,
+            only_applied_migrations=applied_migrations,
+            only_unapplied_migrations=unapplied_migrations,
+            exclude_migration_tests=exclude_migration_tests,
+            quiet=quiet,
+            warnings_as_errors=warnings_as_errors,
         )
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],
