@@ -97,9 +97,16 @@ class MigrationLinter(object):
     def should_use_cache(self):
         return self.django_path and not self.no_cache
 
-    def lint_all_migrations(self, git_commit_id=None, migrations_file_path=None, single_file_path=None):
+    def lint_all_migrations(
+        self,
+        git_commit_id=None,
+        migrations_file_path=None,
+        single_file_path=None,
+    ):
         # Collect migrations
-        migrations_list = self.read_migrations_list(migrations_file_path, single_file_path)
+        migrations_list = self.read_migrations_list(
+            migrations_file_path, single_file_path
+        )
         if git_commit_id:
             migrations = self._gather_migrations_git(git_commit_id, migrations_list)
         else:
