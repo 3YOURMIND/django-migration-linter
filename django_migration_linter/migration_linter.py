@@ -291,7 +291,7 @@ class MigrationLinter(object):
         )
 
     @classmethod
-    def read_migrations_list(cls, migrations_file_path, single_file_path):
+    def read_migrations_list(cls, migrations_file_path, single_file_path=None):
         """
         Returning an empty list is different from returning None here.
         None: no file was specified and we should consider all migrations
