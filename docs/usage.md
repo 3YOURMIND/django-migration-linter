@@ -24,6 +24,7 @@ Detailed command line options:
 |`--unapplied-migrations`                                      | Only lint migrations that are not yet applied to the selected database. Other migrations are ignored.                       |
 |`--project-root-path DJANGO_PROJECT_FOLDER`                   | An absolute or relative path to the django project.                                                                         |
 |`--include-migrations-from FILE_PATH`                         | If specified, only migrations listed in the given file will be considered.                                                  |
+|`--migration-file FILE_PATH`                                  | If specified, only the specified migration file will be considered                                                          |
 |`--quiet or -q {ok,ignore,warning,error}`                     | Suppress certain output messages, instead of writing them to stdout.                                                        |
 |`--warnings-as-errors`                                        | Handle warnings as errors and therefore return an error status code if we should.                                           |
 

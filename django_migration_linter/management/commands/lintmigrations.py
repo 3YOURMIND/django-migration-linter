@@ -40,12 +40,19 @@ class Command(BaseCommand):
         parser.add_argument(
             "--project-root-path", type=str, nargs="?", help="django project root path"
         )
-        parser.add_argument(
+        filepath_group = parser.add_mutually_exclusive_group()
+        filepath_group.add_argument(
             "--include-migrations-from",
             metavar="FILE_PATH",
             type=str,
             nargs="?",
             help="if specified, only migrations listed in the file will be considered",
+        )
+        filepath_group.add_argument(
+            "--migration-file",
+            type=str,
+            nargs="?",
+            help="if specified, only the specified migration file will be considered",
         )
         cache_group = parser.add_mutually_exclusive_group(required=False)
         cache_group.add_argument(
@@ -106,7 +113,6 @@ class Command(BaseCommand):
             logging.basicConfig(format="%(message)s", level=logging.DEBUG)
         else:
             logging.basicConfig(format="%(message)s")
-
         linter = MigrationLinter(
             settings_path,
             ignore_name_contains=options["ignore_name_contains"],
@@ -125,6 +131,7 @@ class Command(BaseCommand):
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],
             migrations_file_path=options["include_migrations_from"],
+            single_file_path=options["migration_file"],
         )
         linter.print_summary()
         if linter.has_errors:

@@ -97,9 +97,9 @@ class MigrationLinter(object):
     def should_use_cache(self):
         return self.django_path and not self.no_cache
 
-    def lint_all_migrations(self, git_commit_id=None, migrations_file_path=None):
+    def lint_all_migrations(self, git_commit_id=None, migrations_file_path=None, single_file_path=None):
         # Collect migrations
-        migrations_list = self.read_migrations_list(migrations_file_path)
+        migrations_list = self.read_migrations_list(migrations_file_path, single_file_path)
         if git_commit_id:
             migrations = self._gather_migrations_git(git_commit_id, migrations_list)
         else:
@@ -291,15 +291,19 @@ class MigrationLinter(object):
         )
 
     @classmethod
-    def read_migrations_list(cls, migrations_file_path):
+    def read_migrations_list(cls, migrations_file_path, single_file_path):
         """
         Returning an empty list is different from returning None here.
         None: no file was specified and we should consider all migrations
         Empty list: no migration found in the file and we should consider no migration
         """
-        if not migrations_file_path:
+        if not migrations_file_path and not single_file_path:
             return None
 
+        if not migrations_file_path:
+            if cls.is_migration_file(single_file_path):
+                app_label, name = split_migration_path(single_file_path)
+                return[(app_label, name)]
         migrations = []
         try:
             with open(migrations_file_path, "r") as file:
