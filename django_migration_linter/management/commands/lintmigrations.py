@@ -138,13 +138,15 @@ class Command(BaseCommand):
         cache_path = options["cache_path"] or config_parser.get(
             CONFIG_NAME, "cache_path", fallback=None
         )
-        no_cache = options["no_cache"] or config_parser.get(
+        no_cache = options["no_cache"] or config_parser.getboolean(
             CONFIG_NAME, "no_cache", fallback=None
         )
-        applied_migrations = options["applied_migrations"] or config_parser.get(
+        applied_migrations = options["applied_migrations"] or config_parser.getboolean(
             CONFIG_NAME, "applied_migrations", fallback=None
         )
-        unapplied_migrations = options["unapplied_migrations"] or config_parser.get(
+        unapplied_migrations = options[
+            "unapplied_migrations"
+        ] or config_parser.getboolean(
             CONFIG_NAME, "unapplied_migrations", fallback=None
         )
         exclude_migration_tests = options[
@@ -153,7 +155,7 @@ class Command(BaseCommand):
         quiet = options["quiet"] or config_parser.get(
             CONFIG_NAME, "quiet", fallback=None
         )
-        warnings_as_errors = options["warnings_as_errors"] or config_parser.get(
+        warnings_as_errors = options["warnings_as_errors"] or config_parser.getboolean(
             CONFIG_NAME, "warnings_as_errors", fallback=None
         )
 
