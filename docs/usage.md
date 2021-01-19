@@ -13,6 +13,8 @@ Below the detailed command line options, which can all also be defined using a c
 |`GIT_COMMIT_ID`                                               | If specified, only migrations since this commit will be taken into account. If not specified, all migrations will be linted.|
 |`--ignore-name-contains IGNORE_NAME_CONTAINS`                 | Ignore migrations containing this name.                                                                                     |
 |`--ignore-name IGNORE_NAME [IGNORE_NAME ...]`                 | Ignore migrations with exactly one of these names.                                                                          |
+|`--include-name-contains INCLUDE_NAME_CONTAINS`               | Include migrations containing this name.                                                                                     |
+|`--include-name INCLUDE_NAME [INCLUDE_NAME ...]`              | Include migrations with exactly one of these names.                                                                          |
 |`--include-apps INCLUDE_APPS [INCLUDE_APPS ...]`              | Check only migrations that are in the specified django apps.                                                                |
 |`--exclude-apps EXCLUDE_APPS [EXCLUDE_APPS ...]`              | Ignore migrations that are in the specified django apps.                                                                    |
 |`--exclude-migration-tests MIGRATION_TEST_CODE [...]`         | Specify backward incompatible migration tests to be ignored using the code (e.g. ALTER_COLUMN).                             |

@@ -45,6 +45,8 @@ class MigrationLinter(object):
         path=None,
         ignore_name_contains=None,
         ignore_name=None,
+        include_name_contains=None,
+        include_name=None,
         include_apps=None,
         exclude_apps=None,
         database=DEFAULT_DB_ALIAS,
@@ -60,6 +62,8 @@ class MigrationLinter(object):
         self.django_path = path
         self.ignore_name_contains = ignore_name_contains
         self.ignore_name = ignore_name or tuple()
+        self.include_name_contains = include_name_contains
+        self.include_name = include_name or tuple()
         self.include_apps = include_apps
         self.exclude_apps = exclude_apps
         self.exclude_migration_tests = exclude_migration_tests or []
@@ -371,7 +375,12 @@ class MigrationLinter(object):
                 self.ignore_name_contains
                 and self.ignore_name_contains in migration_name
             )
+            or (
+                self.include_name_contains
+                and self.include_name_contains not in migration_name
+            )
             or (migration_name in self.ignore_name)
+            or (self.include_name and migration_name not in self.include_name)
             or (
                 self.only_applied_migrations
                 and (app_label, migration_name)

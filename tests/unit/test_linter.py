@@ -56,6 +56,22 @@ class LinterFunctionsTestCase(unittest.TestCase):
         self.assertFalse(linter.should_ignore_migration("app_correct", "0001_initial"))
         self.assertTrue(linter.should_ignore_migration("app_correct", "0002_foo"))
 
+    def test_include_migration_name_contains(self):
+        linter = MigrationLinter(include_name_contains="foo")
+        self.assertTrue(linter.should_ignore_migration("app_correct", "0001_initial"))
+        self.assertFalse(linter.should_ignore_migration("app_correct", "0002_foo"))
+
+    def test_include_migration_full_name(self):
+        linter = MigrationLinter(include_name=("0002_foo",))
+        self.assertTrue(linter.should_ignore_migration("app_correct", "0001_initial"))
+        self.assertFalse(linter.should_ignore_migration("app_correct", "0002_foo"))
+
+    def test_include_migration_multiple_names(self):
+        linter = MigrationLinter(include_name=("0002_foo", "0003_bar"))
+        self.assertTrue(linter.should_ignore_migration("app_correct", "0001_initial"))
+        self.assertFalse(linter.should_ignore_migration("app_correct", "0002_foo"))
+        self.assertFalse(linter.should_ignore_migration("app_correct", "0003_bar"))
+
     def test_gather_all_migrations(self):
         linter = MigrationLinter()
         migrations = linter._gather_all_migrations()

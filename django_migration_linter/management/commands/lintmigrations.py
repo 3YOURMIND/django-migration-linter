@@ -48,6 +48,18 @@ class Command(BaseCommand):
             help="ignore migrations with exactly one of these names",
         )
         parser.add_argument(
+            "--include-name-contains",
+            type=str,
+            nargs="?",
+            help="only consider migrations containing this name",
+        )
+        parser.add_argument(
+            "--include-name",
+            type=str,
+            nargs="*",
+            help="only consider migrations with exactly one of these names",
+        )
+        parser.add_argument(
             "--project-root-path", type=str, nargs="?", help="django project root path"
         )
         parser.add_argument(
@@ -126,6 +138,12 @@ class Command(BaseCommand):
         ignore_name = options["ignore_name"] or config_parser.get(
             CONFIG_NAME, "ignore_name", fallback=None
         )
+        include_name_contains = options["include_name_contains"] or config_parser.get(
+            CONFIG_NAME, "include_name_contains", fallback=None
+        )
+        include_name = options["include_name"] or config_parser.get(
+            CONFIG_NAME, "include_name", fallback=None
+        )
         include_apps = options["include_apps"] or config_parser.get(
             CONFIG_NAME, "include_apps", fallback=None
         )
@@ -163,6 +181,8 @@ class Command(BaseCommand):
             settings_path,
             ignore_name_contains=ignore_name_contains,
             ignore_name=ignore_name,
+            include_name_contains=include_name_contains,
+            include_name=include_name,
             include_apps=include_apps,
             exclude_apps=exclude_apps,
             database=database,
