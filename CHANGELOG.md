@@ -15,6 +15,7 @@ Features/fixes:
 * Rename the RunPython data migration lint checks for improved consistency
 * Refactor and commonise the loggers, so that all modules the `django_migration_linter` logger
 * Allow using configuration file for linter options
+* Add option `--include-name` and `--include-name-contains` to only include migration with a certain name
 
 Others:
 * Switched from Travis CI to GitHub Actions for tests
