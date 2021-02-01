@@ -16,7 +16,6 @@ DEFAULT_CONFIG_FILES = (
     "pyproject.toml",
     "setup.cfg",
     "tox.ini",
-    ".editorconfig",
 )
 
 
