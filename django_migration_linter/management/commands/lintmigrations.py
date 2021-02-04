@@ -129,7 +129,7 @@ class Command(BaseCommand):
             logging.basicConfig(format="%(message)s")
 
         config_parser = configparser.ConfigParser()
-        config_parser.read(DEFAULT_CONFIG_FILES, encoding='utf-8')
+        config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
 
         ignore_name_contains = options["ignore_name_contains"] or config_parser.get(
             CONFIG_NAME, "ignore_name_contains", fallback=None
