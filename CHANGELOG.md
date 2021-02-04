@@ -1,3 +1,8 @@
+## 2.5.1
+
+* Remove `.editorconfig` from default config file
+* Allow utf-8 encoding in config files
+
 ## 2.5.0
 
 **Renamed lint checks**:
