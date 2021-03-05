@@ -4,16 +4,22 @@ import os
 import sys
 from importlib import import_module
 
-import toml
 from django.core.management.base import BaseCommand
 
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ..utils import register_linting_configuration_options
 
+try:
+    import toml
+except ImportError:
+    toml = None
+
 CONFIG_NAME = "django_migration_linter"
+PYPROJECT_TOML = "pyproject.toml"
 DEFAULT_CONFIG_FILES = (
     ".{}.cfg".format(CONFIG_NAME),
+    PYPROJECT_TOML,
     "setup.cfg",
     "tox.ini",
 )
@@ -147,8 +153,8 @@ class Command(BaseCommand):
 
         config = {key: options[key] for key in keys}
 
-        if os.path.exists("pyproject.toml"):
-            pyproject_toml = toml.load("pyproject.toml")
+        if toml and os.path.exists(PYPROJECT_TOML):
+            pyproject_toml = toml.load(PYPROJECT_TOML)
             section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
             config.update({key: section[key] for key in keys if key in section})
         else:
