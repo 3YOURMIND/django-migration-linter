@@ -24,6 +24,8 @@ DEFAULT_CONFIG_FILES = (
     "tox.ini",
 )
 
+logger = logging.getLogger("django_migration_linter")
+
 
 class Command(BaseCommand):
     help = "Lint your migrations"
@@ -159,7 +161,12 @@ class Command(BaseCommand):
             config.update({key: section[key] for key in keys if key in section})
         else:
             config_parser = configparser.ConfigParser()
-            config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
+            try:
+                config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
+            except configparser.ParsingError as err:
+                if err.source == PYPROJECT_TOML:
+                    logger.error("Install toml for full pyproject.toml support")
+                raise
             config.update(
                 {
                     key: config_parser.get(CONFIG_NAME, key, fallback=None)

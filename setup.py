@@ -46,9 +46,7 @@ setup(
             'mock>=3.0.5;python_version<"3.3"',
             'backports.tempfile>=1.0;python_version<="2.7"',
         ],
-        "toml": [
-            "toml==0.10.2",
-        ]
+        "toml": ["toml==0.10.2"],
     },
     keywords="django migration lint linter database backward compatibility",
     classifiers=[
