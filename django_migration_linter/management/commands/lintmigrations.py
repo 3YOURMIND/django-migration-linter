@@ -68,6 +68,16 @@ class Command(BaseCommand):
             nargs="?",
             help="if specified, only migrations listed in the file will be considered",
         )
+        parser.add_argument(
+            "--skip-config",
+            type=str,
+            nargs="?",
+            action="append",
+            help=(
+                "skip certain config files - may be useful considering limited TOML "
+                "format support"
+            ),
+        )
         cache_group = parser.add_mutually_exclusive_group(required=False)
         cache_group.add_argument(
             "--cache-path",
@@ -128,8 +138,15 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
+        config_files = DEFAULT_CONFIG_FILES[:]
+        print(
+            "skip_config:", type(options.get("skip_config")), options.get("skip_config")
+        )
+        for config_to_skip in options.get("skip_config"):
+            config_files = list(set(config_files) - set(options["skip_config"]))
+
         config_parser = configparser.ConfigParser()
-        config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
+        config_parser.read(config_files, encoding="utf-8")
 
         ignore_name_contains = options["ignore_name_contains"] or config_parser.get(
             CONFIG_NAME, "ignore_name_contains", fallback=None
