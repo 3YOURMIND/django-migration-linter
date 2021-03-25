@@ -139,9 +139,6 @@ class Command(BaseCommand):
             logging.basicConfig(format="%(message)s")
 
         config_files = DEFAULT_CONFIG_FILES[:]
-        print(
-            "skip_config:", type(options.get("skip_config")), options.get("skip_config")
-        )
         for config_to_skip in options.get("skip_config"):
             config_files = list(set(config_files) - set(options["skip_config"]))
 
