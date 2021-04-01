@@ -4,6 +4,7 @@ import os
 import sys
 from importlib import import_module
 
+import toml
 from django.core.management.base import BaseCommand
 
 from ...constants import __version__
@@ -11,11 +12,14 @@ from ...migration_linter import MessageType, MigrationLinter
 from ..utils import register_linting_configuration_options
 
 CONFIG_NAME = "django_migration_linter"
+PYPROJECT_TOML = "pyproject.toml"
 DEFAULT_CONFIG_FILES = (
     ".{}.cfg".format(CONFIG_NAME),
     "setup.cfg",
     "tox.ini",
 )
+
+logger = logging.getLogger("django_migration_linter")
 
 
 class Command(BaseCommand):
@@ -127,70 +131,66 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
+        keys = (
+            "ignore_name_contains",
+            "ignore_name",
+            "include_name_contains",
+            "include_name",
+            "include_apps",
+            "exclude_apps",
+            "database",
+            "cache_path",
+            "no_cache",
+            "applied_migrations",
+            "unapplied_migrations",
+            "exclude_migration_tests",
+            "quiet",
+            "warnings_as_errors",
+        )
+        boolean_keys = (
+            "no_cache",
+            "applied_migrations",
+            "unapplied_migrations",
+            "warnings_as_errors",
+        )
+
+        config = {key: options[key] for key in keys}
+
         config_parser = configparser.ConfigParser()
         config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
+        for key in keys:
+            if key in boolean_keys:
+                config_get_fn = config_parser.getboolean
+            else:
+                config_get_fn = config_parser.get
 
-        ignore_name_contains = options["ignore_name_contains"] or config_parser.get(
-            CONFIG_NAME, "ignore_name_contains", fallback=None
-        )
-        ignore_name = options["ignore_name"] or config_parser.get(
-            CONFIG_NAME, "ignore_name", fallback=None
-        )
-        include_name_contains = options["include_name_contains"] or config_parser.get(
-            CONFIG_NAME, "include_name_contains", fallback=None
-        )
-        include_name = options["include_name"] or config_parser.get(
-            CONFIG_NAME, "include_name", fallback=None
-        )
-        include_apps = options["include_apps"] or config_parser.get(
-            CONFIG_NAME, "include_apps", fallback=None
-        )
-        exclude_apps = options["exclude_apps"] or config_parser.get(
-            CONFIG_NAME, "exclude_apps", fallback=None
-        )
-        database = options["database"] or config_parser.get(
-            CONFIG_NAME, "database", fallback=None
-        )
-        cache_path = options["cache_path"] or config_parser.get(
-            CONFIG_NAME, "cache_path", fallback=None
-        )
-        no_cache = options["no_cache"] or config_parser.getboolean(
-            CONFIG_NAME, "no_cache", fallback=None
-        )
-        applied_migrations = options["applied_migrations"] or config_parser.getboolean(
-            CONFIG_NAME, "applied_migrations", fallback=None
-        )
-        unapplied_migrations = options[
-            "unapplied_migrations"
-        ] or config_parser.getboolean(
-            CONFIG_NAME, "unapplied_migrations", fallback=None
-        )
-        exclude_migration_tests = options[
-            "exclude_migration_tests"
-        ] or config_parser.get(CONFIG_NAME, "exclude_migration_tests", fallback=None)
-        quiet = options["quiet"] or config_parser.get(
-            CONFIG_NAME, "quiet", fallback=None
-        )
-        warnings_as_errors = options["warnings_as_errors"] or config_parser.getboolean(
-            CONFIG_NAME, "warnings_as_errors", fallback=None
-        )
+            config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
+            if config_value and not config[key]:
+                config[key] = config_value
+
+        if os.path.exists(PYPROJECT_TOML):
+            pyproject_toml = toml.load(PYPROJECT_TOML)
+            section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
+            for key in keys:
+                if key in section and not config[key]:
+                    config[key] = section[key]
 
         linter = MigrationLinter(
             settings_path,
-            ignore_name_contains=ignore_name_contains,
-            ignore_name=ignore_name,
-            include_name_contains=include_name_contains,
-            include_name=include_name,
-            include_apps=include_apps,
-            exclude_apps=exclude_apps,
-            database=database,
-            cache_path=cache_path,
-            no_cache=no_cache,
-            only_applied_migrations=applied_migrations,
-            only_unapplied_migrations=unapplied_migrations,
-            exclude_migration_tests=exclude_migration_tests,
-            quiet=quiet,
-            warnings_as_errors=warnings_as_errors,
+            ignore_name_contains=config["ignore_name_contains"],
+            ignore_name=config["ignore_name"],
+            include_name_contains=config["include_name_contains"],
+            include_name=config["include_name"],
+            include_apps=config["include_apps"],
+            exclude_apps=config["exclude_apps"],
+            database=config["database"],
+            cache_path=config["cache_path"],
+            no_cache=config["no_cache"],
+            only_applied_migrations=config["applied_migrations"],
+            only_unapplied_migrations=config["unapplied_migrations"],
+            exclude_migration_tests=config["exclude_migration_tests"],
+            quiet=config["quiet"],
+            warnings_as_errors=config["warnings_as_errors"],
         )
         linter.lint_all_migrations(
             git_commit_id=options["commit_id"],
