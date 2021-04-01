@@ -6,7 +6,7 @@ The linter is installed as a Django app and is integrated through the Django man
 
 `python manage.py lintmigrations [GIT_COMMIT_ID] ...`
 
-Below the detailed command line options, which can all also be defined using a config file (`setup.cfg`, `tox.ini`, `pyproject.toml`, `.django_migration_linter.cfg`):
+Below the detailed command line options, which can all also be defined using a config file (`setup.cfg`, `tox.ini`, `.django_migration_linter.cfg`):
 
 |                   Parameter                                  |                                        Description                                                                          |
 |--------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
