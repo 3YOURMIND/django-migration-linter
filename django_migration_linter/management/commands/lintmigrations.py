@@ -4,22 +4,17 @@ import os
 import sys
 from importlib import import_module
 
+import toml
 from django.core.management.base import BaseCommand
 
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ..utils import register_linting_configuration_options
 
-try:
-    import toml
-except ImportError:
-    toml = None
-
 CONFIG_NAME = "django_migration_linter"
 PYPROJECT_TOML = "pyproject.toml"
 DEFAULT_CONFIG_FILES = (
     ".{}.cfg".format(CONFIG_NAME),
-    PYPROJECT_TOML,
     "setup.cfg",
     "tox.ini",
 )
@@ -136,7 +131,7 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
-        keys = [
+        keys = (
             "ignore_name_contains",
             "ignore_name",
             "include_name_contains",
@@ -151,29 +146,34 @@ class Command(BaseCommand):
             "exclude_migration_tests",
             "quiet",
             "warnings_as_errors",
-        ]
+        )
+        boolean_keys = (
+            "no_cache",
+            "applied_migrations",
+            "unapplied_migrations",
+            "warnings_as_errors",
+        )
 
         config = {key: options[key] for key in keys}
 
-        if toml and os.path.exists(PYPROJECT_TOML):
+        config_parser = configparser.ConfigParser()
+        config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
+        for key in keys:
+            if key in boolean_keys:
+                config_get_fn = config_parser.getboolean
+            else:
+                config_get_fn = config_parser.get
+
+            config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
+            if config_value and not config[key]:
+                config[key] = config_value
+
+        if os.path.exists(PYPROJECT_TOML):
             pyproject_toml = toml.load(PYPROJECT_TOML)
             section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
-            config.update({key: section[key] for key in keys if key in section})
-        else:
-            config_parser = configparser.ConfigParser()
-            try:
-                config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
-            except configparser.ParsingError as err:
-                if err.source == PYPROJECT_TOML:
-                    logger.error("Install toml for full pyproject.toml support")
-                raise
-            config.update(
-                {
-                    key: config_parser.get(CONFIG_NAME, key, fallback=None)
-                    for key in keys
-                    if config_parser.get(CONFIG_NAME, key, fallback=None)
-                }
-            )
+            for key in keys:
+                if key in section and not config[key]:
+                    config[key] = section[key]
 
         linter = MigrationLinter(
             settings_path,
