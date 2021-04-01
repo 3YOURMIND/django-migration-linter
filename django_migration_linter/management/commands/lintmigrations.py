@@ -13,7 +13,6 @@ from ..utils import register_linting_configuration_options
 CONFIG_NAME = "django_migration_linter"
 DEFAULT_CONFIG_FILES = (
     ".{}.cfg".format(CONFIG_NAME),
-    "pyproject.toml",
     "setup.cfg",
     "tox.ini",
 )

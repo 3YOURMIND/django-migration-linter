@@ -1,3 +1,7 @@
+## 2.5.2
+
+* Remove `toml` support for config files
+
 ## 2.5.1
 
 * Remove `.editorconfig` from default config file
