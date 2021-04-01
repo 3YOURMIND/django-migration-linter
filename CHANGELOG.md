@@ -1,3 +1,7 @@
+## 2.6.0
+
+* Add complete and working support for `toml` configuration files
+
 ## 2.5.2
 
 * Remove `toml` support for config files
