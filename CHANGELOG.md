@@ -1,6 +1,7 @@
 ## 2.5.3
 
 * Stop packaging the 'tests' module into the release wheel file
+* Add Django 3.2 support
 
 ## 2.5.2
 
