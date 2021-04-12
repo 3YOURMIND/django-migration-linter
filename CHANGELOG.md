@@ -1,3 +1,7 @@
+## 2.5.3
+
+* Stop packaging the 'tests' module into the release wheel file
+
 ## 2.5.2
 
 * Remove `toml` support for config files
