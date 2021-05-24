@@ -1,3 +1,5 @@
+* Renamed `master` branch to `main`
+
 ## 2.5.3
 
 * Stop packaging the 'tests' module into the release wheel file
