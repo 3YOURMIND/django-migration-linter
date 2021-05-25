@@ -1,4 +1,5 @@
 * Renamed `master` branch to `main`
+* Add complete and working support for `toml` configuration files
 
 ## 2.5.3
 

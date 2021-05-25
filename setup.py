@@ -36,6 +36,7 @@ setup(
         "appdirs>=1.4.3",
         'enum34>=1.1.6;python_version<"3.4"',
         "six>=1.14.0",
+        "toml>=0.10.2",
     ],
     extras_require={
         "test": [
@@ -45,7 +46,7 @@ setup(
             "django_add_default_value>=0.4.0",
             'mock>=3.0.5;python_version<"3.3"',
             'backports.tempfile>=1.0;python_version<="2.7"',
-        ]
+        ],
     },
     keywords="django migration lint linter database backward compatibility",
     classifiers=[
