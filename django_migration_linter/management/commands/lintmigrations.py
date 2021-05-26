@@ -27,14 +27,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "commit_id",
-            metavar="GIT_COMMIT_ID",
+            "--git-commit-id",
             type=str,
             nargs="?",
             help=(
                 "if specified, only migrations since this commit "
-                "will be taken into account. If not specified, "
-                "the initial repo commit will be used"
+                "will be taken into account"
             ),
         )
         parser.add_argument(
@@ -193,7 +191,7 @@ class Command(BaseCommand):
             warnings_as_errors=config["warnings_as_errors"],
         )
         linter.lint_all_migrations(
-            git_commit_id=options["commit_id"],
+            git_commit_id=options["git_commit_id"],
             migrations_file_path=options["include_migrations_from"],
         )
         linter.print_summary()
