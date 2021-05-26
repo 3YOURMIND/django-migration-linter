@@ -1,5 +1,12 @@
-* Renamed `master` branch to `main`
+## 3.0.0
+
+**Breaking API change on `lintmigrations` command**:
+* the positional argument `GIT_COMMIT_ID` becomes an optional argument with the named parameter ` --git-commit-id [GIT_COMMIT_ID]`
+* the `lintmigrations` command takes now two positional arguments: `lintmigrations [app_label] [migration_name]`
+
+Miscellaneous:
 * Add complete and working support for `toml` configuration files
+* Renamed `master` branch to `main`
 
 ## 2.5.3
 
