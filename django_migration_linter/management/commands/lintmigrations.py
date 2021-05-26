@@ -27,6 +27,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
+            "app_label",
+            nargs="?",
+            type=str,
+            help="App label of an application to lint migrations.",
+        )
+        parser.add_argument(
+            "migration_name",
+            nargs="?",
+            type=str,
+            help="Linting will only be done on that migration only.",
+        )
+        parser.add_argument(
             "--git-commit-id",
             type=str,
             nargs="?",
@@ -191,6 +203,8 @@ class Command(BaseCommand):
             warnings_as_errors=config["warnings_as_errors"],
         )
         linter.lint_all_migrations(
+            app_label=options["app_label"],
+            migration_name=options["migration_name"],
             git_commit_id=options["git_commit_id"],
             migrations_file_path=options["include_migrations_from"],
         )

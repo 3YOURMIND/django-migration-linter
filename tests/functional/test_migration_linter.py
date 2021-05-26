@@ -23,16 +23,12 @@ class BaseBackwardCompatibilityDetection(object):
         self.assertNotEqual(linter.nb_valid + linter.nb_erroneous, 0)
 
     def _launch_linter(self, app=None, commit_id=None):
-        if app is not None:
-            app = [app]
-
         linter = MigrationLinter(
             self.test_project_path,
-            include_apps=app,
             database=next(iter(self.databases)),
             no_cache=True,
         )
-        linter.lint_all_migrations(git_commit_id=commit_id)
+        linter.lint_all_migrations(app_label=app, git_commit_id=commit_id)
         return linter
 
     # *** Tests ***
