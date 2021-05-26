@@ -101,7 +101,13 @@ class MigrationLinter(object):
     def should_use_cache(self):
         return self.django_path and not self.no_cache
 
-    def lint_all_migrations(self, git_commit_id=None, migrations_file_path=None):
+    def lint_all_migrations(
+        self,
+        app_label=None,
+        migration_name=None,
+        git_commit_id=None,
+        migrations_file_path=None,
+    ):
         # Collect migrations
         migrations_list = self.read_migrations_list(migrations_file_path)
         if git_commit_id:
@@ -113,8 +119,22 @@ class MigrationLinter(object):
         sorted_migrations = sorted(
             migrations, key=lambda migration: (migration.app_label, migration.name)
         )
+
+        specific_target_migration = (
+            self.migration_loader.get_migration_by_prefix(app_label, migration_name)
+            if app_label and migration_name
+            else None
+        )
+
         for m in sorted_migrations:
-            self.lint_migration(m)
+            if app_label and migration_name:
+                if m == specific_target_migration:
+                    self.lint_migration(m)
+            elif app_label:
+                if m.app_label == app_label:
+                    self.lint_migration(m)
+            else:
+                self.lint_migration(m)
 
         if self.should_use_cache():
             self.new_cache.save()
