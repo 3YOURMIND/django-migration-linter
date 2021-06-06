@@ -4,6 +4,7 @@ Detect backward incompatible migrations for your Django project.
 It will save you time by making sure migrations will not break with a older codebase.
 
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2F3YOURMIND%2Fdjango-migration-linter%2Fbadge%3Fref%3Dmain&style=flat)](https://actions-badge.atrox.dev/3YOURMIND/django-migration-linter/goto?ref=main)
+[![codecov](https://codecov.io/gh/3YOURMIND/django-migration-linter/branch/master/graph/badge.svg?token=pgNNXGbCf7)](https://codecov.io/gh/3YOURMIND/django-migration-linter)
 [![PyPI](https://img.shields.io/pypi/v/django-migration-linter.svg)](https://pypi.python.org/pypi/django-migration-linter/)
 [![PR_Welcome](https://img.shields.io/badge/PR-welcome-green.svg)](https://github.com/3YOURMIND/django-migration-linter/pulls)
 [![3YD_Hiring](https://img.shields.io/badge/3YOURMIND-Hiring-brightgreen.svg)](https://www.3yourmind.com/career)
