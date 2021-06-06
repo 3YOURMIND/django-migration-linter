@@ -6,6 +6,7 @@
 
 Miscellaneous:
 * Add complete and working support for `toml` configuration files
+* Add code coverage to the linter
 * Renamed `master` branch to `main`
 
 ## 2.5.3

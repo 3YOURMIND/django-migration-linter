@@ -46,6 +46,7 @@ setup(
             "django_add_default_value>=0.4.0",
             'mock>=3.0.5;python_version<"3.3"',
             'backports.tempfile>=1.0;python_version<="2.7"',
+            "coverage>=5.5",
         ],
     },
     keywords="django migration lint linter database backward compatibility",
