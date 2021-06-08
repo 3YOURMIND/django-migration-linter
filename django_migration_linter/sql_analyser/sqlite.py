@@ -27,6 +27,7 @@ class SqliteAnalyser(BaseAnalyser):
             "fn": lambda sql, **kw: re.search("ALTER TABLE .* RENAME TO", sql)
             and "__old" not in sql
             and "new__" not in sql,
+            "type": "error",
         },
         {
             "code": "DROP_TABLE",
@@ -37,6 +38,7 @@ class SqliteAnalyser(BaseAnalyser):
             and not any(sql.startswith("CREATE TABLE") for sql in sql_statements),
             "msg": "DROPPING table",
             "mode": "transaction",
+            "type": "error",
         },
         {
             "code": "NOT_NULL",
@@ -50,8 +52,14 @@ class SqliteAnalyser(BaseAnalyser):
                 for sql in sql_statements
             ),
             "mode": "transaction",
+            "type": "error",
         },
-        {"code": "ADD_UNIQUE", "fn": has_add_unique, "mode": "transaction"},
+        {
+            "code": "ADD_UNIQUE",
+            "fn": has_add_unique,
+            "mode": "transaction",
+            "type": "error",
+        },
     ]
 
     @staticmethod

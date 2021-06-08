@@ -11,6 +11,7 @@ class MySqlAnalyser(BaseAnalyser):
                 "ALTER TABLE .* MODIFY .* (?!NULL);?$", sql
             ),
             "mode": "one_liner",
+            "type": "error",
         }
     ]
 
