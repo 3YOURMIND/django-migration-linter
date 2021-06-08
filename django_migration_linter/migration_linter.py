@@ -159,17 +159,19 @@ class MigrationLinter(object):
             return
 
         sql_statements = self.get_sql(app_label, migration_name)
-        errors, ignored = analyse_sql_statements(
+        errors, ignored, warnings = analyse_sql_statements(
             sql_statements,
             settings.DATABASES[self.database]["ENGINE"],
             self.exclude_migration_tests,
         )
 
-        err, ignored_data, warnings = self.analyse_data_migration(migration)
+        err, ignored_data, warnings_data = self.analyse_data_migration(migration)
         if err:
             errors += err
         if ignored_data:
             ignored += ignored_data
+        if warnings_data:
+            warnings += warnings_data
 
         if self.warnings_as_errors:
             errors += warnings
@@ -616,7 +618,7 @@ class MigrationLinter(object):
             else:
                 sql_statements.append(runsql.sql)
 
-            sql_errors, sql_ignored = analyse_sql_statements(
+            sql_errors, sql_ignored, sql_warnings = analyse_sql_statements(
                 sql_statements,
                 settings.DATABASES[self.database]["ENGINE"],
                 self.exclude_migration_tests,
@@ -625,6 +627,8 @@ class MigrationLinter(object):
                 error += sql_errors
             if sql_ignored:
                 ignored += sql_ignored
+            if sql_warnings:
+                warnings += sql_warnings
 
         # And analysse the reverse SQL
         if runsql.reversible and runsql.reverse_sql != RunSQL.noop:
@@ -644,7 +648,7 @@ class MigrationLinter(object):
             else:
                 sql_statements.append(runsql.reverse_sql)
 
-            sql_errors, sql_ignored = analyse_sql_statements(
+            sql_errors, sql_ignored, sql_warnings = analyse_sql_statements(
                 sql_statements,
                 settings.DATABASES[self.database]["ENGINE"],
                 self.exclude_migration_tests,
@@ -653,5 +657,7 @@ class MigrationLinter(object):
                 error += sql_errors
             if sql_ignored:
                 ignored += sql_ignored
+            if sql_warnings:
+                warnings += sql_warnings
 
         return error, ignored, warning
