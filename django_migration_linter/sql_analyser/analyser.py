@@ -29,4 +29,4 @@ def analyse_sql_statements(
 ):
     sql_analyser = get_sql_analyser(database_vendor, exclude_migration_tests)
     sql_analyser.analyse(sql_statements)
-    return sql_analyser.errors, sql_analyser.ignored
+    return sql_analyser.errors, sql_analyser.ignored, sql_analyser.warnings
