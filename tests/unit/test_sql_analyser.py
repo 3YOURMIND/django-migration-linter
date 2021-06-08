@@ -14,12 +14,16 @@ class SqlAnalyserTestCase(unittest.TestCase):
         )
 
     def assertValidSql(self, sql):
-        errors, _ = self.analyse_sql(sql)
+        errors, _, _ = self.analyse_sql(sql)
         self.assertEqual(0, len(errors), "Found errors in sql: {}".format(errors))
 
     def assertBackwardIncompatibleSql(self, sql):
-        errors, _ = self.analyse_sql(sql)
+        errors, _, _ = self.analyse_sql(sql)
         self.assertNotEqual(0, len(errors), "Found no errors in sql")
+
+    def assertWarningSql(self, sql):
+        _, _, warnings = self.analyse_sql(sql)
+        self.assertNotEqual(0, len(warnings), "Found no warnings in sql")
 
 
 class MySqlAnalyserTestCase(SqlAnalyserTestCase):
@@ -202,4 +206,16 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
             'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" DROP DEFAULT;',
             'ALTER TABLE "app_drop_default_a" ALTER COLUMN "col" SET DEFAULT `\'empty\';',
         ]
+        self.assertValidSql(sql)
+
+    def test_create_index_non_concurrently(self):
+        sql = "CREATE INDEX ON films ((lower(titre)));"
+        self.assertWarningSql(sql)
+        sql = "CREATE UNIQUE INDEX title_idx ON films (title);"
+        self.assertWarningSql(sql)
+
+    def test_create_index_concurrently(self):
+        sql = "CREATE INDEX CONCURRENTLY ON films ((lower(titre)));"
+        self.assertValidSql(sql)
+        sql = "CREATE UNIQUE INDEX CONCURRENTLY title_idx ON films (title);"
         self.assertValidSql(sql)
