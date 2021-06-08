@@ -48,24 +48,28 @@ class BaseAnalyser(object):
             or re.search("ALTER TABLE .* RENAME TO", sql),
             "msg": "RENAMING tables",
             "mode": "one_liner",
+            "type": "error",
         },
         {
             "code": "NOT_NULL",
             "fn": has_not_null_column,
             "msg": "NOT NULL constraint on columns",
             "mode": "transaction",
+            "type": "error",
         },
         {
             "code": "DROP_COLUMN",
             "fn": lambda sql, **kw: re.search("DROP COLUMN", sql),
             "msg": "DROPPING columns",
             "mode": "one_liner",
+            "type": "error",
         },
         {
             "code": "DROP_TABLE",
             "fn": lambda sql, **kw: sql.startswith("DROP TABLE"),
             "msg": "DROPPING table",
             "mode": "one_liner",
+            "type": "error",
         },
         {
             "code": "RENAME_COLUMN",
@@ -73,6 +77,7 @@ class BaseAnalyser(object):
             or re.search("ALTER TABLE .* RENAME COLUMN", sql),
             "msg": "RENAMING columns",
             "mode": "one_liner",
+            "type": "error",
         },
         {
             "code": "ALTER_COLUMN",
@@ -84,12 +89,14 @@ class BaseAnalyser(object):
                 "You may ignore this migration.)"
             ),
             "mode": "one_liner",
+            "type": "error",
         },
         {
             "code": "ADD_UNIQUE",
             "fn": has_add_unique,
             "msg": "ADDING unique constraint",
             "mode": "transaction",
+            "type": "error",
         },
     ]
 
@@ -98,6 +105,7 @@ class BaseAnalyser(object):
     def __init__(self, exclude_migration_tests):
         self.exclude_migration_tests = exclude_migration_tests or []
         self.errors = []
+        self.warnings = []
         self.ignored = []
         self.migration_tests = update_migration_tests(
             self.base_migration_tests, self.migration_tests
@@ -123,11 +131,16 @@ class BaseAnalyser(object):
         if test["fn"](sql, errors=self.errors):
             err = self.build_error_dict(migration_test=test, sql_statement=sql)
             if test["code"] in self.exclude_migration_tests:
-                logger.debug("Testing %s -- IGNORED", sql)
-                self.ignored.append(err)
+                action = "IGNORED"
+                list_to_add = self.ignored
+            elif test["type"] == "warning":
+                action = "WARNING"
+                list_to_add = self.warnings
             else:
-                logger.debug("Testing %s -- ERROR", sql)
-                self.errors.append(err)
+                action = "ERROR"
+                list_to_add = self.errors
+            logger.debug("Testing %s -- %s", sql, action)
+            list_to_add.append(err)
         else:
             logger.debug("Testing %s -- PASSED", sql)
 
