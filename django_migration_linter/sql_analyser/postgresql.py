@@ -15,7 +15,8 @@ class PostgresqlAnalyser(BaseAnalyser):
         },
         {
             "code": "DROP_INDEX",
-            "fn": lambda sql, **kw: re.search("DROP INDEX", sql) and not re.search("INDEX CONCURRENTLY", sql),
+            "fn": lambda sql, **kw: re.search("DROP INDEX", sql)
+            and not re.search("INDEX CONCURRENTLY", sql),
             "msg": "DROP INDEX locks table",
             "mode": "one_liner",
             "type": "warning",
