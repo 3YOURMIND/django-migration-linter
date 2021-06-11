@@ -628,7 +628,7 @@ class MigrationLinter(object):
             if sql_ignored:
                 ignored += sql_ignored
             if sql_warnings:
-                warnings += sql_warnings
+                warning += sql_warnings
 
         # And analysse the reverse SQL
         if runsql.reversible and runsql.reverse_sql != RunSQL.noop:
@@ -658,6 +658,6 @@ class MigrationLinter(object):
             if sql_ignored:
                 ignored += sql_ignored
             if sql_warnings:
-                warnings += sql_warnings
+                warning += sql_warnings
 
         return error, ignored, warning
