@@ -13,9 +13,11 @@ class SqlAnalyserTestCase(unittest.TestCase):
             sql_statements=sql, database_vendor=self.database_vendor
         )
 
-    def assertValidSql(self, sql):
-        errors, _, _ = self.analyse_sql(sql)
+    def assertValidSql(self, sql, allow_warnings=False):
+        errors, _, warnings = self.analyse_sql(sql)
         self.assertEqual(0, len(errors), "Found errors in sql: {}".format(errors))
+        if not allow_warnings:
+            self.assertEqual(0, len(warnings), "Found warnings in sql: {}".format(errors))
 
     def assertBackwardIncompatibleSql(self, sql):
         errors, _, _ = self.analyse_sql(sql)
@@ -187,7 +189,7 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
             'CREATE INDEX "app_add_manytomany_field_b_many_to_many_b_id_953b185b" ON "app_add_manytomany_field_b_many_to_many"("b_id");',
             'CREATE INDEX "app_add_manytomany_field_b_many_to_many_a_id_4b44832a" ON "app_add_manytomany_field_b_many_to_many"("a_id");',
         ]
-        self.assertValidSql(sql)
+        self.assertValidSql(sql, allow_warnings=True)
 
     def test_make_column_not_null_with_django_default(self):
         sql = [
@@ -218,4 +220,12 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         sql = "CREATE INDEX CONCURRENTLY ON films ((lower(titre)));"
         self.assertValidSql(sql)
         sql = "CREATE UNIQUE INDEX CONCURRENTLY title_idx ON films (title);"
+        self.assertValidSql(sql)
+
+    def test_drop_index_non_concurrently(self):
+        sql = "DROP INDEX ON films"
+        self.assertWarningSql(sql)
+
+    def test_drop_index_concurrently(self):
+        sql = "DROP INDEX CONCURRENTLY ON films;"
         self.assertValidSql(sql)
