@@ -213,13 +213,13 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         self.assertValidSql(sql)
 
     def test_create_index_non_concurrently(self):
-        sql = "CREATE INDEX ON films ((lower(titre)));"
+        sql = "CREATE INDEX ON films ((lower(title)));"
         self.assertWarningSql(sql)
         sql = "CREATE UNIQUE INDEX title_idx ON films (title);"
         self.assertWarningSql(sql)
 
     def test_create_index_concurrently(self):
-        sql = "CREATE INDEX CONCURRENTLY ON films ((lower(titre)));"
+        sql = "CREATE INDEX CONCURRENTLY ON films (lower(title));"
         self.assertValidSql(sql)
         sql = "CREATE UNIQUE INDEX CONCURRENTLY title_idx ON films (title);"
         self.assertValidSql(sql)
@@ -231,3 +231,9 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
     def test_drop_index_concurrently(self):
         sql = "DROP INDEX CONCURRENTLY ON films;"
         self.assertValidSql(sql)
+
+    def test_reindex(self):
+        sql = "REINDEX INDEX my_index;"
+        self.assertWarningSql(sql)
+        sql = "REINDEX TABLE my_table;"
+        self.assertWarningSql(sql)

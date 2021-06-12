@@ -121,15 +121,14 @@ class BaseAnalyser(object):
 
     @property
     def one_line_migration_tests(self):
-        return [test for test in self.migration_tests if test["mode"] == "one_liner"]
+        return (test for test in self.migration_tests if test["mode"] == "one_liner")
 
     @property
     def transaction_migration_tests(self):
-        return [test for test in self.migration_tests if test["mode"] == "transaction"]
+        return (test for test in self.migration_tests if test["mode"] == "transaction")
 
     def _test_sql(self, test, sql):
         if test["fn"](sql, errors=self.errors):
-            err = self.build_error_dict(migration_test=test, sql_statement=sql)
             if test["code"] in self.exclude_migration_tests:
                 action = "IGNORED"
                 list_to_add = self.ignored
@@ -140,6 +139,7 @@ class BaseAnalyser(object):
                 action = "ERROR"
                 list_to_add = self.errors
             logger.debug("Testing %s -- %s", sql, action)
+            err = self.build_error_dict(migration_test=test, sql_statement=sql)
             list_to_add.append(err)
         else:
             logger.debug("Testing %s -- PASSED", sql)

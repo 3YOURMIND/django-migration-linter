@@ -39,5 +39,6 @@ You can ignore check through the `--exclude-migration-test` option and specifyin
 |`RUNPYTHON_MODEL_IMPORT`           | Missing apps.get_model() calls for model
 |`RUNPYTHON_MODEL_VARIABLE_NAME`    | The model variable name is different from the model class itself
 |`RUNSQL_REVERSIBLE`                | RunSQL data migration is not reversible (missing reverse SQL)
-|`CREATE_INDEX`                     | Creating an index without the concurrent keyword will lock the table and may generate downtime
-|`DROP_INDEX`                       | Dropping an index without the concurrent keyword will lock the table and may generate downtime
+|`CREATE_INDEX`                     | (Postgresql specific) Creating an index without the concurrent keyword will lock the table and may generate downtime
+|`DROP_INDEX`                       | (Postgresql specific) Dropping an index without the concurrent keyword will lock the table and may generate downtime
+|`REINDEX`                          | (Postgresql specific) Reindexing will lock the table and may generate downtime
