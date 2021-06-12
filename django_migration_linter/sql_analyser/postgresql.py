@@ -21,4 +21,11 @@ class PostgresqlAnalyser(BaseAnalyser):
             "mode": "one_liner",
             "type": "warning",
         },
+        {
+            "code": "REINDEX",
+            "fn": lambda sql, **kw: sql.startswith("REINDEX"),
+            "msg": "REINDEX locks table",
+            "mode": "one_liner",
+            "type": "warning",
+        },
     ]
