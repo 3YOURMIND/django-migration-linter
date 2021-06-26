@@ -9,6 +9,7 @@ New features:
 
 Miscellaneous:
 * Add complete and working support for `toml` configuration files
+* Handle `--verbosity 0` or `-v 0` correctly to not print anything from the linter
 * Add code coverage to the linter
 * Renamed `master` branch to `main`
 
