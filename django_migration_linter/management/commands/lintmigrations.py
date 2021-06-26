@@ -138,6 +138,8 @@ class Command(BaseCommand):
 
         if options["verbosity"] > 1:
             logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+        elif options["verbosity"] == 0:
+            logger.disabled = True
         else:
             logging.basicConfig(format="%(message)s")
 
@@ -201,6 +203,7 @@ class Command(BaseCommand):
             exclude_migration_tests=config["exclude_migration_tests"],
             quiet=config["quiet"],
             warnings_as_errors=config["warnings_as_errors"],
+            no_output=options["verbosity"] == 0,
         )
         linter.lint_all_migrations(
             app_label=options["app_label"],

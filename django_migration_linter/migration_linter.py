@@ -57,6 +57,7 @@ class MigrationLinter(object):
         exclude_migration_tests=None,
         quiet=None,
         warnings_as_errors=False,
+        no_output=False,
     ):
         # Store parameters and options
         self.django_path = path
@@ -74,6 +75,7 @@ class MigrationLinter(object):
         self.only_unapplied_migrations = only_unapplied_migrations
         self.quiet = quiet or []
         self.warnings_as_errors = warnings_as_errors
+        self.no_output = no_output
 
         # Initialise counters
         self.reset_counters()
@@ -248,7 +250,8 @@ class MigrationLinter(object):
     def print_linting_msg(self, app_label, migration_name, msg, lint_result):
         if lint_result.value in self.quiet:
             return
-        print("({0}, {1})... {2}".format(app_label, migration_name, msg))
+        if not self.no_output:
+            print("({0}, {1})... {2}".format(app_label, migration_name, msg))
 
     def print_errors(self, errors):
         if MessageType.ERROR.value in self.quiet:
@@ -260,7 +263,8 @@ class MigrationLinter(object):
                 if err.get("column"):
                     error_str += ", column: {0}".format(err["column"])
                 error_str += ")"
-            print(error_str)
+            if not self.no_output:
+                print(error_str)
 
     def print_warnings(self, warnings):
         if MessageType.WARNING.value in self.quiet:
@@ -268,10 +272,12 @@ class MigrationLinter(object):
 
         for warning_details in warnings:
             warn_str = "\t{}".format(warning_details["msg"])
-            print(warn_str)
+            if not self.no_output:
+                print(warn_str)
 
     def print_summary(self):
-        print()
+        if self.no_output:
+            return
         print("*** Summary ***")
         print("Valid migrations: {}/{}".format(self.nb_valid, self.nb_total))
         print("Erroneous migrations: {}/{}".format(self.nb_erroneous, self.nb_total))
