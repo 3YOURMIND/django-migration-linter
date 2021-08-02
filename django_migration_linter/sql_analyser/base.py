@@ -8,7 +8,7 @@ logger = logging.getLogger("django_migration_linter")
 
 def has_not_null_column(sql_statements, **kwargs):
     # TODO: improve to detect that the same column is concerned
-    ends_with_default = None
+    ends_with_default = False
     for sql in sql_statements:
         if "SET DEFAULT" in sql:
             ends_with_default = True
