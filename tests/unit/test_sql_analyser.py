@@ -171,6 +171,21 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
 
+    def test_field_to_not_null_with_dropped_default(self):
+        sql = [
+            'ALTER TABLE "api_example_example" ALTER COLUMN "foo_id" SET DEFAULT 42;',
+            'UPDATE "example_example" SET "foo_id" = 42 WHERE "foo_id" IS NULL;',
+            'ALTER TABLE "example_example" ALTER COLUMN "foo_id" SET NOT NULL;',
+            'ALTER TABLE "example_example" ALTER COLUMN "foo_id" DROP DEFAULT;',
+        ]
+        self.assertBackwardIncompatibleSql(sql)
+
+    def test_onetoonefield_to_not_null(self):
+        sql = [
+            'ALTER TABLE "example_example" ALTER COLUMN "foo" SET NOT NULL;',
+        ]
+        self.assertBackwardIncompatibleSql(sql)
+
     def test_drop_not_null(self):
         sql = 'ALTER TABLE "app_alter_column_drop_not_null_a" ALTER COLUMN "not_null_field" DROP NOT NULL;'
         self.assertValidSql(sql)
