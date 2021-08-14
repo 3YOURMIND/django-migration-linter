@@ -1,3 +1,8 @@
+## 3.0.1
+
+Fixed bug:
+- Setting a field as NOT NULL without default passed the linter.
+
 ## 3.0.0
 
 **Breaking API change on `lintmigrations` command**:
