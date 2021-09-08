@@ -23,7 +23,7 @@ On data migrations, the linter will show a warning when:
 
 ## Codes
 
-You can ignore check through the `--exclude-migration-tests` option and specifying any of the codes:
+You can ignore checks through the `--exclude-migration-tests` option by specifying any of the codes:
 
 |               Code                |            Description                                               |
 |-----------------------------------|----------------------------------------------------------------------|

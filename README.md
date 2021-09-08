@@ -57,7 +57,7 @@ More advanced usages of the linter and options [can be found at docs/usage.md](.
 
 ## Integration
 
-One can either integrate the linter in the CI and the `lintmigrations` command, or detect incompatibilities during generation with
+One can either integrate the linter in the CI using its `lintmigrations` command, or detect incompatibilities during generation of migrations with
 ```
 $ python manage.py makemigrations --lint
 
@@ -68,23 +68,22 @@ Linting for 'app_correct':
 (app_correct, 0003_a_column)... ERR
         NOT NULL constraint on columns
 
-The migration linter detected that this migration is not be backward compatible.
+The migration linter detected that this migration is not backward compatible.
 - If you keep the migration, you will want to fix the issue or ignore the migration.
 - By default, the newly created migration file will be deleted.
-Do you want to keep the migration? [y/N]
-[...]
+Do you want to keep the migration? [y/N] n
 Deleted tests/test_project/app_correct/migrations/0003_a_column.py
 ```
 
-The linter found that the newly created migration is not backward compatible and deletes the files.
-This behaviour can be the default of the `makemigrations` command through the `MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS` Django settings.
+The linter found that the newly created migration is not backward compatible and deleted the file after confirmation.
+This behaviour can be the default of the `makemigrations` command through the `MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS` Django setting.
 Find out more about the [makemigrations command at docs/makemigrations.md](./docs/makemigrations.md).
 
 ### More information
 
-Please find more documentation generally [in the docs/ folder](./docs/).
+Please find more documentation [in the docs/ folder](./docs/).
 
-Some implementation details [can found in the ./docs/internals/ folder](./docs/internals/).
+Some implementation details [can be found in the ./docs/internals/ folder](./docs/internals/).
 
 ### Blog post
 
