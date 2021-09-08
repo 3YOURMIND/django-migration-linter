@@ -35,7 +35,6 @@ setup(
         "django>=1.11",
         "appdirs>=1.4.3",
         'enum34>=1.1.6;python_version<"3.4"',
-        "six>=1.14.0",
         "toml>=0.10.2",
     ],
     extras_require={
