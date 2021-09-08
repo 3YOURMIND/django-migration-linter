@@ -5,6 +5,7 @@ import inspect
 import logging
 import os
 import re
+import sys
 from enum import Enum, unique
 from subprocess import PIPE, Popen
 
@@ -12,7 +13,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connections
 from django.db.migrations import RunPython, RunSQL
-from six import PY2
 
 from .cache import Cache
 from .constants import (
@@ -25,6 +25,8 @@ from .sql_analyser import analyse_sql_statements
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 
 logger = logging.getLogger("django_migration_linter")
+
+PY2 = sys.version_info[0] == 2
 
 
 @unique
