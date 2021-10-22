@@ -41,7 +41,7 @@ setup(
         "test": [
             "tox>=3.15.2",
             "mysqlclient>=1.4.6,<2",
-            "psycopg2-binary>=2.8.5,<2.9",
+            "psycopg2-binary>=2.8.5,<2.10",
             "django_add_default_value>=0.4.0",
             'mock>=3.0.5;python_version<"3.3"',
             'backports.tempfile>=1.0;python_version<="2.7"',
