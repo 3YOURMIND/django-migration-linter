@@ -1,20 +1,10 @@
 import os
 import shutil
-import sys
+import tempfile
+import unittest.mock as mock
 from contextlib import contextmanager
 from importlib import import_module
-
-if sys.version_info >= (3, 3):
-    import unittest.mock as mock
-else:
-    import mock
-
-if sys.version_info.major >= 3:
-    import tempfile
-    from io import StringIO as StringIO
-else:
-    from backports import tempfile
-    from io import BytesIO as StringIO
+from io import StringIO
 
 from django.apps import apps
 from django.conf import settings

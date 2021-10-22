@@ -5,7 +5,6 @@ import inspect
 import logging
 import os
 import re
-import sys
 from enum import Enum, unique
 from subprocess import PIPE, Popen
 
@@ -25,8 +24,6 @@ from .sql_analyser import analyse_sql_statements
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 
 logger = logging.getLogger("django_migration_linter")
-
-PY2 = sys.version_info[0] == 2
 
 
 @unique
@@ -465,11 +462,7 @@ class MigrationLinter(object):
                 warning.append(issue)
 
         # Detect warning for argument naming convention
-        args_spec = (
-            inspect.getargspec(runpython.code)
-            if PY2
-            else inspect.getfullargspec(runpython.code)
-        )
+        args_spec = inspect.getfullargspec(runpython.code)
         if tuple(args_spec.args) != EXPECTED_DATA_MIGRATION_ARGS:
             issue = {
                 "code": "RUNPYTHON_ARGS_NAMING_CONVENTION",

@@ -1,3 +1,8 @@
+## 4.0.0
+
+- Drop support for Python 2.7 and 3.5
+- Drop support for Django 1.11, 2.0, 2.1, 3.0
+
 ## 3.0.1
 
 Fixed bug:
