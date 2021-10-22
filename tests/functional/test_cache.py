@@ -1,6 +1,6 @@
 import os
-import sys
 import unittest
+import unittest.mock as mock
 
 from django.conf import settings
 from django.db.migrations import Migration
@@ -11,11 +11,6 @@ from django_migration_linter import (
     analyse_sql_statements,
     get_migration_abspath,
 )
-
-if sys.version_info >= (3, 3):
-    import unittest.mock as mock
-else:
-    import mock
 
 
 class OperationsIgnoreMigration(Migration):
