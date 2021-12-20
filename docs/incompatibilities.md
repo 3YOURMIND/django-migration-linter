@@ -171,6 +171,8 @@ Instead, once you use the `apps.get_model` function, if the first argument of yo
 However, in a migration, you should be using the version of the model, at the point in time where this migration was created.
 It could happen that you use a `RunPython` operation to fill a new column. But if you import that latest version of the model, this column might not exist anymore, which will break a prior migration.
 
+:white_check_mark: **Solution**: use `apps.get_model` to get the model class
+
 ### Others
 
 To be added...
