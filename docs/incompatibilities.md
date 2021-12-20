@@ -49,39 +49,45 @@ You can ignore checks through the `--exclude-migration-tests` option by specifyi
 This section will go into the depth of the different check the migration linter makes.
 The base hypotheses of these cases are:
 - in a production system, you cannot deploy your database(s) (DB) and code server(s) simultaneously
-- you deploy your DB first, as there are very few cases in which deploying the code first is viable for database operations
+- you deploy your DB first, as there are very few cases in which deploying the code first is viable when database operations are required
 
 ### Adding `NOT NULL` column without default value
 
 A frequent and error-prone operation is adding a non-nullable column to an existing table.
 
-First, adding a `NOT NULL` column **without any default value** is problematic.
+Adding a `NOT NULL` column **without any default value** is problematic.
 
 **Forward migration**:
 1. update your DB to add a `NOT NULL` column
-2. your Django code will not specify the new column when inserting a row
-=> error `column cannot be null`
-3. once the code updated, insertion will work where the new column has explicitly been specified
+2. before code migration, your Django code will not specify the new column when inserting a row
+=> error `column cannot be null` :x:
+3. once the code updated, insertion will work because the new column is explicitly specified by Django
 
-**Rollback**: in the case of a rollback, you will encounter the same errors.
+**Rollback**: in the case of a rollback, you will encounter the same error.
+Only rolling back the code will make all new insertions crash because Django doesn't specify the new column.
 
-**Incorrect solution**: specify a default value in the Django model field.
+:warning: An incorrect solution is to specify simply a default value in the Django model field.
 One would think that adding a default value in Django will prevent these errors.
 
 A common misconception is that the Django default value is translated to a database default.
-But Django actually uses the default value to fill existing rows and set an unspecified column value to its default.
-The latter is done at the application level, by Django - and the database default value was dropped during migration.
+But Django actually uses the default value to fill new new column on existing rows and to set an unspecified column value to its default.
+The latter is done at the application level, by Django and not by the database because the default value was dropped during migration.
 You can read more about this in the [Django and its default values blog post](https://medium.com/botify-labs/django-and-its-default-values-c21a13cff9f).
+
+:white_check_mark: **Solutions**:
+- Make the column nullable, and later do a multistep process later to make it NOT NULL once your code is aware of it.
+
+### Adding `NOT NULL` column **with** default value
 
 **Forward migration**:
 1. update your DB to add a `NOT NULL` column with a Django default
-2. your Django code will not specify the new column when inserting a row, and Django is not aware of the default value
-   => error `column cannot be null`
+2. before code migration, your Django code will not specify the new column when inserting a row, and Django is not aware of the default value
+   => error `column cannot be null` :x:
 3. once the code updated, insertion will work
 
 **Rollback**: in the case of a rollback, you will encounter the same errors
 
-**Solutions**:
+:white_check_mark: **Solutions**:
 - Make the column nullable
 - Set a database default using Django's [RunSQL](https://docs.djangoproject.com/en/dev/ref/migration-operations/#django.db.migrations.operations.RunSQL)
 - Set a database default using [django-add-default-value](https://github.com/3YOURMIND/django-add-default-value/)
