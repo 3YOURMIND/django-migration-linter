@@ -1,7 +1,8 @@
-## 4.0.0
+## 4.0.0 (unreleased)
 
 - Drop support for Python 2.7 and 3.5
 - Drop support for Django 1.11, 2.0, 2.1, 3.0
+- Fix index creation detection when table is being created in the transaction (issue #178)
 
 ## 3.0.1
 
