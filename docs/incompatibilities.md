@@ -173,10 +173,6 @@ It could happen that you use a `RunPython` operation to fill a new column. But i
 
 :white_check_mark: **Solution**: use `apps.get_model` to get the model class
 
-### Others
-
-To be added...
-
 ## The special case of sqlite
 
 While on PostgreSQL and MySQL a table modification can be expressed by one `ALTER TABLE` statement, sqlite is handled in a different way.
