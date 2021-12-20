@@ -129,6 +129,48 @@ Be careful :warning: fake dropping a non-nullable column without a database defa
 :white_check_mark: **Solutions**:
 - Do a multistep deleting. First, only update the code to make sure it is not querying the table anymore
 
+### :arrow_forward: Altering a column
+
+In some cases, altering a column can lead to backward incompatible migrations.
+One of these cases is changing the column's type, which can be backward incompatible, but not necessarily.
+
+**Forward migration**:
+1. update your DB to change a string/varchar column to integer
+2. before code migration, your code will crash when trying to insert strings that cannot be cast to integer implicitly :x:
+3. once the code is updated, the errors should cease (because your code will probably aware that it should only use int values)
+
+**Rollback**: shouldn't be an issue in this case, because when the code expects strings but the DB has integers, implicitly casting should be fine.
+However, if the forward migration was migrating from an integer type to strings, the rollback would have involved an integer field potentially receiving string values that couldn't be cast to integers.
+
+:white_check_mark: **Solutions**:
+- create a new column with the new field settings and keep data in sync between the old and new version.
+At some point, start using the new column and delete the old one once the migration went well
+- multistep deployment by first ensuring that the application is only manipulating the new type and gracefully handling an incorrect value.
+
+### :arrow_forward: Adding a unique constraint
+
+**Forward migration**:
+1. update your DB to add a unique constraint on multiple columns
+2. before code migration, your code might still try to add the same value twice in the column
+3. once the code is updated, the errors should cease
+
+**Rollback**:
+1. rollback your code
+2. your code will crash trying to add an existing value
+3. rollback your DB to drop the unique constraint, and it should work again
+
+:white_check_mark: **Solutions**:
+- Do a multistep deployment. First, make sure that the code is only pushing a value if it is not unique.
+
+### :arrow_forward: Importing a model in a RunPython migration
+
+When doing [RunPython](https://docs.djangoproject.com/en/dev/ref/migration-operations/#runpython) operations in migrations, it is important to not do direct `import`s of model classes.
+Instead, once you use the `apps.get_model` function, if the first argument of your `RunPython` function is called `apps`.
+
+:warning: When doing a direct `import` statement, your code will use the latest version of your model class.
+However, in a migration, you should be using the version of the model, at the point in time where this migration was created.
+It could happen that you use a `RunPython` operation to fill a new column. But if you import that latest version of the model, this column might not exist anymore, which will break a prior migration.
+
 ### Others
 
 To be added...
