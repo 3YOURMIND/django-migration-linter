@@ -233,6 +233,23 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         sql = "CREATE UNIQUE INDEX title_idx ON films (title);"
         self.assertWarningSql(sql)
 
+    def test_create_index_non_concurrently_with_table_creation(self):
+        sql = [
+            'CREATE TABLE "films" ("title" text);',
+            'CREATE INDEX ON "films" ((lower("title")));',
+        ]
+        self.assertValidSql(sql)
+        sql = [
+            'CREATE TABLE "some_table" ("title" text);',
+            'CREATE INDEX ON "films" ((lower("title")));',
+        ]
+        self.assertWarningSql(sql)
+        sql = [
+            'CREATE TABLE "films" ("title" text);',
+            'CREATE INDEX ON "some_table" ((lower("title")));',
+        ]
+        self.assertWarningSql(sql)
+
     def test_create_index_concurrently(self):
         sql = "CREATE INDEX CONCURRENTLY ON films (lower(title));"
         self.assertValidSql(sql)
