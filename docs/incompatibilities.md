@@ -51,7 +51,7 @@ The base hypotheses of these cases are:
 - in a production system, you cannot deploy your database(s) (DB) and code server(s) simultaneously
 - you deploy your DB first, as there are very few cases in which deploying the code first is viable when database operations are required
 
-### Adding `NOT NULL` column without default value
+### :black_circle: Adding `NOT NULL` column without default value
 
 A frequent and error-prone operation is adding a non-nullable column to an existing table.
 
@@ -77,7 +77,7 @@ You can read more about this in the [Django and its default values blog post](ht
 :white_check_mark: **Solutions**:
 - Make the column nullable, and later do a multistep process later to make it NOT NULL once your code is aware of it.
 
-### Adding `NOT NULL` column **with** default value
+### :black_circle: Adding `NOT NULL` column **with** default value
 
 **Forward migration**:
 1. update your DB to add a `NOT NULL` column with a Django default
@@ -92,7 +92,7 @@ You can read more about this in the [Django and its default values blog post](ht
 - Set a database default using Django's [RunSQL](https://docs.djangoproject.com/en/dev/ref/migration-operations/#django.db.migrations.operations.RunSQL)
 - Set a database default using [django-add-default-value](https://github.com/3YOURMIND/django-add-default-value/)
 
-### Dropping a column
+### :black_circle: Dropping a column
 
 Deletion operations often lead to errors during deployment.
 
