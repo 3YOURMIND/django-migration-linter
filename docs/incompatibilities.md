@@ -51,7 +51,7 @@ The base hypotheses of these cases are:
 - in a production system, you cannot deploy your database(s) (DB) and code server(s) simultaneously
 - you deploy your DB first, as there are very few cases in which deploying the code first is viable when database operations are required
 
-### :black_circle: Adding `NOT NULL` column without default value
+### :arrow_forward: Adding `NOT NULL` column without default value
 
 A frequent and error-prone operation is adding a non-nullable column to an existing table.
 
@@ -77,7 +77,7 @@ You can read more about this in the [Django and its default values blog post](ht
 :white_check_mark: **Solutions**:
 - Make the column nullable, and later do a multistep process later to make it NOT NULL once your code is aware of it.
 
-### :black_circle: Adding `NOT NULL` column **with** default value
+### :arrow_forward: Adding `NOT NULL` column **with** default value
 
 **Forward migration**:
 1. update your DB to add a `NOT NULL` column with a Django default
@@ -92,13 +92,14 @@ You can read more about this in the [Django and its default values blog post](ht
 - Set a database default using Django's [RunSQL](https://docs.djangoproject.com/en/dev/ref/migration-operations/#django.db.migrations.operations.RunSQL)
 - Set a database default using [django-add-default-value](https://github.com/3YOURMIND/django-add-default-value/)
 
-### :black_circle: Dropping a column
+### :arrow_forward: Dropping a column
 
 Deletion operations often lead to errors during deployment.
 
 **Forward migration**:
 1. update your DB to drop a column
-2. your code will crash retrieving rows from this table (because Django explicits all column names when fetching a model object)
+2. before code migration, your code will crash retrieving rows from this table
+(because Django explicits all column names when fetching a model object) :x:
 3. once the code is updated, the errors should cease
 
 **Rollback**:
@@ -107,10 +108,26 @@ Deletion operations often lead to errors during deployment.
 3. rollback your DB to re-create the column
 4. restore a backup  of your data (if available and fresh enough)
 
-**Solutions**:
+:white_check_mark: **Solutions**:
 - Deprecate the column before dropping it using [django-deprecate-fields](https://github.com/3YOURMIND/django-deprecate-fields/)
 - Don't actually drop the column, but fake the drop migration until you are sure you won't roll back.
-Be careful /!\ fake dropping a non-nullable column without a database default will create errors once the code is not aware of the column anymore.
+Be careful :warning: fake dropping a non-nullable column without a database default will create errors once the code is not aware of the column anymore.
+
+### :arrow_forward: Dropping a table
+
+**Forward migration**:
+1. update your DB to drop a table
+2. before code migration, your code might still try to query the deleted table to fetch rows. Of course, this will crash :x:
+3. once the code is updated, the errors should cease
+
+**Rollback**:
+1. rollback your code
+2. your code will crash retrieving rows from this table
+3. rollback your DB to re-create the table
+4. restore a backup  of your data (if available and fresh enough)
+
+:white_check_mark: **Solutions**:
+- Do a multistep deleting. First, only update the code to make sure it is not querying the table anymore
 
 ### Others
 
