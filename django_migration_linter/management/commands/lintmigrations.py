@@ -144,6 +144,7 @@ class Command(BaseCommand):
             logging.basicConfig(format="%(message)s")
 
         keys = (
+            "git_commit_id",
             "ignore_name_contains",
             "ignore_name",
             "include_name_contains",
@@ -208,7 +209,7 @@ class Command(BaseCommand):
         linter.lint_all_migrations(
             app_label=options["app_label"],
             migration_name=options["migration_name"],
-            git_commit_id=options["git_commit_id"],
+            git_commit_id=config["git_commit_id"],
             migrations_file_path=options["include_migrations_from"],
         )
         linter.print_summary()
