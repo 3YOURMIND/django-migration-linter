@@ -21,9 +21,16 @@ class SqlAnalyserTestCase(unittest.TestCase):
                 0, len(warnings), "Found warnings in sql: {}".format(errors)
             )
 
-    def assertBackwardIncompatibleSql(self, sql):
+    def assertBackwardIncompatibleSql(self, sql, code=None):
         errors, _, _ = self.analyse_sql(sql)
         self.assertNotEqual(0, len(errors), "Found no errors in sql")
+        if code:
+            self.assertTrue(
+                any(err["code"] == code for err in errors),
+                "Didn't find error code {} in returned errors ({})".format(
+                    code, [err["code"] for err in errors]
+                ),
+            )
 
     def assertWarningSql(self, sql):
         _, _, warnings = self.analyse_sql(sql)
@@ -61,6 +68,16 @@ class MySqlAnalyserTestCase(SqlAnalyserTestCase):
         self.assertBackwardIncompatibleSql(sql)
 
         sql = "ALTER TABLE `app_unique_together_a` DROP INDEX `app_unique_together_a_int_field_char_field_979ac7d8_uniq`;"
+        self.assertValidSql(sql)
+
+    def test_unique_index(self):
+        sql = 'CREATE UNIQUE INDEX "index_name" ON "table" ("col1", "col2");'
+        self.assertBackwardIncompatibleSql(sql, "ADD_UNIQUE")
+
+        sql = [
+            'CREATE TABLE "table" ("col1" integer, "col2" integer);',
+            'CREATE UNIQUE INDEX "index_name" ON "table" ("col1", "col2");',
+        ]
         self.assertValidSql(sql)
 
     def test_add_many_to_many_field(self):
@@ -146,6 +163,16 @@ class SqliteAnalyserTestCase(SqlAnalyserTestCase):
         sql = 'DROP INDEX "app_unique_together_a_int_field_char_field_979ac7d8_uniq";'
         self.assertValidSql(sql)
 
+    def test_unique_index(self):
+        sql = 'CREATE UNIQUE INDEX "index_name" ON "table" ("col1", "col2");'
+        self.assertBackwardIncompatibleSql(sql, "ADD_UNIQUE")
+
+        sql = [
+            'CREATE TABLE "table" ("col1" integer, "col2" integer);',
+            'CREATE UNIQUE INDEX "index_name" ON "table" ("col1", "col2");',
+        ]
+        self.assertValidSql(sql)
+
     def test_add_many_to_many_field(self):
         sql = [
             'CREATE TABLE "app_add_manytomany_field_b_many_to_many"("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "b_id" integer NOT NULL REFERENCES "app_add_manytomany_field_b"("id") DEFERRABLE INITIALLY DEFERRED, "a_id" integer NOT NULL REFERENCES "app_add_manytomany_field_a"("id") DEFERRABLE INITIALLY DEFERRED);',
@@ -195,6 +222,16 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         self.assertBackwardIncompatibleSql(sql)
 
         sql = 'ALTER TABLE "app_unique_together_a" DROP CONSTRAINT "app_unique_together_a_int_field_char_field_979ac7d8_uniq";'
+        self.assertValidSql(sql)
+
+    def test_unique_index(self):
+        sql = 'CREATE UNIQUE INDEX "index_name" ON "table" ("col1", "col2");'
+        self.assertBackwardIncompatibleSql(sql, "ADD_UNIQUE")
+
+        sql = [
+            'CREATE TABLE "table" ("col1" integer, "col2" integer);',
+            'CREATE UNIQUE INDEX "index_name" ON "table" ("col1", "col2");',
+        ]
         self.assertValidSql(sql)
 
     def test_add_many_to_many_field(self):
