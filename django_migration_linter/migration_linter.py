@@ -20,7 +20,7 @@ from .constants import (
     EXPECTED_DATA_MIGRATION_ARGS,
 )
 from .operations import IgnoreMigration
-from .sql_analyser import analyse_sql_statements
+from .sql_analyser import analyse_sql_statements, get_sql_analyser_class
 from .utils import clean_bytes_to_str, get_migration_abspath, split_migration_path
 
 logger = logging.getLogger("django_migration_linter")
@@ -57,6 +57,7 @@ class MigrationLinter(object):
         quiet=None,
         warnings_as_errors=False,
         no_output=False,
+        analyser_string=None,
     ):
         # Store parameters and options
         self.django_path = path
@@ -75,6 +76,10 @@ class MigrationLinter(object):
         self.quiet = quiet or []
         self.warnings_as_errors = warnings_as_errors
         self.no_output = no_output
+        self.sql_analyser_class = get_sql_analyser_class(
+            settings.DATABASES[self.database]["ENGINE"],
+            analyser_string=analyser_string,
+        )
 
         # Initialise counters
         self.reset_counters()
@@ -161,8 +166,8 @@ class MigrationLinter(object):
 
         sql_statements = self.get_sql(app_label, migration_name)
         errors, ignored, warnings = analyse_sql_statements(
+            self.sql_analyser_class,
             sql_statements,
-            settings.DATABASES[self.database]["ENGINE"],
             self.exclude_migration_tests,
         )
 
@@ -620,8 +625,8 @@ class MigrationLinter(object):
                 sql_statements.append(runsql.sql)
 
             sql_errors, sql_ignored, sql_warnings = analyse_sql_statements(
+                self.sql_analyser_class,
                 sql_statements,
-                settings.DATABASES[self.database]["ENGINE"],
                 self.exclude_migration_tests,
             )
             if sql_errors:
@@ -650,8 +655,8 @@ class MigrationLinter(object):
                 sql_statements.append(runsql.reverse_sql)
 
             sql_errors, sql_ignored, sql_warnings = analyse_sql_statements(
+                self.sql_analyser_class,
                 sql_statements,
-                settings.DATABASES[self.database]["ENGINE"],
                 self.exclude_migration_tests,
             )
             if sql_errors:

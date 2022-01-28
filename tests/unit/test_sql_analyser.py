@@ -1,6 +1,9 @@
 import unittest
 
-from django_migration_linter.sql_analyser import analyse_sql_statements
+from django_migration_linter.sql_analyser import (
+    analyse_sql_statements,
+    get_sql_analyser_class,
+)
 
 
 class SqlAnalyserTestCase(unittest.TestCase):
@@ -10,7 +13,8 @@ class SqlAnalyserTestCase(unittest.TestCase):
         if isinstance(sql, str):
             sql = sql.splitlines()
         return analyse_sql_statements(
-            sql_statements=sql, database_vendor=self.database_vendor
+            get_sql_analyser_class(self.database_vendor),
+            sql_statements=sql,
         )
 
     def assertValidSql(self, sql, allow_warnings=False):
