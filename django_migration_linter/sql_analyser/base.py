@@ -26,7 +26,9 @@ def has_not_null_column(sql_statements, **kwargs):
 def has_add_unique(sql_statements, **kwargs):
     regex_result = None
     for sql in sql_statements:
-        regex_result = re.search("ALTER TABLE (.*) ADD CONSTRAINT .* UNIQUE", sql)
+        regex_result = re.search(
+            "ALTER TABLE (.*) ADD CONSTRAINT .* UNIQUE", sql
+        ) or re.search('CREATE UNIQUE INDEX .* ON (".*?")', sql)
         if regex_result:
             break
     if not regex_result:

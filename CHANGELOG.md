@@ -5,6 +5,7 @@
 - Drop support for Django 1.11, 2.0, 2.1, 3.0 and 3.1
 - Add support for Django 4.0
 - Fix index creation detection when table is being created in the transaction (issue #178)
+- Handle unique index creation as adding a unique constraint (issue #183)
 
 ## 3.0.1
 
