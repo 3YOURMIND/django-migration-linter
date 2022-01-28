@@ -10,6 +10,7 @@ from django.core.management.base import BaseCommand
 
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
+from ...sql_analyser.analyser import ANALYSER_STRING_MAPPING
 from ..utils import register_linting_configuration_options
 
 CONFIG_NAME = "django_migration_linter"
@@ -127,6 +128,12 @@ class Command(BaseCommand):
             choices=MessageType.values(),
             help="don't print linting messages to stdout",
         )
+        parser.add_argument(
+            "--sql-analyser",
+            nargs="?",
+            choices=list(ANALYSER_STRING_MAPPING.keys()),
+            help="select the SQL analyser",
+        )
         register_linting_configuration_options(parser)
 
     def handle(self, *args, **options):
@@ -167,6 +174,7 @@ class Command(BaseCommand):
             quiet=options["quiet"],
             warnings_as_errors=options["warnings_as_errors"],
             no_output=options["verbosity"] == 0,
+            analyser_string=options["sql_analyser"],
         )
         linter.lint_all_migrations(
             app_label=options["app_label"],
