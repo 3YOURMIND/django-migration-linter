@@ -6,6 +6,7 @@
 - Add support for Django 4.0
 - Fix index creation detection when table is being created in the transaction (issue #178)
 - Handle unique index creation as adding a unique constraint (issue #183)
+- Allow any option to be set/unset in config file (issue #167)
 
 ## 3.0.1
 

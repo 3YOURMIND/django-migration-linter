@@ -143,66 +143,41 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
-        keys = (
-            "ignore_name_contains",
-            "ignore_name",
-            "include_name_contains",
-            "include_name",
-            "include_apps",
-            "exclude_apps",
-            "database",
-            "cache_path",
-            "no_cache",
-            "applied_migrations",
-            "unapplied_migrations",
-            "exclude_migration_tests",
-            "quiet",
-            "warnings_as_errors",
-        )
-        boolean_keys = (
-            "no_cache",
-            "applied_migrations",
-            "unapplied_migrations",
-            "warnings_as_errors",
-        )
-
-        config = {key: options[key] for key in keys}
-
         config_parser = configparser.ConfigParser()
         config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
-        for key in keys:
-            if key in boolean_keys:
+        for key, value in options.items():
+            if isinstance(value, bool):
                 config_get_fn = config_parser.getboolean
             else:
                 config_get_fn = config_parser.get
 
             config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
-            if config_value and not config[key]:
-                config[key] = config_value
+            if config_value and not options[key]:
+                options[key] = config_value
 
         if os.path.exists(PYPROJECT_TOML):
             pyproject_toml = toml.load(PYPROJECT_TOML)
             section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
-            for key in keys:
-                if key in section and not config[key]:
-                    config[key] = section[key]
+            for key in options:
+                if key in section and not options[key]:
+                    options[key] = section[key]
 
         linter = MigrationLinter(
             settings_path,
-            ignore_name_contains=config["ignore_name_contains"],
-            ignore_name=config["ignore_name"],
-            include_name_contains=config["include_name_contains"],
-            include_name=config["include_name"],
-            include_apps=config["include_apps"],
-            exclude_apps=config["exclude_apps"],
-            database=config["database"],
-            cache_path=config["cache_path"],
-            no_cache=config["no_cache"],
-            only_applied_migrations=config["applied_migrations"],
-            only_unapplied_migrations=config["unapplied_migrations"],
-            exclude_migration_tests=config["exclude_migration_tests"],
-            quiet=config["quiet"],
-            warnings_as_errors=config["warnings_as_errors"],
+            ignore_name_contains=options["ignore_name_contains"],
+            ignore_name=options["ignore_name"],
+            include_name_contains=options["include_name_contains"],
+            include_name=options["include_name"],
+            include_apps=options["include_apps"],
+            exclude_apps=options["exclude_apps"],
+            database=options["database"],
+            cache_path=options["cache_path"],
+            no_cache=options["no_cache"],
+            only_applied_migrations=options["applied_migrations"],
+            only_unapplied_migrations=options["unapplied_migrations"],
+            exclude_migration_tests=options["exclude_migration_tests"],
+            quiet=options["quiet"],
+            warnings_as_errors=options["warnings_as_errors"],
             no_output=options["verbosity"] == 0,
         )
         linter.lint_all_migrations(
