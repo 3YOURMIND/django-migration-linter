@@ -1,4 +1,5 @@
 import configparser
+import itertools
 import logging
 import os
 import sys
@@ -143,24 +144,11 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
-        config_parser = configparser.ConfigParser()
-        config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
-        for key, value in options.items():
-            if isinstance(value, bool):
-                config_get_fn = config_parser.getboolean
-            else:
-                config_get_fn = config_parser.get
-
-            config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
-            if config_value and not options[key]:
-                options[key] = config_value
-
-        if os.path.exists(PYPROJECT_TOML):
-            pyproject_toml = toml.load(PYPROJECT_TOML)
-            section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
-            for key in options:
-                if key in section and not options[key]:
-                    options[key] = section[key]
+        config_options = self.read_config_file(options)
+        toml_options = self.read_toml_file(options)
+        for k, v in itertools.chain(config_options.items(), toml_options.items()):
+            if not options[k]:
+                options[k] = v
 
         linter = MigrationLinter(
             settings_path,
@@ -189,6 +177,36 @@ class Command(BaseCommand):
         linter.print_summary()
         if linter.has_errors:
             sys.exit(1)
+
+    @staticmethod
+    def read_config_file(options):
+        config_options = dict()
+
+        config_parser = configparser.ConfigParser()
+        config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
+        for key, value in options.items():
+            if isinstance(value, bool):
+                config_get_fn = config_parser.getboolean
+            else:
+                config_get_fn = config_parser.get
+
+            config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
+            if config_value is not None:
+                config_options[key] = config_value
+        return config_options
+
+    @staticmethod
+    def read_toml_file(options):
+        toml_options = dict()
+
+        if os.path.exists(PYPROJECT_TOML):
+            pyproject_toml = toml.load(PYPROJECT_TOML)
+            section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
+            for key in options:
+                if key in section:
+                    toml_options[key] = section[key]
+
+        return toml_options
 
     def get_version(self):
         return __version__
