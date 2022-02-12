@@ -6,6 +6,7 @@ import sys
 from importlib import import_module
 
 import toml
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from ...constants import __version__
@@ -151,9 +152,14 @@ class Command(BaseCommand):
         else:
             logging.basicConfig(format="%(message)s")
 
+        django_settings_options = self.read_django_settings(options)
         config_options = self.read_config_file(options)
         toml_options = self.read_toml_file(options)
-        for k, v in itertools.chain(config_options.items(), toml_options.items()):
+        for k, v in itertools.chain(
+            django_settings_options.items(),
+            config_options.items(),
+            toml_options.items(),
+        ):
             if not options[k]:
                 options[k] = v
 
@@ -185,6 +191,19 @@ class Command(BaseCommand):
         linter.print_summary()
         if linter.has_errors:
             sys.exit(1)
+
+    @staticmethod
+    def read_django_settings(options):
+        django_settings_options = dict()
+
+        django_migration_linter_settings = getattr(
+            settings, "MIGRATION_LINTER_OPTIONS", dict()
+        )
+        for key in options:
+            if key in django_migration_linter_settings:
+                django_settings_options[key] = django_migration_linter_settings[key]
+
+        return django_settings_options
 
     @staticmethod
     def read_config_file(options):

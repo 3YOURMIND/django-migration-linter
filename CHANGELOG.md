@@ -7,6 +7,7 @@
 - Fix index creation detection when table is being created in the transaction (issue #178)
 - Handle unique index creation as adding a unique constraint (issue #183)
 - Allow any option to be set/unset in config file (issue #167)
+- Allow using Django settings for any option to be set/unset (issue #198)
 - Raise when unsupported database vendor, allow passing an option to select SQL analyser (issue #138 and #169)
 
 ## 3.0.1

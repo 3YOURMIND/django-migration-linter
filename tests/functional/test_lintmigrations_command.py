@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import TransactionTestCase
+from django.test.utils import override_settings
 
 
 class LintMigrationsCommandTestCase(TransactionTestCase):
@@ -29,3 +30,7 @@ class LintMigrationsCommandTestCase(TransactionTestCase):
 
             with self.assertRaises(SystemExit):
                 call_command("lintmigrations", app_label="app_drop_table")
+
+    @override_settings(MIGRATION_LINTER_OPTIONS={"app_label": "app_correct"})
+    def test_django_settings_option(self):
+        call_command("lintmigrations")

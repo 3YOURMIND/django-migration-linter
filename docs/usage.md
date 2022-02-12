@@ -41,6 +41,17 @@ Below the detailed command line options, which can all also be defined using a c
 | `--warnings-as-errors`                                | Handle warnings as errors and therefore return an error status code if we should.                     |
 | `--sql-analyser`                                      | Specify the SQL analyser that should be used. Allowed values: 'sqlite', 'mysql', 'postgresql'.        |
 
+## Django settings configuration
+
+All settings can be defined in the Django settings:
+
+```
+MIGRATION_LINTER_OPTIONS = {
+    "no_cache": True,
+    "exclude_apps": ["users"]
+}
+```
+
 ## File configuration
 
 Example `setup.cfg` file:
