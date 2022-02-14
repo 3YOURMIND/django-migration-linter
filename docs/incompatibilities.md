@@ -111,7 +111,7 @@ Deletion operations often lead to errors during deployment.
 :white_check_mark: **Solutions**:
 - Deprecate the column before dropping it using [django-deprecate-fields](https://github.com/3YOURMIND/django-deprecate-fields/).
 This process requires to first make sure that the field is unused (for which `django-deprecate-fields` is made for).
-Once the column is unsed, drop it in a migration. This migration will require to be ignored through the [IgnoreMigration](docs/usage.md#ignoring-migrations) for instance.
+Once the column is unsed, drop it in a migration. This migration will require to be ignored through the [IgnoreMigration](/docs/usage.md#ignoring-migrations) for instance.
 - Don't actually drop the column, but fake the drop migration until you are sure you won't roll back.
 Be careful :warning: fake dropping a non-nullable column without a database default will create errors once the code is not aware of the column anymore.
 
