@@ -1,6 +1,6 @@
 from appdirs import user_cache_dir
 
-__version__ = "3.0.1"
+__version__ = "4.0.0"
 
 DEFAULT_CACHE_PATH = user_cache_dir("django-migration-linter", version=__version__)
 
