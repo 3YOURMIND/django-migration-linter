@@ -132,15 +132,6 @@ class Command(BaseCommand):
         register_linting_configuration_options(parser)
 
     def handle(self, *args, **options):
-        if options["project_root_path"]:
-            settings_path = options["project_root_path"]
-        else:
-            settings_path = os.path.dirname(
-                import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
-            )
-
-        configure_logging(options["verbosity"])
-
         django_settings_options = self.read_django_settings(options)
         config_options = self.read_config_file(options)
         toml_options = self.read_toml_file(options)
@@ -157,8 +148,13 @@ class Command(BaseCommand):
             all_warnings_as_errors,
         ) = extract_warnings_as_errors_option(options["warnings_as_errors"])
 
+        configure_logging(options["verbosity"])
+
+        root_path = options["project_root_path"] or os.path.dirname(
+            import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
+        )
         linter = MigrationLinter(
-            settings_path,
+            root_path,
             ignore_name_contains=options["ignore_name_contains"],
             ignore_name=options["ignore_name"],
             include_name_contains=options["include_name_contains"],
