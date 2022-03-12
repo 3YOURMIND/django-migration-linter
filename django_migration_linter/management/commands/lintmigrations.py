@@ -1,6 +1,5 @@
 import configparser
 import itertools
-import logging
 import os
 import sys
 from importlib import import_module
@@ -12,7 +11,7 @@ from django.core.management.base import BaseCommand
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ...sql_analyser.analyser import ANALYSER_STRING_MAPPING
-from ..utils import register_linting_configuration_options
+from ..utils import configure_logging, register_linting_configuration_options
 
 CONFIG_NAME = "django_migration_linter"
 PYPROJECT_TOML = "pyproject.toml"
@@ -21,8 +20,6 @@ DEFAULT_CONFIG_FILES = (
     "setup.cfg",
     "tox.ini",
 )
-
-logger = logging.getLogger("django_migration_linter")
 
 
 class Command(BaseCommand):
@@ -145,12 +142,7 @@ class Command(BaseCommand):
                 import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
             )
 
-        if options["verbosity"] > 1:
-            logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-        elif options["verbosity"] == 0:
-            logger.disabled = True
-        else:
-            logging.basicConfig(format="%(message)s")
+        configure_logging(options["verbosity"])
 
         django_settings_options = self.read_django_settings(options)
         config_options = self.read_config_file(options)

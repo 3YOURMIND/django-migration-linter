@@ -1,3 +1,6 @@
+import logging
+
+
 def register_linting_configuration_options(parser):
     parser.add_argument(
         "--database",
@@ -21,3 +24,14 @@ def register_linting_configuration_options(parser):
         action="store_true",
         help="handle warnings as errors",
     )
+
+
+def configure_logging(verbosity):
+    logger = logging.getLogger("django_migration_linter")
+
+    if verbosity > 1:
+        logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+    elif verbosity == 0:
+        logger.disabled = True
+    else:
+        logging.basicConfig(format="%(message)s")
