@@ -9,7 +9,7 @@ from django.db.migrations.writer import MigrationWriter
 
 from django_migration_linter import MigrationLinter
 
-from ..utils import register_linting_configuration_options
+from ..utils import configure_logging, register_linting_configuration_options
 
 
 def ask_should_keep_migration():
@@ -42,6 +42,7 @@ class Command(MakeMigrationsCommand):
         self.database = options["database"]
         self.exclude_migrations_tests = options["exclude_migration_tests"]
         self.warnings_as_errors = options["warnings_as_errors"]
+        configure_logging(options["verbosity"])
         return super(Command, self).handle(*app_labels, **options)
 
     def write_migration_files(self, changes):
