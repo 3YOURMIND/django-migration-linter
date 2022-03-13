@@ -11,7 +11,11 @@ from django.core.management.base import BaseCommand
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ...sql_analyser.analyser import ANALYSER_STRING_MAPPING
-from ..utils import configure_logging, register_linting_configuration_options
+from ..utils import (
+    configure_logging,
+    extract_warnings_as_errors_option,
+    register_linting_configuration_options,
+)
 
 CONFIG_NAME = "django_migration_linter"
 PYPROJECT_TOML = "pyproject.toml"
@@ -155,6 +159,11 @@ class Command(BaseCommand):
             if not options[k]:
                 options[k] = v
 
+        (
+            warnings_as_errors_tests,
+            all_warnings_as_errors,
+        ) = extract_warnings_as_errors_option(options["warnings_as_errors"])
+
         linter = MigrationLinter(
             settings_path,
             ignore_name_contains=options["ignore_name_contains"],
@@ -170,7 +179,8 @@ class Command(BaseCommand):
             only_unapplied_migrations=options["unapplied_migrations"],
             exclude_migration_tests=options["exclude_migration_tests"],
             quiet=options["quiet"],
-            warnings_as_errors=options["warnings_as_errors"],
+            warnings_as_errors_tests=warnings_as_errors_tests,
+            all_warnings_as_errors=all_warnings_as_errors,
             no_output=options["verbosity"] == 0,
             analyser_string=options["sql_analyser"],
         )

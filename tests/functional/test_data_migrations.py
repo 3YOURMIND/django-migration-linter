@@ -51,11 +51,11 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.assertEqual(1, self.linter.nb_valid)
         self.assertFalse(self.linter.has_errors)
 
-    def test_warnings_as_errors(self):
+    def test_all_warnings_as_errors(self):
         self.linter = MigrationLinter(
             self.test_project_path,
             include_apps=fixtures.DATA_MIGRATIONS,
-            warnings_as_errors=True,
+            all_warnings_as_errors=True,
         )
 
         reverse_migration = self.linter.migration_loader.disk_migrations[
@@ -66,6 +66,41 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.assertEqual(0, self.linter.nb_warnings)
         self.assertEqual(1, self.linter.nb_erroneous)
         self.assertTrue(self.linter.has_errors)
+
+    def test_warnings_as_errors_tests_matches(self):
+        self.linter = MigrationLinter(
+            self.test_project_path,
+            include_apps=fixtures.DATA_MIGRATIONS,
+            warnings_as_errors_tests=["RUNPYTHON_ARGS_NAMING_CONVENTION"],
+        )
+
+        reverse_migration = self.linter.migration_loader.disk_migrations[
+            ("app_data_migrations", "0003_incorrect_arguments")
+        ]
+        self.linter.lint_migration(reverse_migration)
+
+        self.assertEqual(0, self.linter.nb_warnings)
+        self.assertEqual(1, self.linter.nb_erroneous)
+        self.assertTrue(self.linter.has_errors)
+
+    def test_warnings_as_errors_tests_no_match(self):
+        self.linter = MigrationLinter(
+            self.test_project_path,
+            include_apps=fixtures.DATA_MIGRATIONS,
+            warnings_as_errors_tests=[
+                "RUNPYTHON_MODEL_IMPORT",
+                "RUNPYTHON_MODEL_VARIABLE_NAME",
+            ],
+        )
+
+        reverse_migration = self.linter.migration_loader.disk_migrations[
+            ("app_data_migrations", "0003_incorrect_arguments")
+        ]
+        self.linter.lint_migration(reverse_migration)
+
+        self.assertEqual(1, self.linter.nb_warnings)
+        self.assertEqual(0, self.linter.nb_erroneous)
+        self.assertFalse(self.linter.has_errors)
 
 
 class DataMigrationModelImportTestCase(unittest.TestCase):
