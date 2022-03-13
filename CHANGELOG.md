@@ -1,7 +1,8 @@
-## 4.x.y (unreleased)
+## 4.1.0 (unreleased)
 
-- Allow configuring logging for `makemigrations` command and unify behaviour with `lintmigrations`
-- Adapt `--warnings-as-errors` option to allow selecting some migration tests only
+- Allow configuring logging for `makemigrations` command and unify behaviour with `lintmigrations` (issue #207)
+- Adapt `--warnings-as-errors` option to allow selecting some migration tests only (issue #201)
+- Add `sql_analyser` option to `makemigrations` in order to specify the SQL analyser to use (issue #208)
 
 ## 4.0.0
 

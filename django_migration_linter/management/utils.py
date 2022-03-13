@@ -1,5 +1,7 @@
 import logging
 
+from ..sql_analyser.analyser import ANALYSER_STRING_MAPPING
+
 
 def register_linting_configuration_options(parser):
     parser.add_argument(
@@ -25,6 +27,13 @@ def register_linting_configuration_options(parser):
         nargs="*",
         help="handle warnings as errors. Optionally specify the tests to handle as "
         "errors (e.g. RUNPYTHON_REVERSIBLE)",
+    )
+
+    parser.add_argument(
+        "--sql-analyser",
+        nargs="?",
+        choices=list(ANALYSER_STRING_MAPPING.keys()),
+        help="select the SQL analyser",
     )
 
 
