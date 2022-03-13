@@ -10,7 +10,6 @@ from django.core.management.base import BaseCommand
 
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
-from ...sql_analyser.analyser import ANALYSER_STRING_MAPPING
 from ..utils import (
     configure_logging,
     extract_warnings_as_errors_option,
@@ -129,12 +128,6 @@ class Command(BaseCommand):
             nargs="+",
             choices=MessageType.values(),
             help="don't print linting messages to stdout",
-        )
-        parser.add_argument(
-            "--sql-analyser",
-            nargs="?",
-            choices=list(ANALYSER_STRING_MAPPING.keys()),
-            help="select the SQL analyser",
         )
         register_linting_configuration_options(parser)
 
