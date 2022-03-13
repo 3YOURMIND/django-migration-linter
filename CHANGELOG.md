@@ -1,3 +1,7 @@
+## 4.x.y (unreleased)
+
+- Allow configuring logging for `makemigrations` command and unify behaviour with `lintmigrations`
+
 ## 4.0.0
 
 - Drop support for Python 2.7, 3.5 and 3.6
