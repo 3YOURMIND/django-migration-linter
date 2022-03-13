@@ -29,5 +29,5 @@ Deleted tests/test_project/app_correct/migrations/0003_a_column.py
 Among the options that can be given, additionally to the default `makemigrations` options, you can count the options
 to configure what should be linted:
 * `--database DATABASE` - specify the database for which to generate the SQL. Defaults to *default*.
-* `--warnings-as-errors` - handle warnings as errors and therefore return an error status code if we should.
+* `--warnings-as-errors [MIGRATION_TEST_CASE ...]` - handle warnings as errors. Optionally specify the selected tests using their code.
 * `--exclude-migration-tests MIGRATION_TEST_CODE [...]` - specify backward incompatible migration tests to be ignored using the code (e.g. ALTER_COLUMN).

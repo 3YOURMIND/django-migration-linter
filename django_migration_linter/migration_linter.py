@@ -55,7 +55,8 @@ class MigrationLinter(object):
         only_unapplied_migrations=False,
         exclude_migration_tests=None,
         quiet=None,
-        warnings_as_errors=False,
+        warnings_as_errors_tests=None,
+        all_warnings_as_errors=False,
         no_output=False,
         analyser_string=None,
     ):
@@ -74,7 +75,8 @@ class MigrationLinter(object):
         self.only_applied_migrations = only_applied_migrations
         self.only_unapplied_migrations = only_unapplied_migrations
         self.quiet = quiet or []
-        self.warnings_as_errors = warnings_as_errors
+        self.warnings_as_errors_tests = warnings_as_errors_tests
+        self.all_warnings_as_errors = all_warnings_as_errors
         self.no_output = no_output
         self.sql_analyser_class = get_sql_analyser_class(
             settings.DATABASES[self.database]["ENGINE"],
@@ -179,9 +181,17 @@ class MigrationLinter(object):
         if warnings_data:
             warnings += warnings_data
 
-        if self.warnings_as_errors:
+        if self.all_warnings_as_errors:
             errors += warnings
             warnings = []
+        elif self.warnings_as_errors_tests:
+            new_warnings = []
+            for w in warnings:
+                if w["code"] in self.warnings_as_errors_tests:
+                    errors.append(w)
+                else:
+                    new_warnings.append(w)
+            warnings = new_warnings
 
         # Fixme: have a more generic approach to handling errors/warnings/ignored/ok?
         if errors:

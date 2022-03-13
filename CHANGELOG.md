@@ -1,6 +1,7 @@
 ## 4.x.y (unreleased)
 
 - Allow configuring logging for `makemigrations` command and unify behaviour with `lintmigrations`
+- Adapt `--warnings-as-errors` option to allow selecting some migration tests only
 
 ## 4.0.0
 
