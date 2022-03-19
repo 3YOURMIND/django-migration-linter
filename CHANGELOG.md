@@ -3,6 +3,7 @@
 - Allow configuring logging for `makemigrations` command and unify behaviour with `lintmigrations` (issue #207)
 - Adapt `--warnings-as-errors` option to allow selecting some migration tests only (issue #201)
 - Add `sql_analyser` option to `makemigrations` in order to specify the SQL analyser to use (issue #208)
+- Make `project_root_path` and `verbosity` configurable from other setting source (issue #203)
 
 ## 4.0.0
 
