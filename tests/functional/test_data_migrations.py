@@ -137,7 +137,7 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
     def test_not_overlapping_model_name(self):
         """
-        Correct for the import error, but should raise a warning
+        Correct for the import error, but should raise a warning.
         """
 
         def forward_method(apps, schema_editor):
@@ -159,7 +159,7 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
     def test_not_overlapping_one_param(self):
         """
-        Not an error, but should raise a warning
+        Not an error, but should raise a warning.
         """
 
         def forward_method(apps, schema_editor):
@@ -169,6 +169,24 @@ class DataMigrationModelImportTestCase(unittest.TestCase):
 
         issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
         self.assertEqual(0, len(issues))
+
+    def test_m2m_through_orm_usage(self):
+        def forward_method(apps, schema_editor):
+            MyModel = apps.get_model("myapp", "MyModel")
+
+            MyModel.many_to_many.through.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
+        self.assertEqual(0, len(issues))
+
+    def test_missing_m2m_through_orm(self):
+        def forward_method(apps, schema_editor):
+            from tests.test_project.app_data_migrations.models import MyModel
+
+            MyModel.many_to_many.through.objects.filter(id=1).first()
+
+        issues = MigrationLinter.get_runpython_model_import_issues(forward_method)
+        self.assertEqual(1, len(issues))
 
 
 class DataMigrationModelVariableNamingTestCase(unittest.TestCase):
