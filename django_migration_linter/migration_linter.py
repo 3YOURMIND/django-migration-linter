@@ -531,7 +531,7 @@ class MigrationLinter(object):
 
     @staticmethod
     def get_runpython_model_import_issues(code):
-        model_object_regex = re.compile(r"[^a-zA-Z]?([a-zA-Z0-9]+?)\.objects")
+        model_object_regex = re.compile(r"[^a-zA-Z0-9._]?([a-zA-Z0-9._]+?)\.objects")
 
         function_name = code.__name__
         source_code = inspect.getsource(code)
@@ -539,6 +539,7 @@ class MigrationLinter(object):
         called_models = model_object_regex.findall(source_code)
         issues = []
         for model in called_models:
+            model = model.split(".", 1)[0]
             has_get_model_call = (
                 re.search(
                     r"{}.*= +\w+\.get_model\(".format(model),

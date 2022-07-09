@@ -1,3 +1,7 @@
+## 4.1.1 (unreleased)
+
+- Fixed `RunPython` model import check when using a `through` object like `MyModel.many_to_many.through.objects.filter(...)` (issue #218)
+
 ## 4.1.0
 
 - Allow configuring logging for `makemigrations` command and unify behaviour with `lintmigrations` (issue #207)
