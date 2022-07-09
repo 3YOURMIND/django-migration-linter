@@ -39,8 +39,8 @@ setup(
     extras_require={
         "test": [
             "tox>=3.15.2",
-            "mysqlclient>=1.4.6,<2",
-            "psycopg2-binary>=2.8.5,<2.9",
+            "mysqlclient>=1.4.6",
+            "psycopg2>=2.8.5",
             "django_add_default_value>=0.4.0",
             "coverage>=5.5",
         ],
