@@ -315,14 +315,11 @@ class MigrationLinter(object):
             )
         except (ValueError, ProgrammingError):
             logger.warning(
-                (
-                    "Error while executing sqlmigrate on (%s, %s). "
-                    "Continuing execution with empty SQL."
-                ),
+                "Error while executing sqlmigrate on (%s, %s).",
                 app_label,
                 migration_name,
             )
-            sql_statement = ""
+            raise
         return sql_statement.splitlines()
 
     @staticmethod
