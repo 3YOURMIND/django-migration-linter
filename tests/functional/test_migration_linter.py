@@ -2,6 +2,7 @@ import os
 import unittest
 
 from django.conf import settings
+from django.core.management import call_command
 
 from django_migration_linter import MigrationLinter
 from tests import fixtures
@@ -9,7 +10,20 @@ from tests import fixtures
 
 class BaseBackwardCompatibilityDetection(object):
     def setUp(self, *args, **kwargs):
+        self.database = next(iter(self.databases))
         self.test_project_path = os.path.dirname(settings.BASE_DIR)
+        call_command(
+            "migrate",
+            "app_unique_together",
+            "0002",
+            database=self.database,
+        )
+        self.addCleanup(
+            call_command,
+            "migrate",
+            "app_unique_together",
+            database=self.database,
+        )
         return super(BaseBackwardCompatibilityDetection, self).setUp(*args, **kwargs)
 
     def _test_linter_finds_errors(self, app=None, commit_id=None):
@@ -25,7 +39,7 @@ class BaseBackwardCompatibilityDetection(object):
     def _launch_linter(self, app=None, commit_id=None):
         linter = MigrationLinter(
             self.test_project_path,
-            database=next(iter(self.databases)),
+            database=self.database,
             no_cache=True,
         )
         linter.lint_all_migrations(app_label=app, git_commit_id=commit_id)
@@ -90,6 +104,13 @@ class BaseBackwardCompatibilityDetection(object):
 
     def test_with_git_ref(self):
         self._test_linter_finds_errors(commit_id="v0.1.4")
+
+    def test_failing_get_sql(self):
+        call_command("migrate", "app_unique_together", database=self.database)
+
+        linter = MigrationLinter(database=self.database)
+        with self.assertRaises(ValueError):
+            linter.get_sql("app_unique_together", "0003")
 
 
 class SqliteBackwardCompatibilityDetectionTestCase(

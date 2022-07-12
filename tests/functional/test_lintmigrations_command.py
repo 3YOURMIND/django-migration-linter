@@ -8,6 +8,11 @@ from django.test.utils import override_settings
 class LintMigrationsCommandTestCase(TransactionTestCase):
     databases = {"default", "sqlite"}
 
+    def setUp(self):
+        call_command("migrate", "app_unique_together", "0002")
+        self.addCleanup(call_command, "migrate", "app_unique_together")
+        super().setUp()
+
     def test_plain(self):
         with self.assertRaises(SystemExit):
             call_command("lintmigrations")
