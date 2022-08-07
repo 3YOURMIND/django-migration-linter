@@ -18,7 +18,8 @@ from ..utils import (
 
 def ask_should_keep_migration():
     questioner = InteractiveMigrationQuestioner()
-    msg = """\nThe migration linter detected that this migration is not backward compatible.
+    msg = """
+The migration linter detected that this migration is not backward compatible.
 - If you keep the migration, you will want to fix the issue or ignore the migration.
 - By default, the newly created migration file will be deleted.
 Do you want to keep the migration? [y/N]"""
