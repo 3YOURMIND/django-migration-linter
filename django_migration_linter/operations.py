@@ -9,6 +9,7 @@ class IgnoreMigration(Operation):
 
     reversible = True
     reduces_to_sql = False
+    elidable = True
 
     def state_forwards(self, app_label, state):
         pass
