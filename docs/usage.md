@@ -17,7 +17,14 @@ The three main usages are:
 * Lint a specific migration
 `python manage.py lintmigrations app_label migration_name`
 
-Below the detailed command line options, which can all also be defined using a config file (`setup.cfg`, `tox.ini`, `pyproject.toml`, `.django_migration_linter.cfg`):
+Below the detailed command line options, which can all also be defined using a config file:
+- `settings.py`
+- `setup.cfg`
+- `tox.ini`
+- `pyproject.toml`
+- `.django_migration_linter.cfg`
+
+If you are using a config file, replace any dashes (`-`) with an underscore (`_`).
 
 | Parameter                                             | Description                                                                                                                                                                                                     |
 |-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

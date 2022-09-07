@@ -310,3 +310,19 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         self.assertWarningSql(sql)
         sql = "REINDEX TABLE my_table;"
         self.assertWarningSql(sql)
+
+
+class SqlUtilsTestCase(unittest.TestCase):
+    def test_unknown_analyser_string(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Unknown SQL analyser 'unknown'. Known values: 'sqlite','mysql','postgresql'",
+        ):
+            get_sql_analyser_class("db", "unknown")
+
+    def test_unsupported_db_vendor(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Unsupported database vendor 'unknown'. Try specifying an SQL analyser.",
+        ):
+            get_sql_analyser_class("unknown")
