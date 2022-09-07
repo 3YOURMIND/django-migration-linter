@@ -24,7 +24,10 @@ def get_sql_analyser_class(database_vendor, analyser_string=None):
 def get_sql_analyser_from_string(analyser_string):
     if analyser_string not in ANALYSER_STRING_MAPPING:
         raise ValueError(
-            "Unknown SQL analyser. Known values: {}".format(analyser_string.keys())
+            "Unknown SQL analyser '{}'. Known values: '{}'".format(
+                analyser_string,
+                "','".join(ANALYSER_STRING_MAPPING.keys()),
+            )
         )
     return ANALYSER_STRING_MAPPING[analyser_string]
 
@@ -37,7 +40,11 @@ def get_sql_analyser_class_from_db_vendor(database_vendor):
     elif "sqlite" in database_vendor:
         sql_analyser_class = SqliteAnalyser
     else:
-        raise ValueError("Unsupported database vendor. Try specifying an SQL analyser.")
+        raise ValueError(
+            "Unsupported database vendor '{}'. Try specifying an SQL analyser.".format(
+                database_vendor
+            )
+        )
 
     logger.debug("Chosen SQL analyser class: %s", sql_analyser_class)
     return sql_analyser_class

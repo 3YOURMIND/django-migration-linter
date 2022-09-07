@@ -16,14 +16,23 @@ It will save you time by making sure migrations will not break with a older code
 pip install django-migration-linter
 ```
 
-And add the migration linter your ``INSTALLED_APPS``:
+And add the migration linter to your ``INSTALLED_APPS``:
 ```
-    INSTALLED_APPS = [
-        ...,
-        "django_migration_linter",
-        ...,
-    ]
+INSTALLED_APPS = [
+    ...,
+    "django_migration_linter",
+    ...,
+]
 ```
+
+Optionally, add a configuration:
+```
+MIGRATION_LINTER_OPTIONS = {
+    ...
+}
+```
+
+For details about configuration options, checkout [Usage](docs/usage.md).
 
 ## Usage example
 
