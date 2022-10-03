@@ -5,6 +5,7 @@ Instead, the linter crashes and lets the `sqlmigrate` error raise, in order to a
 One common reason for such an error is the SQL generation which requires the database to be actually migrated in order to fetch actual constraint names from it.
 The crash is a sign to double-check the migration. But if you are certain the migration is safe, you can ignore it (issue #209)
 - Fixed `RunPython` model import check when using a `through` object like `MyModel.many_to_many.through.objects.filter(...)` (issue #218)
+- Mark the `IgnoreMigration` operation as `elidable=True`
 
 ## 4.1.0
 
