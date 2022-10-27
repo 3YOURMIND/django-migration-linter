@@ -6,7 +6,7 @@ class Cache(dict):
     def __init__(self, django_folder, database, cache_path):
         self.filename = os.path.join(
             cache_path,
-            "{}_{}.pickle".format(django_folder.replace(os.sep, "_"), database),
+            "{}_{}.pickle".format(str(django_folder).replace(os.sep, "_"), database),
         )
 
         if not os.path.exists(os.path.dirname(self.filename)):
