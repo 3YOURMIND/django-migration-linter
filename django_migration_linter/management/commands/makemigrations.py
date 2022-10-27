@@ -34,7 +34,7 @@ class Command(MakeMigrationsCommand):
     help = "Creates new migration(s) for apps and lints them."
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             "--lint",
             action="store_true",
@@ -49,10 +49,10 @@ class Command(MakeMigrationsCommand):
         self.warnings_as_errors = options["warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
         configure_logging(options["verbosity"])
-        return super(Command, self).handle(*app_labels, **options)
+        return super().handle(*app_labels, **options)
 
     def write_migration_files(self, changes):
-        super(Command, self).write_migration_files(changes)
+        super().write_migration_files(changes)
 
         if (
             not getattr(settings, "MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS", False)

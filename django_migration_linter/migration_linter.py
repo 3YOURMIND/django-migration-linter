@@ -36,7 +36,7 @@ class MessageType(Enum):
         return list(map(lambda c: c.value, MessageType))
 
 
-class MigrationLinter(object):
+class MigrationLinter:
     def __init__(
         self,
         path=None,
@@ -263,17 +263,17 @@ class MigrationLinter(object):
         if lint_result.value in self.quiet:
             return
         if not self.no_output:
-            print("({0}, {1})... {2}".format(app_label, migration_name, msg))
+            print(f"({app_label}, {migration_name})... {msg}")
 
     def print_errors(self, errors):
         if MessageType.ERROR.value in self.quiet:
             return
         for err in errors:
-            error_str = "\t{0}".format(err["msg"])
+            error_str = "\t{}".format(err["msg"])
             if err.get("table"):
-                error_str += " (table: {0}".format(err["table"])
+                error_str += " (table: {}".format(err["table"])
                 if err.get("column"):
-                    error_str += ", column: {0}".format(err["column"])
+                    error_str += ", column: {}".format(err["column"])
                 error_str += ")"
             if not self.no_output:
                 print(error_str)
@@ -291,10 +291,10 @@ class MigrationLinter(object):
         if self.no_output:
             return
         print("*** Summary ***")
-        print("Valid migrations: {}/{}".format(self.nb_valid, self.nb_total))
-        print("Erroneous migrations: {}/{}".format(self.nb_erroneous, self.nb_total))
-        print("Migrations with warnings: {}/{}".format(self.nb_warnings, self.nb_total))
-        print("Ignored migrations: {}/{}".format(self.nb_ignored, self.nb_total))
+        print(f"Valid migrations: {self.nb_valid}/{self.nb_total}")
+        print(f"Erroneous migrations: {self.nb_erroneous}/{self.nb_total}")
+        print(f"Migrations with warnings: {self.nb_warnings}/{self.nb_total}")
+        print(f"Ignored migrations: {self.nb_ignored}/{self.nb_total}")
 
     @property
     def has_errors(self):
@@ -302,7 +302,7 @@ class MigrationLinter(object):
 
     def get_sql(self, app_label, migration_name):
         logger.info(
-            "Calling sqlmigrate command {} {}".format(app_label, migration_name)
+            f"Calling sqlmigrate command {app_label} {migration_name}"
         )
         dev_null = open(os.devnull, "w")
         try:
@@ -327,7 +327,7 @@ class MigrationLinter(object):
         from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
 
         return (
-            re.search(r"/{0}/.*\.py".format(MIGRATIONS_MODULE_NAME), filename)
+            re.search(fr"/{MIGRATIONS_MODULE_NAME}/.*\.py", filename)
             and "__init__" not in filename
         )
 
@@ -343,12 +343,12 @@ class MigrationLinter(object):
 
         migrations = []
         try:
-            with open(migrations_file_path, "r") as file:
+            with open(migrations_file_path) as file:
                 for line in file:
                     if cls.is_migration_file(line):
                         app_label, name = split_migration_path(line)
                         migrations.append((app_label, name))
-        except IOError:
+        except OSError:
             logger.exception("Migrations list path not found %s", migrations_file_path)
             raise Exception("Error while reading migrations list file")
 
@@ -363,9 +363,9 @@ class MigrationLinter(object):
         migrations = []
         # Get changes since specified commit
         git_diff_command = (
-            "cd {0} && git diff --relative --name-only --diff-filter=AR {1}"
+            "cd {} && git diff --relative --name-only --diff-filter=AR {}"
         ).format(self.django_path, git_commit_id)
-        logger.info("Executing {0}".format(git_diff_command))
+        logger.info(f"Executing {git_diff_command}")
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
         for line in map(clean_bytes_to_str, diff_process.stdout.readlines()):
             # Only gather lines that include added migrations
@@ -537,7 +537,7 @@ class MigrationLinter(object):
             model = model.split(".", 1)[0]
             has_get_model_call = (
                 re.search(
-                    r"{}.*= +\w+\.get_model\(".format(model),
+                    fr"{model}.*= +\w+\.get_model\(",
                     source_code,
                 )
                 is not None

@@ -16,7 +16,7 @@ def has_create_index(sql_statements, **kwargs):
 
     concerned_table = regex_result.group(2)
     table_is_added_in_transaction = any(
-        sql.startswith("CREATE TABLE {}".format(concerned_table))
+        sql.startswith(f"CREATE TABLE {concerned_table}")
         for sql in sql_statements
     )
     return not table_is_added_in_transaction

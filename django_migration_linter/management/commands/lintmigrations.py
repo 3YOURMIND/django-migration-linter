@@ -19,7 +19,7 @@ from ..utils import (
 CONFIG_NAME = "django_migration_linter"
 PYPROJECT_TOML = "pyproject.toml"
 DEFAULT_CONFIG_FILES = (
-    ".{}.cfg".format(CONFIG_NAME),
+    f".{CONFIG_NAME}.cfg",
     "setup.cfg",
     "tox.ini",
 )

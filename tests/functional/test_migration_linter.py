@@ -8,7 +8,7 @@ from django_migration_linter import MigrationLinter
 from tests import fixtures
 
 
-class BaseBackwardCompatibilityDetection(object):
+class BaseBackwardCompatibilityDetection:
     def setUp(self, *args, **kwargs):
         self.database = next(iter(self.databases))
         self.test_project_path = os.path.dirname(settings.BASE_DIR)
@@ -24,7 +24,7 @@ class BaseBackwardCompatibilityDetection(object):
             "app_unique_together",
             database=self.database,
         )
-        return super(BaseBackwardCompatibilityDetection, self).setUp(*args, **kwargs)
+        return super().setUp(*args, **kwargs)
 
     def _test_linter_finds_errors(self, app=None, commit_id=None):
         linter = self._launch_linter(app, commit_id)

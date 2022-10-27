@@ -19,10 +19,10 @@ class SqlAnalyserTestCase(unittest.TestCase):
 
     def assertValidSql(self, sql, allow_warnings=False):
         errors, _, warnings = self.analyse_sql(sql)
-        self.assertEqual(0, len(errors), "Found errors in sql: {}".format(errors))
+        self.assertEqual(0, len(errors), f"Found errors in sql: {errors}")
         if not allow_warnings:
             self.assertEqual(
-                0, len(warnings), "Found warnings in sql: {}".format(errors)
+                0, len(warnings), f"Found warnings in sql: {errors}"
             )
 
     def assertBackwardIncompatibleSql(self, sql, code=None):
