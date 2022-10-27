@@ -36,13 +36,13 @@ def has_add_unique(sql_statements, **kwargs):
 
     concerned_table = regex_result.group(1)
     table_is_added_in_transaction = any(
-        sql.startswith("CREATE TABLE {}".format(concerned_table))
+        sql.startswith(f"CREATE TABLE {concerned_table}")
         for sql in sql_statements
     )
     return not table_is_added_in_transaction
 
 
-class BaseAnalyser(object):
+class BaseAnalyser:
     base_migration_tests = [
         {
             "code": "RENAME_TABLE",
