@@ -6,6 +6,9 @@ One common reason for such an error is the SQL generation which requires the dat
 The crash is a sign to double-check the migration. But if you are certain the migration is safe, you can ignore it (issue #209)
 - Fixed `RunPython` model import check when using a `through` object like `MyModel.many_to_many.through.objects.filter(...)` (issue #218)
 - Mark the `IgnoreMigration` operation as `elidable=True`
+- Add support for Python 3.11
+- Add support for Django 4.1
+- Drop support for Django 2.2
 
 ## 4.1.0
 
