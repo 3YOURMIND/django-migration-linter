@@ -301,9 +301,7 @@ class MigrationLinter:
         return self.nb_erroneous > 0
 
     def get_sql(self, app_label, migration_name):
-        logger.info(
-            f"Calling sqlmigrate command {app_label} {migration_name}"
-        )
+        logger.info(f"Calling sqlmigrate command {app_label} {migration_name}")
         dev_null = open(os.devnull, "w")
         try:
             sql_statement = call_command(
@@ -327,7 +325,7 @@ class MigrationLinter:
         from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
 
         return (
-            re.search(fr"/{MIGRATIONS_MODULE_NAME}/.*\.py", filename)
+            re.search(rf"/{MIGRATIONS_MODULE_NAME}/.*\.py", filename)
             and "__init__" not in filename
         )
 
@@ -537,7 +535,7 @@ class MigrationLinter:
             model = model.split(".", 1)[0]
             has_get_model_call = (
                 re.search(
-                    fr"{model}.*= +\w+\.get_model\(",
+                    rf"{model}.*= +\w+\.get_model\(",
                     source_code,
                 )
                 is not None
