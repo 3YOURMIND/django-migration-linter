@@ -302,15 +302,15 @@ class MigrationLinter:
 
     def get_sql(self, app_label, migration_name):
         logger.info(f"Calling sqlmigrate command {app_label} {migration_name}")
-        dev_null = open(os.devnull, "w")
         try:
-            sql_statement = call_command(
-                "sqlmigrate",
-                app_label,
-                migration_name,
-                database=self.database,
-                stdout=dev_null,
-            )
+            with open(os.devnull, "w") as dev_null:
+                sql_statement = call_command(
+                    "sqlmigrate",
+                    app_label,
+                    migration_name,
+                    database=self.database,
+                    stdout=dev_null,
+                )
         except (ValueError, ProgrammingError):
             logger.warning(
                 "Error while executing sqlmigrate on (%s, %s).",
