@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from appdirs import user_cache_dir
 
 __version__ = "4.1.0"

@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import re
 
-from .base import BaseAnalyser
+from .base import BaseAnalyser, Check, CheckMode, CheckType
 
 
-def has_create_index(sql_statements, **kwargs):
+def has_create_index(sql_statements: list[str], **kwargs) -> bool:
     regex_result = None
     for sql in sql_statements:
         regex_result = re.search(r"CREATE (UNIQUE )?INDEX.*ON (.*) \(", sql)
@@ -22,27 +24,27 @@ def has_create_index(sql_statements, **kwargs):
 
 
 class PostgresqlAnalyser(BaseAnalyser):
-    migration_tests = [
-        {
-            "code": "CREATE_INDEX",
-            "fn": has_create_index,
-            "msg": "CREATE INDEX locks table",
-            "mode": "transaction",
-            "type": "warning",
-        },
-        {
-            "code": "DROP_INDEX",
-            "fn": lambda sql, **kw: re.search("DROP INDEX", sql)
+    migration_checks: list[Check] = [
+        Check(
+            code="CREATE_INDEX",
+            fn=has_create_index,
+            message="CREATE INDEX locks table",
+            mode=CheckMode.TRANSACTION,
+            type=CheckType.WARNING,
+        ),
+        Check(
+            code="DROP_INDEX",
+            fn=lambda sql, **kw: re.search("DROP INDEX", sql)
             and not re.search("INDEX CONCURRENTLY", sql),
-            "msg": "DROP INDEX locks table",
-            "mode": "one_liner",
-            "type": "warning",
-        },
-        {
-            "code": "REINDEX",
-            "fn": lambda sql, **kw: sql.startswith("REINDEX"),
-            "msg": "REINDEX locks table",
-            "mode": "one_liner",
-            "type": "warning",
-        },
+            message="DROP INDEX locks table",
+            mode=CheckMode.ONE_LINER,
+            type=CheckType.WARNING,
+        ),
+        Check(
+            code="REINDEX",
+            fn=lambda sql, **kw: sql.startswith("REINDEX"),
+            message="REINDEX locks table",
+            mode=CheckMode.ONE_LINER,
+            type=CheckType.WARNING,
+        ),
     ]

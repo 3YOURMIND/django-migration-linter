@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 CREATE_TABLE_WITH_NOT_NULL_COLUMN = "app_create_table_with_not_null_column"
 ADD_NOT_NULL_COLUMN = "app_add_not_null_column"
 DROP_COLUMN = "app_drop_column"

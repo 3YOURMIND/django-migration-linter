@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import configparser
 import itertools
 import os
 import sys
 from importlib import import_module
+from typing import Any, Callable
 
 import toml
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
@@ -28,7 +31,7 @@ DEFAULT_CONFIG_FILES = (
 class Command(BaseCommand):
     help = "Lint your migrations"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
             "app_label",
             nargs="?",
@@ -184,7 +187,7 @@ class Command(BaseCommand):
             sys.exit(1)
 
     @staticmethod
-    def read_django_settings(options):
+    def read_django_settings(options: dict[str, Any]) -> dict[str, Any]:
         django_settings_options = dict()
 
         django_migration_linter_settings = getattr(
@@ -197,12 +200,13 @@ class Command(BaseCommand):
         return django_settings_options
 
     @staticmethod
-    def read_config_file(options):
+    def read_config_file(options: dict[str, Any]) -> dict[str, Any]:
         config_options = dict()
 
         config_parser = configparser.ConfigParser()
         config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
         for key, value in options.items():
+            config_get_fn: Callable
             if isinstance(value, bool):
                 config_get_fn = config_parser.getboolean
             else:
@@ -214,7 +218,7 @@ class Command(BaseCommand):
         return config_options
 
     @staticmethod
-    def read_toml_file(options):
+    def read_toml_file(options: dict[str, Any]) -> dict[str, Any]:
         toml_options = dict()
 
         if os.path.exists(PYPROJECT_TOML):
@@ -226,5 +230,5 @@ class Command(BaseCommand):
 
         return toml_options
 
-    def get_version(self):
+    def get_version(self) -> str:
         return __version__

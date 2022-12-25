@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import os
 import pickle
 
 
 class Cache(dict):
-    def __init__(self, django_folder, database, cache_path):
+    def __init__(self, django_folder: str | None, database: str, cache_path: str):
         self.filename = os.path.join(
             cache_path,
             "{}_{}.pickle".format(str(django_folder).replace(os.sep, "_"), database),
@@ -14,7 +16,7 @@ class Cache(dict):
 
         super().__init__()
 
-    def load(self):
+    def load(self) -> None:
         try:
             with open(self.filename, "rb") as f:
                 tmp_dict = pickle.load(f)
@@ -22,6 +24,6 @@ class Cache(dict):
         except OSError:
             pass
 
-    def save(self):
+    def save(self) -> None:
         with open(self.filename, "wb") as f:
             pickle.dump(self, f, protocol=2)

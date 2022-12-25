@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import logging
+
+from django.core.management import CommandParser
 
 from ..sql_analyser.analyser import ANALYSER_STRING_MAPPING
 
 
-def register_linting_configuration_options(parser):
+def register_linting_configuration_options(parser: CommandParser) -> None:
     parser.add_argument(
         "--database",
         type=str,
@@ -37,7 +41,7 @@ def register_linting_configuration_options(parser):
     )
 
 
-def configure_logging(verbosity):
+def configure_logging(verbosity: int) -> None:
     logger = logging.getLogger("django_migration_linter")
 
     if verbosity > 1:
@@ -48,7 +52,9 @@ def configure_logging(verbosity):
         logging.basicConfig(format="%(message)s")
 
 
-def extract_warnings_as_errors_option(warnings_as_errors):
+def extract_warnings_as_errors_option(
+    warnings_as_errors: list[str] | None,
+) -> tuple[list[str] | None, bool]:
     if isinstance(warnings_as_errors, list):
         warnings_as_errors_tests = warnings_as_errors
         # If the option is specified but without any test codes,
