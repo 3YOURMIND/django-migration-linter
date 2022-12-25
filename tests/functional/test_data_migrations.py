@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import unittest
 
@@ -307,13 +309,13 @@ class RunSQLMigrationTestCase(unittest.TestCase):
         runsql = migrations.RunSQL("sql;")
 
         error, ignored, warning = self.linter.lint_runsql(runsql)
-        self.assertEqual("RUNSQL_REVERSIBLE", warning[0]["code"])
+        self.assertEqual("RUNSQL_REVERSIBLE", warning[0].code)
 
     def test_sql_linting_error(self):
         runsql = migrations.RunSQL("ALTER TABLE t DROP COLUMN t;")
 
         error, ignored, warning = self.linter.lint_runsql(runsql)
-        self.assertEqual("DROP_COLUMN", error[0]["code"])
+        self.assertEqual("DROP_COLUMN", error[0].code)
 
     def test_sql_linting_error_array(self):
         runsql = migrations.RunSQL(
@@ -321,11 +323,11 @@ class RunSQLMigrationTestCase(unittest.TestCase):
         )
 
         error, ignored, warning = self.linter.lint_runsql(runsql)
-        self.assertEqual("DROP_COLUMN", error[0]["code"])
-        self.assertEqual("RENAME_COLUMN", error[1]["code"])
+        self.assertEqual("DROP_COLUMN", error[0].code)
+        self.assertEqual("RENAME_COLUMN", error[1].code)
 
     def test_sql_linting_error_args(self):
         runsql = migrations.RunSQL([("ALTER TABLE %s DROP COLUMN %s;", ("t", "c"))])
 
         error, ignored, warning = self.linter.lint_runsql(runsql)
-        self.assertEqual("DROP_COLUMN", error[0]["code"])
+        self.assertEqual("DROP_COLUMN", error[0].code)

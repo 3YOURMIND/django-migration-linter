@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .base import BaseAnalyser  # noqa
 from .mysql import MySqlAnalyser  # noqa
 from .postgresql import PostgresqlAnalyser  # noqa

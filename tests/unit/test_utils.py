@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 from django_migration_linter.utils import split_migration_path, split_path

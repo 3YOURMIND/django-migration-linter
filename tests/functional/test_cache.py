@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import unittest
 import unittest.mock as mock
@@ -7,6 +9,7 @@ from django.db.migrations import Migration
 
 from django_migration_linter import (
     IgnoreMigration,
+    Issue,
     MigrationLinter,
     analyse_sql_statements,
     get_migration_abspath,
@@ -29,7 +32,7 @@ class CacheTestCase(unittest.TestCase):
         ],
     )
     def test_cache_normal(self, *args):
-        linter = MigrationLinter(self.test_project_path)
+        linter = MigrationLinter(self.test_project_path, database="mysql")
         linter.old_cache.clear()
         linter.old_cache.save()
 
@@ -43,22 +46,20 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
 
-        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
-        self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
+        self.assertEqual("OK", cache["ab2eef5ceb020d0e6eaa42dda2a754c5"]["result"])
+        self.assertEqual("ERR", cache["52000d9d2c43dfda982945000dc6ba54"]["result"])
         self.assertListEqual(
             [
-                {
-                    "msg": "NOT NULL constraint on columns",
-                    "code": "NOT_NULL",
-                    "table": None,
-                    "column": None,
-                }
+                Issue(
+                    code="NOT_NULL",
+                    message="NOT NULL constraint on columns",
+                ),
             ],
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
+            cache["52000d9d2c43dfda982945000dc6ba54"]["errors"],
         )
 
         # Start the Linter again -> should use cache now.
-        linter = MigrationLinter(self.test_project_path)
+        linter = MigrationLinter(self.test_project_path, database="mysql")
 
         with mock.patch(
             "django_migration_linter.migration_linter.analyse_sql_statements",
@@ -95,18 +96,16 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
 
-        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
-        self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
+        self.assertEqual("OK", cache["ab2eef5ceb020d0e6eaa42dda2a754c5"]["result"])
+        self.assertEqual("ERR", cache["52000d9d2c43dfda982945000dc6ba54"]["result"])
         self.assertListEqual(
             [
-                {
-                    "msg": "NOT NULL constraint on columns",
-                    "code": "NOT_NULL",
-                    "table": None,
-                    "column": None,
-                }
+                Issue(
+                    code="NOT_NULL",
+                    message="NOT NULL constraint on columns",
+                ),
             ],
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
+            cache["52000d9d2c43dfda982945000dc6ba54"]["errors"],
         )
 
         # Start the Linter again but with different database, should not be the same cache
@@ -122,18 +121,16 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
 
-        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
-        self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
+        self.assertEqual("OK", cache["ab2eef5ceb020d0e6eaa42dda2a754c5"]["result"])
+        self.assertEqual("ERR", cache["52000d9d2c43dfda982945000dc6ba54"]["result"])
         self.assertListEqual(
             [
-                {
-                    "msg": "NOT NULL constraint on columns",
-                    "code": "NOT_NULL",
-                    "table": None,
-                    "column": None,
-                }
+                Issue(
+                    code="NOT_NULL",
+                    message="NOT NULL constraint on columns",
+                ),
             ],
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
+            cache["52000d9d2c43dfda982945000dc6ba54"]["errors"],
         )
 
         self.assertTrue(linter.has_errors)
@@ -169,7 +166,7 @@ class CacheTestCase(unittest.TestCase):
         ],
     )
     def test_cache_modified(self, *args):
-        linter = MigrationLinter(self.test_project_path)
+        linter = MigrationLinter(self.test_project_path, database="mysql")
         linter.old_cache.clear()
         linter.old_cache.save()
 
@@ -183,7 +180,7 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
 
-        self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
+        self.assertEqual("ERR", cache["52000d9d2c43dfda982945000dc6ba54"]["result"])
 
         # Get the content of the migration file and mock the open call to append
         # some content to change the hash
@@ -209,9 +206,9 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
 
-        self.assertNotIn("19fd3ea688fc05e2cc2a6e67c0b7aa17", cache)
+        self.assertNotIn("52000d9d2c43dfda982945000dc6ba54", cache)
         self.assertEqual(1, len(cache))
-        self.assertEqual("ERR", cache["a25768641a0ad526fad199f97c303784"]["result"])
+        self.assertEqual("ERR", cache["edeb40ecc1f5550ebef876c8e8ca093d"]["result"])
 
     @mock.patch(
         "django_migration_linter.MigrationLinter._gather_all_migrations",
@@ -221,7 +218,7 @@ class CacheTestCase(unittest.TestCase):
         ],
     )
     def test_ignore_cached_migration(self, *args):
-        linter = MigrationLinter(self.test_project_path)
+        linter = MigrationLinter(self.test_project_path, database="mysql")
         linter.old_cache.clear()
         linter.old_cache.save()
 
@@ -235,23 +232,23 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
 
-        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
-        self.assertEqual("ERR", cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["result"])
+        self.assertEqual("OK", cache["ab2eef5ceb020d0e6eaa42dda2a754c5"]["result"])
+        self.assertEqual("ERR", cache["52000d9d2c43dfda982945000dc6ba54"]["result"])
         self.assertListEqual(
             [
-                {
-                    "msg": "NOT NULL constraint on columns",
-                    "code": "NOT_NULL",
-                    "table": None,
-                    "column": None,
-                }
+                Issue(
+                    code="NOT_NULL",
+                    message="NOT NULL constraint on columns",
+                ),
             ],
-            cache["19fd3ea688fc05e2cc2a6e67c0b7aa17"]["errors"],
+            cache["52000d9d2c43dfda982945000dc6ba54"]["errors"],
         )
 
         # Start the Linter again -> should use cache now but ignore the erroneous
         linter = MigrationLinter(
-            self.test_project_path, ignore_name_contains="0002_add_new_not_null_field"
+            self.test_project_path,
+            ignore_name_contains="0002_add_new_not_null_field",
+            database="mysql",
         )
 
         with mock.patch(
@@ -266,4 +263,4 @@ class CacheTestCase(unittest.TestCase):
         cache = linter.new_cache
         cache.load()
         self.assertEqual(1, len(cache))
-        self.assertEqual("OK", cache["4a3770a405738d457e2d23e17fb1f3aa"]["result"])
+        self.assertEqual("OK", cache["ab2eef5ceb020d0e6eaa42dda2a754c5"]["result"])

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 from django_migration_linter.sql_analyser import (
@@ -28,9 +30,9 @@ class SqlAnalyserTestCase(unittest.TestCase):
         self.assertNotEqual(0, len(errors), "Found no errors in sql")
         if code:
             self.assertTrue(
-                any(err["code"] == code for err in errors),
+                any(err.code == code for err in errors),
                 "Didn't find error code {} in returned errors ({})".format(
-                    code, [err["code"] for err in errors]
+                    code, [err.code for err in errors]
                 ),
             )
 

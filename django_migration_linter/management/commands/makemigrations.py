@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import os
 
 from django.conf import settings
+from django.core.management import CommandParser
 from django.core.management.commands.makemigrations import (
     Command as MakeMigrationsCommand,
 )
+from django.db.migrations import Migration
 from django.db.migrations.questioner import InteractiveMigrationQuestioner
 from django.db.migrations.writer import MigrationWriter
 
@@ -16,7 +20,7 @@ from ..utils import (
 )
 
 
-def ask_should_keep_migration():
+def ask_should_keep_migration() -> bool:
     questioner = InteractiveMigrationQuestioner()
     msg = """
 The migration linter detected that this migration is not backward compatible.
@@ -33,7 +37,7 @@ def default_should_keep_migration():
 class Command(MakeMigrationsCommand):
     help = "Creates new migration(s) for apps and lints them."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         super().add_arguments(parser)
         parser.add_argument(
             "--lint",
@@ -51,7 +55,7 @@ class Command(MakeMigrationsCommand):
         configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
 
-    def write_migration_files(self, changes):
+    def write_migration_files(self, changes: dict[str, list[Migration]]) -> None:
         super().write_migration_files(changes)
 
         if (
@@ -79,7 +83,7 @@ class Command(MakeMigrationsCommand):
             all_warnings_as_errors,
         ) = extract_warnings_as_errors_option(self.warnings_as_errors)
 
-        # Lint migrations
+        # Lint migrations.
         linter = MigrationLinter(
             path=os.environ["DJANGO_SETTINGS_MODULE"],
             database=self.database,
@@ -103,7 +107,7 @@ class Command(MakeMigrationsCommand):
                         self.delete_migration(migration)
                 linter.reset_counters()
 
-    def delete_migration(self, migration):
+    def delete_migration(self, migration: Migration) -> None:
         writer = MigrationWriter(migration)
         os.remove(writer.path)
 

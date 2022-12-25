@@ -9,6 +9,9 @@ The crash is a sign to double-check the migration. But if you are certain the mi
 - Add support for Python 3.11
 - Add support for Django 4.1
 - Drop support for Django 2.2
+- Internally rename "migration tests" to "migration checks"
+- Add dataclasses internally instead of custom dicts
+- Add type checking using `mypy`
 
 ## 4.1.0
 
