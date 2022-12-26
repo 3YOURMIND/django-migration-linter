@@ -11,7 +11,8 @@ The crash is a sign to double-check the migration. But if you are certain the mi
 - Drop support for Django 2.2
 - Internally rename "migration tests" to "migration checks"
 - Add dataclasses internally instead of custom dicts
-- Add type checking using `mypy`
+- Use pre-commit hooks instead for linting
+- Add type checking using `mypy` and `ruff`
 
 ## 4.1.0
 
