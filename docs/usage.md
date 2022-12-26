@@ -2,7 +2,7 @@
 
 ## Command line usage
 
-The linter is installed as a Django app and is integrated through the Django management command system. 
+The linter is installed as a Django app and is integrated through the Django management command system.
 
 `python manage.py lintmigrations [app_label] [migration_name]`
 
