@@ -9,6 +9,7 @@ Features:
 
 - Fixed `RunPython` model import check when using a `through` object like `MyModel.many_to_many.through.objects.filter(...)` (issue #218)
 - Mark the `IgnoreMigration` operation as `elidable=True`
+- Handle `functools.partial` functions in RunPython data migrations
 
 Bug:
 
