@@ -104,6 +104,15 @@ class DataMigrationDetectionTestCase(unittest.TestCase):
         self.assertEqual(0, self.linter.nb_erroneous)
         self.assertFalse(self.linter.has_errors)
 
+    def test_partial_function(self):
+        reverse_migration = self.linter.migration_loader.disk_migrations[
+            ("app_data_migrations", "0004_partial_function")
+        ]
+        self.linter.lint_migration(reverse_migration)
+
+        self.assertEqual(1, self.linter.nb_warnings)
+        self.assertFalse(self.linter.has_errors)
+
 
 class DataMigrationModelImportTestCase(unittest.TestCase):
     def test_missing_get_model_import(self):

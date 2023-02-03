@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import hashlib
 import inspect
 import logging
@@ -473,10 +474,16 @@ class MigrationLinter:
 
         return errors, ignored, warnings
 
+    @staticmethod
+    def discover_function(function):
+        if isinstance(function, functools.partial):
+            return function.func
+        return function
+
     def lint_runpython(
         self, runpython: RunPython
     ) -> tuple[list[Issue], list[Issue], list[Issue]]:
-        function_name = runpython.code.__name__
+        function_name = self.discover_function(runpython.code).__name__
         error = []
         ignored = []
         warning = []
@@ -551,8 +558,9 @@ class MigrationLinter:
     def get_runpython_model_import_issues(code: Callable) -> list[Issue]:
         model_object_regex = re.compile(r"[^a-zA-Z0-9._]?([a-zA-Z0-9._]+?)\.objects")
 
-        function_name = code.__name__
-        source_code = inspect.getsource(code)
+        function = MigrationLinter.discover_function(code)
+        function_name = function.__name__
+        source_code = inspect.getsource(function)
 
         called_models = model_object_regex.findall(source_code)
         issues = []
@@ -582,8 +590,9 @@ class MigrationLinter:
     def get_runpython_model_variable_naming_issues(code: Callable) -> list[Issue]:
         model_object_regex = re.compile(r"[^a-zA-Z]?([a-zA-Z0-9]+?)\.objects")
 
-        function_name = code.__name__
-        source_code = inspect.getsource(code)
+        function = MigrationLinter.discover_function(code)
+        function_name = function.__name__
+        source_code = inspect.getsource(function)
 
         called_models = model_object_regex.findall(source_code)
         issues = []
