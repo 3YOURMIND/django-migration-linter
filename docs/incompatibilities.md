@@ -40,6 +40,7 @@ You can ignore checks through the `--exclude-migration-tests` option by specifyi
 | `RUNPYTHON_MODEL_VARIABLE_NAME`    | The model variable name is different from the model class itself                                                     | Warning      |
 | `RUNSQL_REVERSIBLE`                | RunSQL data migration is not reversible (missing reverse SQL)                                                        | Warning      |
 | `CREATE_INDEX`                     | (Postgresql specific) Creating an index without the concurrent keyword will lock the table and may generate downtime | Warning      |
+| `CREATE_INDEX_EXCLUSIVE`           | (Postgresql specific) Creating an index in a transaction (after an `EXCLUSIVE` lock) prolongs the exclusive lock     | Error        |
 | `DROP_INDEX`                       | (Postgresql specific) Dropping an index without the concurrent keyword will lock the table and may generate downtime | Warning      |
 | `REINDEX`                          | (Postgresql specific) Reindexing will lock the table and may generate downtime                                       | Warning      |
 

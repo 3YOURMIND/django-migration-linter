@@ -5,6 +5,36 @@ import re
 from .base import BaseAnalyser, Check, CheckMode, CheckType
 
 
+def has_create_index_in_transaction(sql_statements: list[str], **kwargs) -> bool:
+    """Return if a migration opens a transaction, acquires EXCLUSIVE lock, then indexes.
+
+    Any locks that are obtained after a transaction is opened will not be released
+    until that transaction either commits or rolls back.
+
+    Accordingly, it's extremely important that a migration avoid any long-running
+    queries while exclusive locks are held.
+
+    Building an index is generally a long-running operation. A standard index
+    creation (that is, avoiding use of `CONCURRENTLY`) can be safe to run on
+    tables which are small in size and/or read-heavy. (`CREATE INDEX` only
+    prevents writes to a table; reads are allowed during index creation).
+
+    This check is a stricter version of `CREATE_INDEX` -- if a team wishes
+    to build indices nonconcurrently, it's imperative to be mindful of locks.
+    """
+    if not (sql_statements and sql_statements[0].startswith("BEGIN")):
+        return False
+
+    for i, sql in enumerate(sql_statements):
+        # If any statements acquire an exclusive lock, complain about index creation later.
+        # Nearly every single `ALTER TABLE` command requires an exclusive lock:
+        #     https://www.postgresql.org/docs/current/sql-altertable.html
+        # (Most common example is `ALTER TABLE... ADD COLUMN`, then later `CREATE INDEX`)
+        if sql.startswith("ALTER TABLE"):
+            return has_create_index(sql_statements[i + 1 :])
+    return False
+
+
 def has_create_index(sql_statements: list[str], **kwargs) -> bool:
     regex_result = None
     for sql in sql_statements:
@@ -31,6 +61,13 @@ class PostgresqlAnalyser(BaseAnalyser):
             message="CREATE INDEX locks table",
             mode=CheckMode.TRANSACTION,
             type=CheckType.WARNING,
+        ),
+        Check(
+            code="CREATE_INDEX_EXCLUSIVE",
+            fn=has_create_index_in_transaction,
+            message="CREATE INDEX prolongs transaction, delaying lock release",
+            mode=CheckMode.TRANSACTION,
+            type=CheckType.ERROR,
         ),
         Check(
             code="DROP_INDEX",
