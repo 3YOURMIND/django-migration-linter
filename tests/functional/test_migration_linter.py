@@ -148,3 +148,7 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
     def test_detect_alter_column(self):
         app = fixtures.ALTER_COLUMN
         self._test_linter_finds_errors(app)
+
+    def test_create_index_exclusive(self):
+        app = fixtures.CREATE_INDEX_EXCLUSIVE
+        self._test_linter_finds_errors(app)

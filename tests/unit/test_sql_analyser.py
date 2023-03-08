@@ -315,6 +315,23 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         sql = "REINDEX TABLE my_table;"
         self.assertWarningSql(sql)
 
+    def test_create_index_exclusive(self):
+        sql = [
+            "BEGIN;",
+            'ALTER TABLE "users" ADD COLUMN "email" varchar(254) NULL;',
+            'CREATE INDEX "user_email" ON "users" ("email");',
+            "COMMIT;",
+        ]
+        self.assertBackwardIncompatibleSql(sql, code="CREATE_INDEX_EXCLUSIVE")
+
+    def test_create_index_exclusive_no_lock(self):
+        sql = [
+            'ALTER TABLE "users" ADD COLUMN "email" varchar(254) NULL;',
+            'CREATE INDEX "user_email" ON "users" ("email");',
+        ]
+        # Will warn about `CREATE_INDEX`, but *not* `CREATE_INDEX_EXCLUSIVE`
+        self.assertValidSql(sql, allow_warnings=True)
+
 
 class SqlUtilsTestCase(unittest.TestCase):
     def test_unknown_analyser_string(self):

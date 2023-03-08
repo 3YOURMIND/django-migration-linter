@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "tests.test_project.app_data_migrations",
     "tests.test_project.app_make_not_null_with_django_default",
     "tests.test_project.app_make_not_null_with_lib_default",
+    "tests.test_project.app_create_index_exclusive",
 ]
 
 MIDDLEWARE = [
