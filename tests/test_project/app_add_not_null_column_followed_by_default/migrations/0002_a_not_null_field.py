@@ -8,7 +8,6 @@ from django_add_default_value import AddDefaultValue
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("app_add_not_null_column_followed_by_default", "0001_initial")]
 
     operations = [

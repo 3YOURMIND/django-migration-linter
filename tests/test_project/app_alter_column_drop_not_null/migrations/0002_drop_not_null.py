@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("app_alter_column_drop_not_null", "0001_create_table")]
 
     operations = [
