@@ -7,7 +7,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("app_rename_column", "0001_initial")]
 
     operations = [

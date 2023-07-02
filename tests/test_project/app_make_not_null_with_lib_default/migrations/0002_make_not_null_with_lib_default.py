@@ -7,7 +7,6 @@ from django_add_default_value import AddDefaultValue
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("app_make_not_null_with_lib_default", "0001_initial"),
     ]

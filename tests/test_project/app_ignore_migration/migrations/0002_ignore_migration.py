@@ -8,7 +8,6 @@ import django_migration_linter as linter
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("app_ignore_migration", "0001_initial")]
 
     operations = [
