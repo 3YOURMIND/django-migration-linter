@@ -40,11 +40,11 @@ setup(
     ],
     extras_require={
         "test": [
-            "tox>=3.15.2",
-            "mysqlclient>=1.4.6",
-            "psycopg2>=2.8.5",
+            "tox>=4.6.3",
+            "mysqlclient>=2.1.1",
+            "psycopg2>=2.9.6",
             "django_add_default_value>=0.4.0",
-            "coverage>=5.5",
+            "coverage>=7.2.7",
         ],
     },
     keywords="django migration lint linter database backward compatibility",
@@ -56,6 +56,7 @@ setup(
         "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.0",
         "Framework :: Django :: 4.1",
+        "Framework :: Django :: 4.2",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",

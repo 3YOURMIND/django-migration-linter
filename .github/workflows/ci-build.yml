@@ -19,7 +19,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
         ports:
@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: python -m pip install tox==3.28.0 tox-gh-actions
+        run: python -m pip install tox==4.6.3 tox-gh-actions
       - name: Test with tox ${{ matrix.python-version }}
         run: tox
 
@@ -52,12 +52,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install dependencies
-        run: python -m pip install tox==3.28.0
+        run: python -m pip install tox==4.6.3
       - name: Lint with tox
         run: tox
         env:
@@ -76,7 +76,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
         ports:
@@ -89,18 +89,18 @@ jobs:
         # Fetch all tags and branches because tests rely on it
         with:
           fetch-depth: 0
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install dependencies and coverage
-        run: python -m pip install tox==3.28.0
+        run: python -m pip install tox==4.6.3
       - name: Test with tox with coverage
         run: tox
         env:
           TOXENV: coverage
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
