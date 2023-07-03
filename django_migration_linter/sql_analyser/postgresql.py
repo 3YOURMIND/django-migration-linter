@@ -67,7 +67,7 @@ class PostgresqlAnalyser(BaseAnalyser):
             fn=has_create_index_in_transaction,
             message="CREATE INDEX prolongs transaction, delaying lock release",
             mode=CheckMode.TRANSACTION,
-            type=CheckType.ERROR,
+            type=CheckType.WARNING,
         ),
         Check(
             code="DROP_INDEX",

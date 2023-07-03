@@ -36,9 +36,16 @@ class SqlAnalyserTestCase(unittest.TestCase):
                 ),
             )
 
-    def assertWarningSql(self, sql):
+    def assertWarningSql(self, sql, code=None):
         _, _, warnings = self.analyse_sql(sql)
         self.assertNotEqual(0, len(warnings), "Found no warnings in sql")
+        if code:
+            self.assertTrue(
+                any(warning.code == code for warning in warnings),
+                "Didn't find error code {} in returned errors ({})".format(
+                    code, [warning.code for warning in warnings]
+                ),
+            )
 
 
 class MySqlAnalyserTestCase(SqlAnalyserTestCase):
@@ -322,7 +329,7 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
             'CREATE INDEX "user_email" ON "users" ("email");',
             "COMMIT;",
         ]
-        self.assertBackwardIncompatibleSql(sql, code="CREATE_INDEX_EXCLUSIVE")
+        self.assertWarningSql(sql, code="CREATE_INDEX_EXCLUSIVE")
 
     def test_create_index_exclusive_no_lock(self):
         sql = [

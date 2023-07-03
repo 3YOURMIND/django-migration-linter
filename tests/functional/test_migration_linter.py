@@ -150,5 +150,6 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
         self._test_linter_finds_errors(app)
 
     def test_create_index_exclusive(self):
-        app = fixtures.CREATE_INDEX_EXCLUSIVE
-        self._test_linter_finds_errors(app)
+        linter = self._launch_linter(fixtures.CREATE_INDEX_EXCLUSIVE)
+        self.assertFalse(linter.has_errors)
+        self.assertTrue(linter.nb_warnings)
