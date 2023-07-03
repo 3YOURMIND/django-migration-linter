@@ -331,6 +331,17 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertWarningSql(sql, code="CREATE_INDEX_EXCLUSIVE")
 
+    def test_create_concurrently_index_exclusive(self):
+        sql = [
+            "BEGIN;",
+            'ALTER TABLE "users" ADD COLUMN "email" varchar(254) NULL;',
+            # Counter-intuitively, concurrent index creation can take *longer*.
+            # It's especially important that we flag an exclusive lock being held.
+            'CREATE INDEX CONCURRENTLY "user_email" ON "users" ("email");',
+            "COMMIT;",
+        ]
+        self.assertWarningSql(sql, code="CREATE_INDEX_EXCLUSIVE")
+
     def test_create_index_exclusive_no_lock(self):
         sql = [
             'ALTER TABLE "users" ADD COLUMN "email" varchar(254) NULL;',
@@ -338,6 +349,13 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         # Will warn about `CREATE_INDEX`, but *not* `CREATE_INDEX_EXCLUSIVE`
         self.assertValidSql(sql, allow_warnings=True)
+
+    def test_create_index_exclusive_concurrently_no_lock(self):
+        sql = [
+            'ALTER TABLE "users" ADD COLUMN "email" varchar(254) NULL;',
+            'CREATE INDEX CONCURRENTLY "user_email" ON "users" ("email");',
+        ]
+        self.assertValidSql(sql)
 
 
 class SqlUtilsTestCase(unittest.TestCase):
