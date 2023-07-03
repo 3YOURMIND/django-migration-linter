@@ -297,6 +297,10 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         sql = "CREATE UNIQUE INDEX CONCURRENTLY title_idx ON films (title);"
         self.assertValidSql(sql)
 
+    def test_create_index_concurrently_where(self):
+        sql = 'CREATE INDEX CONCURRENTLY "index_name" ON "table_name" ("a_column") WHERE ("some_column" IS NOT NULL);'
+        self.assertValidSql(sql)
+
     def test_drop_index_non_concurrently(self):
         sql = "DROP INDEX ON films"
         self.assertWarningSql(sql)
