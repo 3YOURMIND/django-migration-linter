@@ -25,6 +25,7 @@ Miscellaneous:
 - Add dataclasses internally instead of custom dicts
 - Use pre-commit hooks for linting
 - Add `mypy` and `ruff` usages
+- Add a new check, `CREATE_INDEX_EXCLUSIVE` to detect index creation while an exclusive lock is held
 
 ## 4.1.0
 
