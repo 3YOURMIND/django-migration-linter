@@ -87,6 +87,18 @@ class Command(BaseCommand):
             nargs="?",
             help="if specified, only migrations listed in the file will be considered",
         )
+        parser.add_argument(
+            "--resolve-nested-apps",
+            action="store_true",
+            help=(
+                "if specified, read_migrations_list migration files and"
+                " _gather_migrations_git file names will be indexed by their file"
+                " system prefix, relative to 'settings.BASE_DIR', which should"
+                " match the loaded django appconfig's path. on IndexError"
+                " falls-through to normal folder-named must be app_label based"
+                " app_config mapping."
+            ),
+        )
         cache_group = parser.add_mutually_exclusive_group(required=False)
         cache_group.add_argument(
             "--cache-path",
@@ -181,6 +193,7 @@ class Command(BaseCommand):
             migration_name=options["migration_name"],
             git_commit_id=options["git_commit_id"],
             migrations_file_path=options["include_migrations_from"],
+            resolve_nested_apps=options["resolve_nested_apps"],
         )
         linter.print_summary()
         if linter.has_errors:

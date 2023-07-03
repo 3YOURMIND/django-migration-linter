@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from django_migration_linter.utils import split_migration_path, split_path
+from django_migration_linter.utils import split_migration_path, split_path, split_migration_prefix
 
 
 class SplitPathTestCase(unittest.TestCase):
@@ -42,4 +42,22 @@ class SplitPathTestCase(unittest.TestCase):
         input_path = "/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py"
         app, mig = split_migration_path(input_path)
         self.assertEqual(app, "the_app")
+        self.assertEqual(mig, "0001_stuff")
+
+    def test_split_migration_long_prefix(self):
+        input_path = "apps/the_app/migrations/0001_stuff.py"
+        prefix, mig = split_migration_prefix(input_path)
+        self.assertEqual(prefix, "apps/the_app")
+        self.assertEqual(mig, "0001_stuff")
+
+    def test_split_migration_prefix(self):
+        input_path = "the_app/migrations/0001_stuff.py"
+        prefix, mig = split_migration_prefix(input_path)
+        self.assertEqual(prefix, "the_app")
+        self.assertEqual(mig, "0001_stuff")
+
+    def test_split_migration_full_prefix(self):
+        input_path = "/home/user/djangostuff/apps/the_app/migrations/0001_stuff.py"
+        prefix, mig = split_migration_prefix(input_path)
+        self.assertEqual(prefix, "/home/user/djangostuff/apps/the_app")
         self.assertEqual(mig, "0001_stuff")

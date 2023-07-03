@@ -23,6 +23,12 @@ def split_path(path: str) -> list[str]:
     return decomposed_path
 
 
+def join_path(components: tuple[str, ...], sep:str=os.path.sep) -> str:
+    if components[0] == sep:
+        components[0] = ''
+    return sep.join(components)
+
+
 def split_migration_path(migration_path: str) -> tuple[str, str]:
     from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
 
@@ -30,6 +36,15 @@ def split_migration_path(migration_path: str) -> tuple[str, str]:
     for i, p in enumerate(decomposed_path):
         if p == MIGRATIONS_MODULE_NAME:
             return decomposed_path[i - 1], os.path.splitext(decomposed_path[i + 1])[0]
+    return "", ""
+
+def split_migration_prefix(migration_path: str) -> tuple[str, str]:
+    from django.db.migrations.loader import MIGRATIONS_MODULE_NAME
+
+    decomposed_path = split_path(migration_path)
+    for i, p in enumerate(decomposed_path):
+        if p == MIGRATIONS_MODULE_NAME:
+            return join_path(decomposed_path[:i]), os.path.splitext(decomposed_path[i + 1])[0]
     return "", ""
 
 

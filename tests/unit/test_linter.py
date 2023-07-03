@@ -4,6 +4,8 @@ import tempfile
 import unittest
 
 from django.db.migrations import Migration
+from django.test import tag
+
 
 from django_migration_linter import MigrationLinter
 
@@ -74,6 +76,7 @@ class LinterFunctionsTestCase(unittest.TestCase):
         self.assertFalse(linter.should_ignore_migration("app_correct", "0002_foo"))
         self.assertFalse(linter.should_ignore_migration("app_correct", "0003_bar"))
 
+    @tag('gather')
     def test_gather_all_migrations(self):
         linter = MigrationLinter()
         migrations = linter._gather_all_migrations()
@@ -137,6 +140,45 @@ class LinterFunctionsTestCase(unittest.TestCase):
             migration_list,
         )
 
+    def test_read_migrations_app_subapp_legacy(self):
+        tmp = tempfile.NamedTemporaryFile(mode="w", delete=False)
+        tmp.write(
+            "test_project/app_nested/app_subapp/migrations/0001_create_table.py\n"
+        )
+        tmp.write("unknown\n")
+        tmp.write(
+            "test_project/app_nested/app_subapp/migrations/0002_add_new_not_null_field.py\n"
+        )
+        tmp.close()
+        migration_list = MigrationLinter.read_migrations_list(tmp.name, resolve_nested_apps=False)
+        self.assertEqual(
+            [
+                ("app_subapp", "0001_create_table"),
+                ("app_subapp", "0002_add_new_not_null_field"),
+            ],
+            migration_list,
+        )
+
+    def test_read_migrations_app_subapp(self):
+        tmp = tempfile.NamedTemporaryFile(mode="w", delete=False)
+        tmp.write(
+            "test_project/app_nested/app_subapp/migrations/0001_create_table.py\n"
+        )
+        tmp.write("unknown\n")
+        tmp.write(
+            "test_project/app_nested/app_subapp/migrations/0002_add_new_not_null_field.py\n"
+        )
+        tmp.close()
+        migration_list = MigrationLinter.read_migrations_list(tmp.name, resolve_nested_apps=True)
+        self.assertEqual(
+            [
+                ("app_nested_app_subapp", "0001_create_table"),
+                ("app_nested_app_subapp", "0002_add_new_not_null_field"),
+            ],
+            migration_list,
+        )
+
+    @tag('gather')
     def test_gather_migrations_with_list(self):
         linter = MigrationLinter()
         migrations = linter._gather_all_migrations(
@@ -146,3 +188,42 @@ class LinterFunctionsTestCase(unittest.TestCase):
             ]
         )
         self.assertEqual(2, len(list(migrations)))
+
+    @tag('gather')
+    def test_gather_migration_git_correct(self):
+        linter = MigrationLinter("tests/test_project", only_applied_migrations=True)
+        migrations = [
+            linter._gather_migrations_git__inner("app_correct/migrations/0001_initial.py"),
+            linter._gather_migrations_git__inner("app_correct/migrations/0002_foo.py"),
+        ]
+        self.assertEqual(
+            [
+                (migrations[0].app_label, migrations[0].name),
+                (migrations[1].app_label, migrations[1].name),
+            ],
+            [
+                ("app_correct", "0001_initial"),
+                ("app_correct", "0002_foo"),
+            ],
+        )
+
+    @tag('gather')
+    def test_gather_migration_git_nested(self):
+        linter = MigrationLinter("tests/test_project", only_applied_migrations=True)
+        migrations = [
+            linter._gather_migrations_git__inner("app_nested/app_subapp/migrations/0001_initial.py", resolve_nested_apps=True),
+            linter._gather_migrations_git__inner("app_nested/app_subapp/migrations/0002_foo.py", resolve_nested_apps=True),
+        ]
+
+        self.assertTrue(migrations[0])
+        self.assertTrue(migrations[1])
+        self.assertEqual(
+            [
+                (migrations[0].app_label, migrations[0].name),
+                (migrations[1].app_label, migrations[1].name),
+            ],
+            [
+                ("app_nested_app_subapp", "0001_initial"),
+                ("app_nested_app_subapp", "0002_foo"),
+            ],
+        )
