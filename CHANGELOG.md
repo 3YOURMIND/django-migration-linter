@@ -1,4 +1,4 @@
-## 5.0.0 (unreleased)
+## 5.0.0
 
 - **Breaking change**: stop silently ignoring when the internal `sqlmigrate` call fails and the linter cannot analyse the migration.
 Instead, the linter crashes and lets the `sqlmigrate` error raise, in order to avoid letting a problematic migration pass.
