@@ -26,16 +26,20 @@ def has_create_index_in_transaction(sql_statements: list[str], **kwargs) -> bool
         return False
 
     for i, sql in enumerate(sql_statements):
-        # If any statements acquire an exclusive lock, complain about index creation later.
+        # If any statements acquire an exclusive lock, complain about index creation
+        # later.
         # Nearly every single `ALTER TABLE` command requires an exclusive lock:
         #     https://www.postgresql.org/docs/current/sql-altertable.html
-        # (Most common example is `ALTER TABLE... ADD COLUMN`, then later `CREATE INDEX`)
+        # (Most common example is `ALTER TABLE... ADD COLUMN`, then later
+        # `CREATE INDEX`)
         if sql.startswith("ALTER TABLE"):
             return has_create_index(sql_statements[i + 1 :], ignore_concurrently=False)
     return False
 
 
-def has_create_index(sql_statements: list[str], ignore_concurrently: bool = True, **kwargs) -> bool:
+def has_create_index(
+    sql_statements: list[str], ignore_concurrently: bool = True, **kwargs
+) -> bool:
     regex_result = None
     for sql in sql_statements:
         regex_result = re.search(r"CREATE (UNIQUE )?INDEX.*ON (.*) \(", sql)
