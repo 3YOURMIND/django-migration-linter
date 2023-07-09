@@ -10,6 +10,7 @@ Features:
 - Fixed `RunPython` model import check when using a `through` object like `MyModel.many_to_many.through.objects.filter(...)` (issue #218)
 - Mark the `IgnoreMigration` operation as `elidable=True`
 - Handle `functools.partial` functions in RunPython data migrations
+- Add a new check, `CREATE_INDEX_EXCLUSIVE` to detect index creation while an exclusive lock is held
 
 Bug:
 
@@ -25,7 +26,6 @@ Miscellaneous:
 - Add dataclasses internally instead of custom dicts
 - Use pre-commit hooks for linting
 - Add `mypy` and `ruff` usages
-- Add a new check, `CREATE_INDEX_EXCLUSIVE` to detect index creation while an exclusive lock is held
 
 ## 4.1.0
 
