@@ -1,8 +1,11 @@
-## x.y.z
+## 6.0.0
+
+Feature:
+- **Breaking change**: Handle custom Django app label when gathering migrations from git reference. (#262)
+This means that, an app that was previously referenced by its folder name, will now be referenced by its Django app label.
 
 Miscellaneous:
-
-- Add py.typed file
+- Add py.typed file (#303)
 
 ## 5.2.0
 
