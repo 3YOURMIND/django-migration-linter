@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "tests.test_project.app_make_not_null_with_django_default",
     "tests.test_project.app_make_not_null_with_lib_default",
     "tests.test_project.app_create_index_exclusive",
+    "tests.test_project.app_with_custom_name.apps.DefaultConfig",
 ]
 
 if django.VERSION[0] >= 5:

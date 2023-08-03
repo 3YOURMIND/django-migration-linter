@@ -34,22 +34,32 @@ class BaseBackwardCompatibilityDetection:
         linter = self._launch_linter(app, commit_id)
         self.assertTrue(linter.has_errors)
         self.assertNotEqual(linter.nb_valid + linter.nb_erroneous, 0)
+        self.assertGreater(linter.nb_total, 0)
 
     def _test_linter_finds_no_errors(self, app=None, commit_id=None):
         linter = self._launch_linter(app, commit_id)
         self.assertFalse(linter.has_errors)
         self.assertNotEqual(linter.nb_valid + linter.nb_erroneous, 0)
+        self.assertGreater(linter.nb_total, 0)
+
+    def _test_linter_linted_no_migration(self, app=None, commit_id=None):
+        linter = self._launch_linter(app, commit_id)
+        self.assertEqual(linter.nb_valid, 0)
+        self.assertEqual(linter.nb_erroneous, 0)
+        self.assertEqual(linter.nb_total, 0)
 
     def _launch_linter(self, app=None, commit_id=None):
-        linter = MigrationLinter(
+        linter = self._get_linter()
+        linter.lint_all_migrations(app_label=app, git_commit_id=commit_id)
+        return linter
+
+    def _get_linter(self):
+        return MigrationLinter(
             self.test_project_path,
             database=self.database,
             no_cache=True,
         )
-        linter.lint_all_migrations(app_label=app, git_commit_id=commit_id)
-        return linter
 
-    # *** Tests ***
     def test_create_table_with_not_null_column(self):
         app = fixtures.CREATE_TABLE_WITH_NOT_NULL_COLUMN
         self._test_linter_finds_no_errors(app)
@@ -120,6 +130,22 @@ class BaseBackwardCompatibilityDetection:
         linter = MigrationLinter(database=self.database)
         with self.assertRaises(ValueError):
             linter.get_sql("app_unique_together", "0003")
+
+    def test_custom_named_app(self):
+        # Folder name is not found.
+        app = fixtures.CUSTOM_APP_NAME_DIRECTORY
+        self._test_linter_linted_no_migration(app)
+
+        # Django app name is found.
+        app = fixtures.CUSTOM_APP_LABEL
+        self._test_linter_finds_no_errors(app)
+
+        # And with git ref:
+        app = fixtures.CUSTOM_APP_NAME_DIRECTORY
+        self._test_linter_linted_no_migration(app, commit_id="v0.1.4")
+
+        app = fixtures.CUSTOM_APP_LABEL
+        self._test_linter_finds_no_errors(app, commit_id="v0.1.4")
 
 
 class SqliteBackwardCompatibilityDetectionTestCase(
