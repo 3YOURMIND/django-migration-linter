@@ -163,7 +163,7 @@ At some point, start using the new column and delete the old one once the migrat
 3. rollback your DB to drop the unique constraint, and it should work again
 
 :white_check_mark: **Solutions**:
-- Do a multistep deployment. First, make sure that the code is only pushing a value if it is not unique.
+- Do a multistep deployment. First, make sure that the code is only pushing a value if it is unique.
 
 ### :arrow_forward: Importing a model in a RunPython migration
 
