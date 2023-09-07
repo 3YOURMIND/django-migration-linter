@@ -14,8 +14,8 @@ from django.db.migrations.writer import MigrationWriter
 from django_migration_linter import MigrationLinter
 
 from ..utils import (
-    configure_logging,
     extract_warnings_as_errors_option,
+    load_config,
     register_linting_configuration_options,
 )
 
@@ -47,12 +47,13 @@ class Command(MakeMigrationsCommand):
         register_linting_configuration_options(parser)
 
     def handle(self, *app_labels, **options):
+        options = load_config(options)
+
         self.lint = options["lint"]
         self.database = options["database"]
         self.exclude_migrations_tests = options["exclude_migration_tests"]
         self.warnings_as_errors = options["warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
-        configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
 
     def write_migration_files(self, changes: dict[str, list[Migration]]) -> None:

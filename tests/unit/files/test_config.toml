@@ -1,0 +1,2 @@
+[tool.django_migration_linter]
+sql_analyser = "postgresql"

@@ -1,30 +1,17 @@
 from __future__ import annotations
 
-import configparser
-import itertools
 import os
 import sys
 from importlib import import_module
-from typing import Any, Callable
 
-import toml
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ..utils import (
-    configure_logging,
     extract_warnings_as_errors_option,
+    load_config,
     register_linting_configuration_options,
-)
-
-CONFIG_NAME = "django_migration_linter"
-PYPROJECT_TOML = "pyproject.toml"
-DEFAULT_CONFIG_FILES = (
-    f".{CONFIG_NAME}.cfg",
-    "setup.cfg",
-    "tox.ini",
 )
 
 
@@ -135,23 +122,13 @@ class Command(BaseCommand):
         register_linting_configuration_options(parser)
 
     def handle(self, *args, **options):
-        django_settings_options = self.read_django_settings(options)
-        config_options = self.read_config_file(options)
-        toml_options = self.read_toml_file(options)
-        for k, v in itertools.chain(
-            django_settings_options.items(),
-            config_options.items(),
-            toml_options.items(),
-        ):
-            if not options[k]:
-                options[k] = v
 
+        options = load_config(options)
+       
         (
             warnings_as_errors_tests,
             all_warnings_as_errors,
         ) = extract_warnings_as_errors_option(options["warnings_as_errors"])
-
-        configure_logging(options["verbosity"])
 
         root_path = options["project_root_path"] or os.path.dirname(
             import_module(os.getenv("DJANGO_SETTINGS_MODULE")).__file__
@@ -185,50 +162,6 @@ class Command(BaseCommand):
         linter.print_summary()
         if linter.has_errors:
             sys.exit(1)
-
-    @staticmethod
-    def read_django_settings(options: dict[str, Any]) -> dict[str, Any]:
-        django_settings_options = dict()
-
-        django_migration_linter_settings = getattr(
-            settings, "MIGRATION_LINTER_OPTIONS", dict()
-        )
-        for key in options:
-            if key in django_migration_linter_settings:
-                django_settings_options[key] = django_migration_linter_settings[key]
-
-        return django_settings_options
-
-    @staticmethod
-    def read_config_file(options: dict[str, Any]) -> dict[str, Any]:
-        config_options = dict()
-
-        config_parser = configparser.ConfigParser()
-        config_parser.read(DEFAULT_CONFIG_FILES, encoding="utf-8")
-        for key, value in options.items():
-            config_get_fn: Callable
-            if isinstance(value, bool):
-                config_get_fn = config_parser.getboolean
-            else:
-                config_get_fn = config_parser.get
-
-            config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
-            if config_value is not None:
-                config_options[key] = config_value
-        return config_options
-
-    @staticmethod
-    def read_toml_file(options: dict[str, Any]) -> dict[str, Any]:
-        toml_options = dict()
-
-        if os.path.exists(PYPROJECT_TOML):
-            pyproject_toml = toml.load(PYPROJECT_TOML)
-            section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
-            for key in options:
-                if key in section:
-                    toml_options[key] = section[key]
-
-        return toml_options
 
     def get_version(self) -> str:
         return __version__
