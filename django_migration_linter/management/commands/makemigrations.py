@@ -14,9 +14,10 @@ from django.db.migrations.writer import MigrationWriter
 from django_migration_linter import MigrationLinter
 
 from ..utils import (
+    configure_logging,
     extract_warnings_as_errors_option,
-    load_config,
     register_linting_configuration_options,
+    set_defaults_from_conf,
 )
 
 
@@ -45,9 +46,11 @@ class Command(MakeMigrationsCommand):
             help="Lint newly generated migrations.",
         )
         register_linting_configuration_options(parser)
+        set_defaults_from_conf(parser)
+
 
     def handle(self, *app_labels, **options):
-        options = load_config(options)
+        configure_logging(options["verbosity"])
 
         self.lint = options["lint"]
         self.database = options["database"]

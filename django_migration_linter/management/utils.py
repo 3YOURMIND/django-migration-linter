@@ -23,12 +23,6 @@ DEFAULT_CONFIG_FILES = (
 )
 
 
-class ConfigCommandParser(CommandParser):
-    def parse_args(self, args=None, namespace=None):
-        config_options = load_config()
-        return super().parse_args(args, namespace)
-
-
 def register_linting_configuration_options(parser: CommandParser) -> None:
     parser.add_argument(
         "--database",
@@ -88,34 +82,34 @@ def extract_warnings_as_errors_option(
 
     return warnings_as_errors_tests, all_warnings_as_errors
 
-
-def load_config(options: dict) -> dict[str, Any]:
+def set_defaults_from_conf(parser) -> None:
     """
-    Load config options and setup logging.
+    Load options defined in config.
 
     Settings are loaded in priority order, where higher
     priority settings override lower.
 
-    1. Command line
-    2. Django Settings
-    3. Config files
-    4. pyproject.toml
+    1. Django Settings
+    2. Config files
+    3. pyproject.toml
+
+    Any command line options then override config file args.
     """
 
-    django_settings_options = read_django_settings(options)
-    config_options = read_config_file(options)
+    # Parse args to get the relevant options for the current command
+    args = parser.parse_args()
+    options = vars(args)
+
+    # Retrieve relevant config values
     toml_options = read_toml_file(options)
-    for k, v in itertools.chain(
-        toml_options.items(),
-        config_options.items(),
-        django_settings_options.items(),
-    ):
-        if not options[k]:
-            options[k] = v
+    config_options = read_config_file(options)
+    django_settings_options = read_django_settings(options)
 
-    configure_logging(options["verbosity"])
+    # Merge values from configs in priority order toml -> conf -> settings
+    conf_options = {k:v for k,v in itertools.chain(toml_options.items(),config_options.items(),django_settings_options.items())}
 
-    return options
+    # Override default argparse arguments with conf options
+    parser.set_defaults(**conf_options)
 
 
 def read_django_settings(options: dict[str, Any]) -> dict[str, Any]:

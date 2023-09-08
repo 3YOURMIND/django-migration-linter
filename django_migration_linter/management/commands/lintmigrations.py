@@ -9,9 +9,10 @@ from django.core.management.base import BaseCommand, CommandParser
 from ...constants import __version__
 from ...migration_linter import MessageType, MigrationLinter
 from ..utils import (
+    configure_logging,
     extract_warnings_as_errors_option,
-    load_config,
     register_linting_configuration_options,
+    set_defaults_from_conf,
 )
 
 
@@ -120,10 +121,11 @@ class Command(BaseCommand):
             help="don't print linting messages to stdout",
         )
         register_linting_configuration_options(parser)
+        set_defaults_from_conf(parser)
 
     def handle(self, *args, **options):
 
-        options = load_config(options)
+        configure_logging(options["verbosity"])
        
         (
             warnings_as_errors_tests,
