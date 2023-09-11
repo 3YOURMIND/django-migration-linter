@@ -1,0 +1,3 @@
+[tool.django_migration_linter]
+sql_analyser = "postgresql"
+not_a_real_setting = true

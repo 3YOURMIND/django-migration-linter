@@ -99,3 +99,7 @@ The migration test codes can be found in the [corresponding source code files](.
 [3YOURMIND](https://www.3yourmind.com/) is running the linter on every build getting pushed through CI.
 That enables to be sure that the migrations will allow A/B testing, Blue/Green deployment, and they won't break your development environment.
 A non-zero error code is returned to express that at least one invalid migration has been found.
+
+
+## Postgis
+You might be able to get away with using the `postgresql` sql analyser option with PostGIS. This can be configured using the `sql_analyser` option.

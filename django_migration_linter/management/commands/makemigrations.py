@@ -17,6 +17,7 @@ from ..utils import (
     configure_logging,
     extract_warnings_as_errors_option,
     register_linting_configuration_options,
+    set_defaults_from_conf,
 )
 
 
@@ -45,14 +46,17 @@ class Command(MakeMigrationsCommand):
             help="Lint newly generated migrations.",
         )
         register_linting_configuration_options(parser)
+        set_defaults_from_conf(parser)
+
 
     def handle(self, *app_labels, **options):
+        configure_logging(options["verbosity"])
+
         self.lint = options["lint"]
         self.database = options["database"]
         self.exclude_migrations_tests = options["exclude_migration_tests"]
         self.warnings_as_errors = options["warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
-        configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
 
     def write_migration_files(self, changes: dict[str, list[Migration]]) -> None:
