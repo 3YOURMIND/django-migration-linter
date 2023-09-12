@@ -7,8 +7,9 @@ import logging
 import os
 import re
 from enum import Enum, unique
+from importlib.util import find_spec
 from subprocess import PIPE, Popen
-from typing import Callable, Iterable
+from typing import Callable, Dict, Iterable
 
 from django.conf import settings
 from django.core.management import call_command
@@ -379,25 +380,38 @@ class MigrationLinter:
         ).format(self.django_path, git_commit_id)
         logger.info(f"Executing {git_diff_command}")
         diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
+
+        path_to_migration: Dict[str, Migration] = {}
+        for migration in self._gather_all_migrations():
+            spec = find_spec(migration.__module__)
+            if spec:
+                path_to_migration[str(spec.origin)] = migration
+
         for line in map(
             clean_bytes_to_str, diff_process.stdout.readlines()  # type: ignore
         ):
             # Only gather lines that include added migrations
             if self.is_migration_file(line):
-                app_label, name = split_migration_path(line)
-                if migrations_list is None or (app_label, name) in migrations_list:
-                    if (app_label, name) in self.migration_loader.disk_migrations:
-                        migration = self.migration_loader.disk_migrations[
-                            app_label, name
-                        ]
+                suitable_migrations = [
+                    migration
+                    for path, migration in path_to_migration.items()
+                    if path.endswith(line)
+                ]
+                if suitable_migrations:
+                    migration = suitable_migrations[0]
+                    if (
+                        migrations_list is None
+                        or (migration.app_label, migration.name) in migrations_list
+                    ):
                         migrations.append(migration)
-                    else:
-                        logger.info(
-                            "Found migration file (%s, %s) "
-                            "that is not present in loaded migration.",
-                            app_label,
-                            name,
-                        )
+                else:
+                    app_label, name = split_migration_path(line)
+                    logger.info(
+                        "Found migration file (%s, %s) "
+                        "that is not present in loaded migration.",
+                        app_label,
+                        name,
+                    )
         diff_process.wait()
 
         if diff_process.returncode != 0:

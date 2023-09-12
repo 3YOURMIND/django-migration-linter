@@ -8,6 +8,9 @@ from django.core.management import call_command
 
 from django_migration_linter import MigrationLinter
 from tests import fixtures
+from tests.test_project.app_with_custom_name.apps import DefaultConfig
+
+V014_REVISION = "1245e7939dde000af1fd888070c2bd14b5ba29c6"
 
 
 class BaseBackwardCompatibilityDetection:
@@ -39,15 +42,19 @@ class BaseBackwardCompatibilityDetection:
         self.assertNotEqual(linter.nb_valid + linter.nb_erroneous, 0)
 
     def _launch_linter(self, app=None, commit_id=None):
-        linter = MigrationLinter(
+        linter = self._get_linter()
+        linter.lint_all_migrations(app_label=app, git_commit_id=commit_id)
+        return linter
+
+    def _get_linter(self):
+        return MigrationLinter(
             self.test_project_path,
             database=self.database,
             no_cache=True,
         )
-        linter.lint_all_migrations(app_label=app, git_commit_id=commit_id)
-        return linter
 
-    # *** Tests ***
+
+class BaseBackwardCompatibilityDetectionTests(BaseBackwardCompatibilityDetection):
     def test_create_table_with_not_null_column(self):
         app = fixtures.CREATE_TABLE_WITH_NOT_NULL_COLUMN
         self._test_linter_finds_no_errors(app)
@@ -105,7 +112,7 @@ class BaseBackwardCompatibilityDetection:
         self._test_linter_finds_no_errors(app)
 
     def test_with_git_ref(self):
-        self._test_linter_finds_errors(commit_id="v0.1.4")
+        self._test_linter_finds_errors(commit_id=V014_REVISION)
 
     def test_failing_get_sql(self):
         call_command("migrate", "app_unique_together", database=self.database)
@@ -116,7 +123,7 @@ class BaseBackwardCompatibilityDetection:
 
 
 class SqliteBackwardCompatibilityDetectionTestCase(
-    BaseBackwardCompatibilityDetection, unittest.TestCase
+    BaseBackwardCompatibilityDetectionTests, unittest.TestCase
 ):
     databases = ["sqlite"]
 
@@ -135,13 +142,13 @@ class SqliteBackwardCompatibilityDetectionTestCase(
 
 
 class MySqlBackwardCompatibilityDetectionTestCase(
-    BaseBackwardCompatibilityDetection, unittest.TestCase
+    BaseBackwardCompatibilityDetectionTests, unittest.TestCase
 ):
     databases = ["mysql"]
 
 
 class PostgresqlBackwardCompatibilityDetectionTestCase(
-    BaseBackwardCompatibilityDetection, unittest.TestCase
+    BaseBackwardCompatibilityDetectionTests, unittest.TestCase
 ):
     databases = ["postgresql"]
 
@@ -153,3 +160,26 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
         linter = self._launch_linter(fixtures.CREATE_INDEX_EXCLUSIVE)
         self.assertFalse(linter.has_errors)
         self.assertTrue(linter.nb_warnings)
+
+
+class CustomNamedAppGatherMigrationsTestCase(
+    BaseBackwardCompatibilityDetection, unittest.TestCase
+):
+    databases = ["sqlite"]
+
+    def test_custom_named_app_gather_all_migrations(self):
+        linter = self._get_linter()
+        app_labels = [
+            migration.app_label for migration in linter._gather_all_migrations()
+        ]
+        self.assertNotIn(fixtures.CUSTOM_APP_NAME, app_labels)
+        self.assertIn(DefaultConfig.label, app_labels)
+
+    def test_custom_named_app_gather_git_migrations(self):
+        linter = self._get_linter()
+        app_labels = [
+            migration.app_label
+            for migration in linter._gather_migrations_git(V014_REVISION)
+        ]
+        self.assertNotIn(fixtures.CUSTOM_APP_NAME, app_labels)
+        self.assertIn(DefaultConfig.label, app_labels)
