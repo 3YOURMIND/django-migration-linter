@@ -3,6 +3,7 @@
 Miscellaneous:
 
 - Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
+- Add support for Python 3.12
 
 ## 5.0.0
 
