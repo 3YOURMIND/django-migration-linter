@@ -18,3 +18,4 @@ env/
 venv/
 .python-version
 sqlite3
+.DS_Store
