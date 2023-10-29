@@ -1,6 +1,8 @@
+prune tests
 include README.md
 include LICENSE
 include CHANGELOG.md
 include MANIFEST.in
 recursive-include docs *
 include tox.ini
+include pyproject.toml

@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-migration-linter"
+version = "5.0.0"
+description = "Detect backward incompatible migrations for your django project"
+authors = [
+  { name="3YOURMIND GmbH", email="fb@3yourmind.com" },
+]
+maintainers = [{name = "David Wobrock", email = "david.wobrock@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "django>=2.2",
+    "appdirs>=1.4.3",
+    "toml>=0.10.2",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+keywords = [
+    "django",
+    "migration",
+    "lint",
+    "linter",
+    "database",
+    "backward",
+    "compatibility",
+]
+
+
+[project.urls]
+Changelog = "https://github.com/3YOURMIND/django-migration-linter/blob/main/CHANGELOG.md"
+Repository = "https://github.com/3YOURMIND/django-migration-linter"
+
+[project.optional-dependencies]
+test = [
+    "tox>=4.6.3",
+    "mysqlclient>=2.1.1",
+    "psycopg2>=2.9.6",
+    "django_add_default_value>=0.4.0",
+    "coverage>=7.2.7",
+]
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = "True"
+force_grid_wrap = 0
+use_parentheses = "True"
+ensure_newline_before_comments = "True"
+line_length = 88
+add_imports = [ "from __future__ import annotations" ]
