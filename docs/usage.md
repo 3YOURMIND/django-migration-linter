@@ -92,7 +92,7 @@ You can also ignore backward incompatible migration tests by adding this option 
 
 `python manage.py lintmigrations --exclude-migration-tests ALTER_COLUMN`
 
-The migration test codes can be found in the [corresponding source code files](../django_migration_linter/sql_analyser/base.py).
+The migration test codes can be found in the [corresponding source code files](../src/django_migration_linter/sql_analyser/base.py).
 
 ## Production usage example
 
