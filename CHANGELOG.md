@@ -1,3 +1,10 @@
+## 5.x.y
+
+Miscellaneous:
+
+- Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
+- Add support for Python 3.12
+
 ## 5.0.0
 
 - **Breaking change**: stop silently ignoring when the internal `sqlmigrate` call fails and the linter cannot analyse the migration.
