@@ -74,6 +74,12 @@ class MySqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
 
+    def test_add_trigger(self):
+        sql = [
+            'CREATE OR REPLACE FUNCTION "public"._pgtrigger_should_ignore( trigger_name NAME ) RETURNS BOOLEAN AS $$ DECLARE _pgtrigger_ignore TEXT[]; _result BOOLEAN; BEGIN BEGIN SELECT INTO _pgtrigger_ignore CURRENT_SETTING(\'pgtrigger.ignore\'); EXCEPTION WHEN OTHERS THEN END; IF _pgtrigger_ignore IS NOT NULL THEN SELECT trigger_name = ANY(_pgtrigger_ignore) INTO _result; RETURN _result; ELSE RETURN FALSE; END IF; END; $$ LANGUAGE plpgsql; CREATE OR REPLACE FUNCTION pgtrigger_update_field_5d480() RETURNS TRIGGER AS $$ BEGIN IF ("public"._pgtrigger_should_ignore(TG_NAME) IS TRUE) THEN IF (TG_OP = \'DELETE\') THEN RETURN OLD; ELSE RETURN NEW; END IF; END IF; NEW.field := 1; RETURN NEW; END; $$ LANGUAGE plpgsql; DROP TRIGGER IF EXISTS pgtrigger_update_field_5d480 ON "app_add_trigger_a"; CREATE TRIGGER pgtrigger_update_field_5d480 BEFORE UPDATE ON "app_add_trigger_a" FOR EACH ROW WHEN (OLD."field" IS NOT DISTINCT FROM NEW."field") EXECUTE PROCEDURE pgtrigger_update_field_5d480(); COMMENT ON TRIGGER pgtrigger_update_field_5d480 ON "app_add_trigger_a" IS \'8d42224131cefae42a0fa95e72ee29e16e2058ad\'; ; COMMIT;'
+        ]
+        self.assertValidSql(sql)
+
     def test_unique_together(self):
         sql = "ALTER TABLE `app_unique_together_a` ADD CONSTRAINT `app_unique_together_a_int_field_char_field_979ac7d8_uniq` UNIQUE (`int_field`, `char_field`);"
         self.assertBackwardIncompatibleSql(sql)
