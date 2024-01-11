@@ -374,11 +374,21 @@ class MigrationLinter:
     ) -> Iterable[Migration]:
         migrations = []
         # Get changes since specified commit
-        git_diff_command = (
-            "cd {} && git diff --relative --name-only --diff-filter=AR {}"
-        ).format(self.django_path, git_commit_id)
-        logger.info(f"Executing {git_diff_command}")
-        diff_process = Popen(git_diff_command, shell=True, stdout=PIPE, stderr=PIPE)
+        git_diff_command = [
+            "git",
+            "diff",
+            "--relative",
+            "--name-only",
+            "--diff-filter=AR",
+            git_commit_id,
+        ]
+        logger.info(f"Executing {git_diff_command} (in {self.django_path})")
+        diff_process = Popen(
+            git_diff_command,
+            stdout=PIPE,
+            stderr=PIPE,
+            cwd=self.django_path,
+        )
         for line in map(
             clean_bytes_to_str, diff_process.stdout.readlines()  # type: ignore
         ):
