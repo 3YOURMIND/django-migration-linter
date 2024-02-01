@@ -6,6 +6,7 @@ Feature:
 
 Bug:
 - Don't detect 'IS NOT NULL' as backward incompatible changes (issue #263)
+- Don't consider UNIQUE INDEX creation as making a column not nullable
 
 Miscellaneous:
 
