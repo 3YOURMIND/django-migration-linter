@@ -37,7 +37,9 @@ def has_not_null_column(sql_statements: list[str], **kwargs) -> bool:
 
     for sql in sql_statements:
         if re.search("(?<!DROP )(?<!IS )NOT NULL", sql) and not (
-            sql.startswith("CREATE TABLE") or sql.startswith("CREATE INDEX")
+            sql.startswith("CREATE TABLE")
+            or sql.startswith("CREATE INDEX")
+            or sql.startswith("CREATE UNIQUE INDEX")
         ):
             not_null_column = True
         if re.search("DEFAULT.*NOT NULL", sql):
