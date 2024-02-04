@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import django
 
 from django.conf import settings
 from django.core.management import CommandParser
@@ -55,9 +56,23 @@ class Command(MakeMigrationsCommand):
         configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
 
-    def write_migration_files(self, changes: dict[str, list[Migration]]) -> None:
-        super().write_migration_files(changes)
+    if django.VERSION >= (4, 2):
 
+        def write_migration_files(
+            self,
+            changes: dict[str, list[Migration]],
+            update_previous_migration_paths: dict[str, str] | None = None,
+        ) -> None:
+            super().write_migration_files(changes, update_previous_migration_paths)
+            self._write_migration_files(changes)
+
+    else:
+
+        def write_migration_files(self, changes: dict[str, list[Migration]]) -> None:
+            super().write_migration_files(changes)
+            self._write_migration_files(changes)
+
+    def _write_migration_files(self, changes: dict[str, list[Migration]]) -> None:
         if (
             not getattr(settings, "MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS", False)
             and not self.lint
