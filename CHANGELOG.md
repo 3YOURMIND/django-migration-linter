@@ -4,6 +4,7 @@ Miscellaneous:
 
 - Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
 - Add support for Python 3.12
+- Avoid git command injections
 
 ## 5.0.0
 
