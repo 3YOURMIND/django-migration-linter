@@ -32,20 +32,22 @@ def update_migration_checks(
 
 def has_not_null_column(sql_statements: list[str], **kwargs) -> bool:
     # TODO: improve to detect that the same column is concerned
-    ends_with_default = False
+    not_null_column = False
+    has_default_value = False
+
     for sql in sql_statements:
+        if re.search("(?<!DROP )(?<!IS )NOT NULL", sql) and not (
+            sql.startswith("CREATE TABLE") or sql.startswith("CREATE INDEX")
+        ):
+            not_null_column = True
+        if re.search("DEFAULT.*NOT NULL", sql):
+            has_default_value = True
         if "SET DEFAULT" in sql:
-            ends_with_default = True
-        elif "DROP DEFAULT" in sql:
-            ends_with_default = False
-    return (
-        any(
-            re.search("(?<!DROP )(?<!IS )NOT NULL", sql)
-            and not (sql.startswith("CREATE TABLE") or sql.startswith("CREATE INDEX"))
-            for sql in sql_statements
-        )
-        and ends_with_default is False
-    )
+            has_default_value = True
+        if "DROP DEFAULT" in sql:
+            has_default_value = False
+
+    return not_null_column and not has_default_value
 
 
 def has_add_unique(sql_statements: list[str], **kwargs) -> bool:
