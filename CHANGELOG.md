@@ -1,5 +1,8 @@
 ## 5.x.y
 
+Bug:
+- Don't detect 'IS NOT NULL' as backward incompatible changes (issue #263)
+
 Miscellaneous:
 
 - Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
