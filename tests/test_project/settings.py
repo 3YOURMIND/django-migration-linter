@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import os
 
+import django
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,6 +60,12 @@ INSTALLED_APPS = [
     "tests.test_project.app_make_not_null_with_lib_default",
     "tests.test_project.app_create_index_exclusive",
 ]
+
+if django.VERSION[0] >= 5:
+    # db_default attribute was only added in Django 5.0
+    INSTALLED_APPS.append(
+        "tests.test_project.app_add_not_null_column_followed_by_db_default"
+    )
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
