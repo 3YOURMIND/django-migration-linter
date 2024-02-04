@@ -5,6 +5,7 @@ Miscellaneous:
 - Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
 - Add support for Python 3.12
 - Avoid git command injections
+- Remove Codecov integration
 
 ## 5.0.0
 
