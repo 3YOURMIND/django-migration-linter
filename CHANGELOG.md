@@ -1,9 +1,15 @@
 ## 5.x.y
 
+Bug:
+- Don't detect 'IS NOT NULL' as backward incompatible changes (issue #263)
+
 Miscellaneous:
 
 - Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
 - Add support for Python 3.12
+- Add support for Django 5.0
+- Avoid git command injections
+- Remove Codecov integration
 
 ## 5.0.0
 
