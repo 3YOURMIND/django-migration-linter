@@ -41,7 +41,11 @@ def has_not_null_column(sql_statements: list[str], **kwargs) -> bool:
     return (
         any(
             re.search("(?<!DROP )(?<!IS )NOT NULL", sql)
-            and not (sql.startswith("CREATE TABLE") or sql.startswith("CREATE INDEX"))
+            and not (
+                sql.startswith("CREATE TABLE")
+                or sql.startswith("CREATE INDEX")
+                or sql.startswith("CREATE UNIQUE INDEX")
+            )
             for sql in sql_statements
         )
         and ends_with_default is False
