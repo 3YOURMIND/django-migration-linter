@@ -175,6 +175,7 @@ class Command(BaseCommand):
             all_warnings_as_errors=all_warnings_as_errors,
             no_output=options["verbosity"] == 0,
             analyser_string=options["sql_analyser"],
+            mute_sqlmigrate_errors=options["mute_sqlmigrate_errors"],
         )
         linter.lint_all_migrations(
             app_label=options["app_label"],

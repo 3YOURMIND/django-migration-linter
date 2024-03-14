@@ -63,6 +63,7 @@ class MigrationLinter:
         all_warnings_as_errors: bool = False,
         no_output: bool = False,
         analyser_string: str | None = None,
+        mute_sqlmigrate_errors: bool = False,
     ):
         # Store parameters and options
         self.django_path = path
@@ -86,6 +87,7 @@ class MigrationLinter:
             settings.DATABASES[self.database]["ENGINE"],
             analyser_string=analyser_string,
         )
+        self.mute_sqlmigrate_errors = mute_sqlmigrate_errors
 
         # Initialise counters
         self.reset_counters()
@@ -321,13 +323,18 @@ class MigrationLinter:
                     database=self.database,
                     stdout=dev_null,
                 )
-        except (ValueError, ProgrammingError):
+        except (ValueError, ProgrammingError) as err:
             logger.warning(
-                "Error while executing sqlmigrate on (%s, %s).",
+                "Error while executing sqlmigrate on (%s, %s) with exception: %s.",
                 app_label,
                 migration_name,
+                str(err),
             )
-            raise
+            if not self.mute_sqlmigrate_errors:
+                raise
+            else:
+                logger.warning("Continuing execution with empty SQL.")
+                sql_statement = ""
         return sql_statement.splitlines()
 
     @staticmethod
