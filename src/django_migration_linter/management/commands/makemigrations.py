@@ -52,6 +52,7 @@ class Command(MakeMigrationsCommand):
         self.exclude_migrations_tests = options["exclude_migration_tests"]
         self.warnings_as_errors = options["warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
+        self.ignore_sqlmigrate_errors = options["ignore_sqlmigrate_errors"]
         configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
 
@@ -92,6 +93,7 @@ class Command(MakeMigrationsCommand):
             warnings_as_errors_tests=warnings_as_errors_tests,
             all_warnings_as_errors=all_warnings_as_errors,
             analyser_string=self.sql_analyser,
+            ignore_sqlmigrate_errors=self.ignore_sqlmigrate_errors,
         )
 
         for app_label, app_migrations in changes.items():

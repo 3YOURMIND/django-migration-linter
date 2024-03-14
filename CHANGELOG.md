@@ -2,6 +2,7 @@
 
 Feature:
 - Support Django 5.0 `db_default` attribute (issue #275)
+- Allow ignoring the failures of `sqlmigrate` commands, with `--ignore-sqlmigrate-errors` option (issue #274)
 
 Bug:
 - Don't detect 'IS NOT NULL' as backward incompatible changes (issue #263)
