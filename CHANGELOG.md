@@ -1,5 +1,8 @@
 ## 5.x.y
 
+Feature:
+- Support Django 5.0 `db_default` attribute (issue #275)
+
 Bug:
 - Don't detect 'IS NOT NULL' as backward incompatible changes (issue #263)
 

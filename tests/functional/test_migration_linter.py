@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import os
 import unittest
+from unittest import skipIf
 
+import django
 from django.conf import settings
 from django.core.management import call_command
 
@@ -88,6 +90,11 @@ class BaseBackwardCompatibilityDetection:
         app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT
         self._test_linter_finds_no_errors(app)
 
+    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
+    def test_accept_not_null_column_followed_by_adding_db_default(self):
+        app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DB_DEFAULT
+        self._test_linter_finds_no_errors(app)
+
     def test_detect_alter_column(self):
         app = fixtures.ALTER_COLUMN
         self._test_linter_finds_no_errors(app)
@@ -126,6 +133,11 @@ class SqliteBackwardCompatibilityDetectionTestCase(
 
     def test_detect_make_column_not_null_with_django_default(self):
         app = fixtures.MAKE_NOT_NULL_WITH_DJANGO_DEFAULT
+        self._test_linter_finds_errors(app)
+
+    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
+    def test_accept_not_null_column_followed_by_adding_db_default(self):
+        app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DB_DEFAULT
         self._test_linter_finds_errors(app)
 
     def test_detect_make_column_not_null_with_lib_default(self):

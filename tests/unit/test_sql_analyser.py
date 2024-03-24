@@ -66,6 +66,15 @@ class MySqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertBackwardIncompatibleSql(sql)
 
+    def test_add_not_null_without_dropping_default(self):
+        sql = (
+            "ALTER TABLE `app_add_not_null_column_a` ADD COLUMN `new_not_null_field` integer DEFAULT 1 NOT NULL;",
+        )
+        self.assertValidSql(sql)
+
+        sql = "ALTER TABLE `app_add_not_null_column_followed_by_default_a` ADD COLUMN `not_null_field_db_default` integer DEFAULT (PI()) NOT NULL;"
+        self.assertValidSql(sql)
+
     def test_add_not_null_followed_by_default(self):
         sql = [
             "ALTER TABLE `app_add_not_null_column_followed_by_default_a` ADD COLUMN `new_not_null_field` integer DEFAULT 1 NOT NULL;",
@@ -147,6 +156,15 @@ class SqliteAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertBackwardIncompatibleSql(sql)
 
+    def test_add_not_null_without_dropping_default(self):
+        sql = [
+            'CREATE TABLE "new__app_add_not_null_column_followed_by_default_a" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "not_null_field_db_default" integer DEFAULT (PI()) NOT NULL, "field" integer NOT NULL, "not_null_field" integer NOT NULL);',
+            'INSERT INTO "new__app_add_not_null_column_followed_by_default_a" ("id", "field", "not_null_field") SELECT "id", "field", "not_null_field" FROM "app_add_not_null_column_followed_by_default_a";',
+            'DROP TABLE "app_add_not_null_column_followed_by_default_a";',
+            'ALTER TABLE "new__app_add_not_null_column_followed_by_default_a" RENAME TO "app_add_not_null_column_followed_by_default_a";',
+        ]
+        self.assertBackwardIncompatibleSql(sql)
+
     def test_create_table_with_not_null(self):
         sql = 'CREATE TABLE "app_create_table_with_not_null_column_a" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "field" varchar(150) NOT NULL);'
         self.assertValidSql(sql)
@@ -206,6 +224,10 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
     def test_alter_column(self):
         sql = 'ALTER TABLE "app_alter_column_a" ALTER COLUMN "field" TYPE varchar(10) USING "field"::varchar(10);'
         self.assertBackwardIncompatibleSql(sql)
+
+    def test_add_not_null_without_dropping_default(self):
+        sql = 'ALTER TABLE "app_add_not_null_column_followed_by_default_a" ADD COLUMN "not_null_field_db_default" integer DEFAULT (PI()) NOT NULL;'
+        self.assertValidSql(sql)
 
     def test_not_null_followed_by_default(self):
         sql = [

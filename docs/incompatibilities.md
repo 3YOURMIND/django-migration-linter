@@ -71,7 +71,7 @@ Only rolling back the code will make all new insertions crash because Django doe
 One would think that adding a default value in Django will prevent these errors.
 
 A common misconception is that the Django default value is translated to a database default.
-But Django actually uses the default value to fill new new column on existing rows and to set an unspecified column value to its default.
+But Django actually uses the default value to fill the new column on existing rows and to set an unspecified column value to its default.
 The latter is done at the application level, by Django and not by the database because the default value was dropped during migration.
 You can read more about this in the [Django and its default values blog post](https://medium.com/botify-labs/django-and-its-default-values-c21a13cff9f).
 
@@ -90,6 +90,7 @@ You can read more about this in the [Django and its default values blog post](ht
 
 :white_check_mark: **Solutions**:
 - Make the column nullable
+- Set a database default using the Django 5.0 attribute `db_default`. See the [Django docs](https://docs.djangoproject.com/en/dev/releases/5.0/#database-computed-default-values)
 - Set a database default using Django's [RunSQL](https://docs.djangoproject.com/en/dev/ref/migration-operations/#django.db.migrations.operations.RunSQL)
 - Set a database default using [django-add-default-value](https://github.com/3YOURMIND/django-add-default-value/)
 
