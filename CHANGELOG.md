@@ -1,5 +1,9 @@
 ## 5.x.y
 
+- ...
+
+## 5.1.0
+
 Feature:
 - Support Django 5.0 `db_default` attribute (issue #275)
 - Allow ignoring the failures of `sqlmigrate` commands, with `--ignore-sqlmigrate-errors` option (issue #274)
