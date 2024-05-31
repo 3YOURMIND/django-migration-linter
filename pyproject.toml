@@ -10,6 +10,7 @@ authors = [
   { name="3YOURMIND GmbH", email="fb@3yourmind.com" },
 ]
 maintainers = [{name = "David Wobrock", email = "david.wobrock@gmail.com"}]
+license = {text = "Apache License 2.0"}
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
