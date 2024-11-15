@@ -231,7 +231,7 @@ class MigrationLinter:
 
     @staticmethod
     def get_migration_hash(app_label: str, migration_name: str) -> str:
-        hash_md5 = hashlib.md5()
+        hash_md5 = hashlib.md5(usedforsecurity=False)
         with open(get_migration_abspath(app_label, migration_name), "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
