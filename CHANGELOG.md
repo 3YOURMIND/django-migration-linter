@@ -8,6 +8,7 @@ Miscellaneous:
 - Add support for Python 3.13
 - Add support for Django 5.1
 - Drop support for Python 3.7 and 3.8
+- Mark md5 hashing as not used for security
 
 ## 5.1.0
 
