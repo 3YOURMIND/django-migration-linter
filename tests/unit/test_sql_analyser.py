@@ -316,6 +316,13 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
         ]
         self.assertValidSql(sql)
         sql = [
+            'CREATE TABLE "films" ("title" text);',
+            'ALTER TABLE "films" ADD CONSTRAINT "title_not_empty" CHECK (char_length("title") > 0)'
+            'CREATE INDEX ON "films" ((lower("title")));',
+        ]
+        self.assertValidSql(sql)
+        # Not the same column or tables.
+        sql = [
             'CREATE TABLE "some_table" ("title" text);',
             'CREATE INDEX ON "films" ((lower("title")));',
         ]
@@ -362,6 +369,23 @@ class PostgresqlAnalyserTestCase(SqlAnalyserTestCase):
             "COMMIT;",
         ]
         self.assertWarningSql(sql, code="CREATE_INDEX_EXCLUSIVE")
+
+    def test_create_index_exclusive_with_prior_table_creation(self):
+        sql = [
+            "BEGIN;",
+            'CREATE TABLE "users" ("email" text);',
+            'CREATE INDEX "user_email" ON "users" ("email");',
+            "COMMIT;",
+        ]
+        self.assertValidSql(sql)
+        sql = [
+            "BEGIN;",
+            'CREATE TABLE "users" ("id" number);',
+            'ALTER TABLE "users" ADD COLUMN "email" varchar(254) NULL;',
+            'CREATE INDEX "user_email" ON "users" ("email");',
+            "COMMIT;",
+        ]
+        self.assertValidSql(sql)
 
     def test_create_concurrently_index_exclusive(self):
         sql = [

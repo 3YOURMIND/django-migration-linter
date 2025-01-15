@@ -1,5 +1,8 @@
 ## 5.x.y
 
+Bug:
+- Don't detect an index creation during a transaction with an exclusive lock, when the table is being created (#264)
+
 Miscellaneous:
 
 - Add support for Python 3.13
