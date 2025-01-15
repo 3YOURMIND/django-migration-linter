@@ -33,12 +33,19 @@ def has_create_index_in_transaction(sql_statements: list[str], **kwargs) -> bool
         # (Most common example is `ALTER TABLE... ADD COLUMN`, then later
         # `CREATE INDEX`)
         if sql.startswith("ALTER TABLE"):
-            return has_create_index(sql_statements[i + 1 :], ignore_concurrently=False)
+            return has_create_index(
+                sql_statements[i + 1 :],
+                sql_statements[:i],
+                ignore_concurrently=False
+            )
     return False
 
 
 def has_create_index(
-    sql_statements: list[str], ignore_concurrently: bool = True, **kwargs
+    sql_statements: list[str],
+    preceding_sql_statements: list[str] = None,
+    ignore_concurrently: bool = True,
+    **kwargs
 ) -> bool:
     regex_result = None
     for sql in sql_statements:
@@ -50,9 +57,11 @@ def has_create_index(
     if not regex_result:
         return False
 
+    all_sql_statements = (preceding_sql_statements or []) + sql_statements
     concerned_table = regex_result.group(2)
     table_is_added_in_transaction = any(
-        sql.startswith(f"CREATE TABLE {concerned_table}") for sql in sql_statements
+        sql.startswith(f"CREATE TABLE {concerned_table}")
+        for sql in all_sql_statements
     )
     return not table_is_added_in_transaction
 
