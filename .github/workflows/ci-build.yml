@@ -28,7 +28,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
     name: Build with Python ${{ matrix.python-version }}
     steps:
@@ -52,12 +52,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install tox==4.6.3
+        run: python -m pip install tox==4.24.1
       - name: Lint with tox
         run: tox
         env:
@@ -89,12 +89,12 @@ jobs:
         # Fetch all tags and branches because tests rely on it
         with:
           fetch-depth: 0
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Install dependencies and coverage
-        run: python -m pip install tox==4.6.3
+        run: python -m pip install tox==4.24.1
       - name: Test with tox with coverage
         run: tox
         env:
