@@ -1,6 +1,9 @@
 ## 5.x.y
 
-- ...
+Miscellaneous:
+
+- Add support for Python 3.13
+- Add support for Django 5.1
 
 ## 5.1.0
 

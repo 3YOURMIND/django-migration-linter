@@ -10,7 +10,7 @@ authors = [
   { name="3YOURMIND GmbH", email="fb@3yourmind.com" },
 ]
 maintainers = [{name = "David Wobrock", email = "david.wobrock@gmail.com"}]
-license = {text = "Apache License 2.0"}
+license = {text = "Apache-2.0"}
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
@@ -28,6 +28,7 @@ classifiers = [
     "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
@@ -36,6 +37,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 keywords = [
     "django",
