@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -14,29 +14,29 @@ repos:
       - id: forbid-submodules
       - id: trailing-whitespace
   - repo: https://github.com/psf/black
-    rev: 24.3.0
+    rev: 25.1.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+    rev: 7.1.2
     hooks:
       - id: flake8
         exclude: ^tests/
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 6.0.1
     hooks:
       - id: isort
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.15.0
     hooks:
       - id: mypy
         additional_dependencies:
-          - types-toml==0.10.8.6
+          - types-toml==0.10.8.20240310
         args:
           - "--ignore-missing-imports"
         exclude: ^tests/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.4
+    rev: v0.9.9
     hooks:
       - id: ruff
         args:
