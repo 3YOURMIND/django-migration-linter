@@ -12,7 +12,7 @@ authors = [
 maintainers = [{name = "David Wobrock", email = "david.wobrock@gmail.com"}]
 license = {text = "Apache-2.0"}
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
     "django>=2.2",
     "appdirs>=1.4.3",
@@ -31,8 +31,6 @@ classifiers = [
     "Framework :: Django :: 5.1",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
