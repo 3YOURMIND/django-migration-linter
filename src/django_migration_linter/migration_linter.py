@@ -64,6 +64,7 @@ class MigrationLinter:
         no_output: bool = False,
         analyser_string: str | None = None,
         ignore_sqlmigrate_errors: bool = False,
+        ignore_initial_migrations: bool = False,
     ):
         # Store parameters and options
         self.django_path = path
@@ -88,6 +89,7 @@ class MigrationLinter:
             analyser_string=analyser_string,
         )
         self.ignore_sqlmigrate_errors = ignore_sqlmigrate_errors
+        self.ignore_initial_migrations = ignore_initial_migrations
 
         # Initialise counters
         self.reset_counters()
@@ -161,7 +163,9 @@ class MigrationLinter:
 
         md5hash = self.get_migration_hash(app_label, migration_name)
 
-        if self.should_ignore_migration(app_label, migration_name, operations):
+        if self.should_ignore_migration(
+            app_label, migration_name, operations, is_initial=migration.initial
+        ):
             self.print_linting_msg(
                 app_label, migration_name, "IGNORE", MessageType.IGNORE
             )
@@ -445,7 +449,11 @@ class MigrationLinter:
                     yield migration
 
     def should_ignore_migration(
-        self, app_label: str, migration_name: str, operations: Iterable[Operation] = ()
+        self,
+        app_label: str,
+        migration_name: str,
+        operations: Iterable[Operation] = (),
+        is_initial: bool = False,
     ) -> bool:
         return (
             (self.include_apps and app_label not in self.include_apps)
@@ -471,6 +479,7 @@ class MigrationLinter:
                 and (app_label, migration_name)
                 in self.migration_loader.applied_migrations
             )
+            or (self.ignore_initial_migrations and is_initial)
         )
 
     def analyse_data_migration(

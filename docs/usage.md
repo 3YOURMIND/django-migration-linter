@@ -48,6 +48,7 @@ If you are using a config file, replace any dashes (`-`) with an underscore (`_`
 | `--warnings-as-errors [MIGRATION_TEST_CODE [...]]`    | Handle warnings as errors and therefore return an error status code if we should. Optionally specify migration test codes to handle as errors. When no test code specified, all warnings are handled as errors. |
 | `--sql-analyser`                                      | Specify the SQL analyser that should be used. Allowed values: 'sqlite', 'mysql', 'postgresql'.                                                                                                                  |
 | `--ignore-sqlmigrate-errors`                          | Ignore failures of sqlmigrate commands.                                                                                                                                                                         |
+| `--ignore-initial-migrations`                         | Ignore initial migrations.                                                                                                                                                                                      |
 
 ## Django settings configuration
 
@@ -86,6 +87,7 @@ class Migration(migrations.Migration):
 ```
 
 Or you can restrict the migrations that should be selected by a file containing there paths with the `--include-migrations-from` option.
+Or you can ignore all initial migrations with the `--ignore-initial-migrations` option.
 
 ## Ignoring migration tests
 

@@ -1,5 +1,8 @@
 ## 5.x.y
 
+Feature:
+- Allow ignoring all initial migrations, with `--ignore-initial-migrations`
+
 Bug:
 - Don't detect an index creation during a transaction with an exclusive lock, when the table is being created (#264)
 
