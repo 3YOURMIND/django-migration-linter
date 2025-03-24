@@ -170,3 +170,15 @@ class LinterFunctionsTestCase(unittest.TestCase):
             ]
         )
         self.assertEqual(2, len(list(migrations)))
+
+    def test_ignore_initial_migrations(self):
+        linter = MigrationLinter(ignore_initial_migrations=True)
+
+        self.assertTrue(
+            linter.should_ignore_migration(
+                "app_correct", "0001_initial", is_initial=True
+            )
+        )
+        self.assertFalse(
+            linter.should_ignore_migration("app_correct", "0002_foo", is_initial=False)
+        )

@@ -176,6 +176,7 @@ class Command(BaseCommand):
             no_output=options["verbosity"] == 0,
             analyser_string=options["sql_analyser"],
             ignore_sqlmigrate_errors=options["ignore_sqlmigrate_errors"],
+            ignore_initial_migrations=options["ignore_initial_migrations"],
         )
         linter.lint_all_migrations(
             app_label=options["app_label"],
