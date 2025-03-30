@@ -1,4 +1,8 @@
-## 5.x.y
+## x.y.z
+
+...
+
+## 5.2.0
 
 Feature:
 - Allow ignoring all initial migrations, with `--ignore-initial-migrations`
