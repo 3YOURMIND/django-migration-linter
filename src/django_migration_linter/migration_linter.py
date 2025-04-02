@@ -396,7 +396,7 @@ class MigrationLinter:
             "diff",
             "--relative",
             "--name-only",
-            "--diff-filter=AR",
+            "--diff-filter=AMR",
             git_commit_id,
         ]
         logger.info(f"Executing {git_diff_command} (in {self.django_path})")
