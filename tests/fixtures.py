@@ -11,6 +11,9 @@ ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT = "app_add_not_null_column_followed_by_d
 ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DB_DEFAULT = (
     "app_add_not_null_column_followed_by_db_default"
 )
+ADD_NOT_NULL_COLUMN_WITH_NULL_DB_DEFAULT = (
+    "app_add_not_null_column_with_null_db_default"
+)
 ALTER_COLUMN = "app_alter_column"
 ALTER_COLUMN_DROP_NOT_NULL = "app_alter_column_drop_not_null"
 DROP_UNIQUE_TOGETHER = "app_unique_together"
