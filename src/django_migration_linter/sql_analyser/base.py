@@ -42,9 +42,9 @@ def has_not_null_column(sql_statements: list[str], **kwargs) -> bool:
             or sql.startswith("CREATE UNIQUE INDEX")
         ):
             not_null_column = True
-        if re.search("DEFAULT.*NOT NULL", sql):
+        if re.search("DEFAULT (?!NULL).*NOT NULL", sql):
             has_default_value = True
-        if "SET DEFAULT" in sql:
+        if "SET DEFAULT" in sql and "SET DEFAULT NULL" not in sql:
             has_default_value = True
         if "DROP DEFAULT" in sql:
             has_default_value = False

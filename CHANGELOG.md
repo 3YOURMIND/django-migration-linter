@@ -4,6 +4,9 @@ Feature:
 - **Breaking change**: Handle custom Django app label when gathering migrations from git reference. (#262)
 This means that, an app that was previously referenced by its folder name, will now be referenced by its Django app label.
 
+Bug:
+- Consider `DEFAULT NULL` as no default value being defined (#302)
+
 Miscellaneous:
 - Add py.typed file (#303)
 - Add support for Django 5.2 (#304)
