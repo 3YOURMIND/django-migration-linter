@@ -7,6 +7,7 @@ from unittest import skipIf
 import django
 from django.conf import settings
 from django.core.management import call_command
+from django.test import override_settings
 
 from django_migration_linter import MigrationLinter
 from tests import fixtures
@@ -166,6 +167,15 @@ class SqliteBackwardCompatibilityDetectionTestCase(
         app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DB_DEFAULT
         self._test_linter_finds_errors(app)
 
+    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
+    @override_settings(
+        INSTALLED_APPS=settings.INSTALLED_APPS
+        + ["tests.test_project.app_add_not_null_column_with_null_db_default"]
+    )
+    def test_detected_not_null_column_with_null_db_default(self):
+        app = fixtures.ADD_NOT_NULL_COLUMN_WITH_NULL_DB_DEFAULT
+        self._test_linter_finds_errors(app)
+
     def test_detect_make_column_not_null_with_lib_default(self):
         # The 'django-add-default-value' doesn't handle sqlite correctly
         app = fixtures.MAKE_NOT_NULL_WITH_LIB_DEFAULT
@@ -176,6 +186,9 @@ class MySqlBackwardCompatibilityDetectionTestCase(
     BaseBackwardCompatibilityDetection, unittest.TestCase
 ):
     databases = ["mysql"]
+
+    # test_detected_not_null_column_with_null_db_default is not included for mysql, because the setup raises
+    # django.db.utils.OperationalError: (1067, "Invalid default value for 'not_null_field_db_default_null'")
 
 
 class PostgresqlBackwardCompatibilityDetectionTestCase(
@@ -191,3 +204,12 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
         linter = self._launch_linter(fixtures.CREATE_INDEX_EXCLUSIVE)
         self.assertFalse(linter.has_errors)
         self.assertTrue(linter.nb_warnings)
+
+    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
+    @override_settings(
+        INSTALLED_APPS=settings.INSTALLED_APPS
+        + ["tests.test_project.app_add_not_null_column_with_null_db_default"]
+    )
+    def test_detected_not_null_column_with_null_db_default(self):
+        app = fixtures.ADD_NOT_NULL_COLUMN_WITH_NULL_DB_DEFAULT
+        self._test_linter_finds_errors(app)
