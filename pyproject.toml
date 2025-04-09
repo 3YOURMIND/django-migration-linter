@@ -47,10 +47,12 @@ keywords = [
     "compatibility",
 ]
 
-
 [project.urls]
 Changelog = "https://github.com/3YOURMIND/django-migration-linter/blob/main/CHANGELOG.md"
 Repository = "https://github.com/3YOURMIND/django-migration-linter"
+
+[tool.setuptools.package-data]
+django_migration_linter = ['py.typed']
 
 [project.optional-dependencies]
 test = [
