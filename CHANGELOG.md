@@ -1,6 +1,8 @@
 ## x.y.z
 
-...
+Miscellaneous:
+
+- Add py.typed file
 
 ## 5.2.0
 
