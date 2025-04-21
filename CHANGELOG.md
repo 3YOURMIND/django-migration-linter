@@ -6,6 +6,7 @@ This means that, an app that was previously referenced by its folder name, will 
 
 Miscellaneous:
 - Add py.typed file (#303)
+- Add support for Django 5.2 (#304)
 
 ## 5.2.0
 
@@ -16,7 +17,6 @@ Bug:
 - Don't detect an index creation during a transaction with an exclusive lock, when the table is being created (#264)
 
 Miscellaneous:
-
 - Add support for Python 3.13
 - Add support for Django 5.1
 - Drop support for Python 3.7 and 3.8
@@ -33,7 +33,6 @@ Bug:
 - Don't consider UNIQUE INDEX creation as making a column not nullable
 
 Miscellaneous:
-
 - Migrated from `setup.py` and `setup.cfg` to `pyproject.toml`
 - Add support for Python 3.12
 - Add support for Django 5.0
@@ -48,18 +47,15 @@ One common reason for such an error is the SQL generation which requires the dat
 The crash is a sign to double-check the migration. But if you are certain the migration is safe, you can ignore it (issue #209)
 
 Features:
-
 - Fixed `RunPython` model import check when using a `through` object like `MyModel.many_to_many.through.objects.filter(...)` (issue #218)
 - Mark the `IgnoreMigration` operation as `elidable=True`
 - Handle `functools.partial` functions in RunPython data migrations
 - Add a new check, `CREATE_INDEX_EXCLUSIVE` to detect index creation while an exclusive lock is held
 
 Bug:
-
 - Don't detect not nullable field on partial index creation (issue #250)
 
 Miscellaneous:
-
 - Add support for Python 3.11
 - Add support for Django 4.1
 - Add support for Django 4.2
