@@ -16,7 +16,7 @@ def has_not_null_column(sql_statements, **kwargs):
             ends_with_default = False
     return (
         any(
-            re.search("(?<!DROP )NOT NULL", sql) and not sql.startswith("CREATE TABLE")
+            re.search(r"(?<!DROP )NOT NULL", sql) and not sql.startswith("CREATE TABLE")
             for sql in sql_statements
         )
         and ends_with_default is False
@@ -27,8 +27,8 @@ def has_add_unique(sql_statements, **kwargs):
     regex_result = None
     for sql in sql_statements:
         regex_result = re.search(
-            "ALTER TABLE (.*) ADD CONSTRAINT .* UNIQUE", sql
-        ) or re.search('CREATE UNIQUE INDEX .* ON (".*?")', sql)
+           r"ALTER TABLE (.*) ADD CONSTRAINT .* UNIQUE", sql
+        ) or re.search(r'CREATE UNIQUE INDEX .* ON (".*?")', sql)
         if regex_result:
             break
     if not regex_result:
@@ -46,8 +46,8 @@ class BaseAnalyser(object):
     base_migration_tests = [
         {
             "code": "RENAME_TABLE",
-            "fn": lambda sql, **kw: re.search("RENAME TABLE", sql)
-            or re.search("ALTER TABLE .* RENAME TO", sql),
+            "fn": lambda sql, **kw: re.search(r"RENAME TABLE", sql)
+            or re.search(r"ALTER TABLE .* RENAME TO", sql),
             "msg": "RENAMING tables",
             "mode": "one_liner",
             "type": "error",
@@ -61,7 +61,7 @@ class BaseAnalyser(object):
         },
         {
             "code": "DROP_COLUMN",
-            "fn": lambda sql, **kw: re.search("DROP COLUMN", sql),
+            "fn": lambda sql, **kw: re.search(r"DROP COLUMN", sql),
             "msg": "DROPPING columns",
             "mode": "one_liner",
             "type": "error",
@@ -75,8 +75,8 @@ class BaseAnalyser(object):
         },
         {
             "code": "RENAME_COLUMN",
-            "fn": lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
-            or re.search("ALTER TABLE .* RENAME COLUMN", sql),
+            "fn": lambda sql, **kw: re.search(r"ALTER TABLE .* CHANGE", sql)
+            or re.search(r"ALTER TABLE .* RENAME COLUMN", sql),
             "msg": "RENAMING columns",
             "mode": "one_liner",
             "type": "error",
@@ -84,7 +84,7 @@ class BaseAnalyser(object):
         {
             "code": "ALTER_COLUMN",
             "fn": lambda sql, **kw: re.search(
-                "ALTER TABLE .* ALTER COLUMN .* TYPE", sql
+                r"ALTER TABLE .* ALTER COLUMN .* TYPE", sql
             ),
             "msg": (
                 "ALTERING columns (Could be backward compatible. "
@@ -159,13 +159,13 @@ class BaseAnalyser(object):
     @staticmethod
     def detect_table(sql):
         if isinstance(sql, str):
-            regex_result = re.search("TABLE [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            regex_result = re.search(r"TABLE [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
             if regex_result:
                 return regex_result.group(1)
 
     @staticmethod
     def detect_column(sql):
         if isinstance(sql, str):
-            regex_result = re.search("COLUMN [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            regex_result = re.search(r"COLUMN [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
             if regex_result:
                 return regex_result.group(1)

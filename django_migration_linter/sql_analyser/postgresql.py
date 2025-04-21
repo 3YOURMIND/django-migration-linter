@@ -7,7 +7,7 @@ def has_create_index(sql_statements, **kwargs):
     regex_result = None
     for sql in sql_statements:
         regex_result = re.search(r"CREATE (UNIQUE )?INDEX.*ON (.*) \(", sql)
-        if re.search("INDEX CONCURRENTLY", sql):
+        if re.search(r"INDEX CONCURRENTLY", sql):
             regex_result = None
         elif regex_result:
             break
@@ -26,7 +26,7 @@ def has_add_unique_column(sql_statements, **kwargs):
     regex_result = None
     for sql in sql_statements:
         regex_result = re.search(
-            "ALTER TABLE (.*) ADD COLUMN .*UNIQUE CONSTRAINT.*",
+            r"ALTER TABLE (.*) ADD COLUMN .*UNIQUE CONSTRAINT.*",
             sql
         )
         if regex_result:
@@ -50,7 +50,7 @@ def multiple_table_locks(sql_statements, **kwargs):
     tables = set()
 
     for sql in sql_statements:
-        result = re.search('ALTER TABLE "([\w]+)".*', sql)
+        result = re.search(r'ALTER TABLE "([\w]+)".*', sql)
 
         if result:
             table_name = result.group(1)
@@ -70,8 +70,8 @@ class PostgresqlAnalyser(BaseAnalyser):
         },
         {
             "code": "DROP_INDEX",
-            "fn": lambda sql, **kw: re.search("DROP INDEX", sql)
-            and not re.search("INDEX CONCURRENTLY", sql),
+            "fn": lambda sql, **kw: re.search(r"DROP INDEX", sql)
+            and not re.search(r"INDEX CONCURRENTLY", sql),
             "msg": "DROP INDEX locks table",
             "mode": "one_liner",
             "type": "warning",
