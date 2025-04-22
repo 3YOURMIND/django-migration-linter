@@ -8,7 +8,7 @@ class MySqlAnalyser(BaseAnalyser):
         {
             "code": "ALTER_COLUMN",
             "fn": lambda sql, **kw: re.search(
-                "ALTER TABLE .* MODIFY .* (?!NULL);?$", sql
+               r"ALTER TABLE .* MODIFY .* (?!NULL);?$", sql
             ),
             "mode": "one_liner",
             "type": "error",
@@ -18,9 +18,9 @@ class MySqlAnalyser(BaseAnalyser):
     @staticmethod
     def detect_column(sql):
         if isinstance(sql, str):
-            regex_result = re.search("COLUMN [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            regex_result = re.search(r"COLUMN [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
             if regex_result:
                 return regex_result.group(1)
-            regex_result = re.search("MODIFY [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            regex_result = re.search(r"MODIFY [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
             if regex_result:
                 return regex_result.group(1)

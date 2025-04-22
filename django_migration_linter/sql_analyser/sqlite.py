@@ -7,7 +7,7 @@ class SqliteAnalyser(BaseAnalyser):
     migration_tests = [
         {
             "code": "RENAME_TABLE",
-            "fn": lambda sql, **kw: re.search("ALTER TABLE .* RENAME TO", sql)
+            "fn": lambda sql, **kw: re.search(r"ALTER TABLE .* RENAME TO", sql)
             and "__old" not in sql
             and "new__" not in sql,
             "type": "error",
@@ -26,11 +26,11 @@ class SqliteAnalyser(BaseAnalyser):
         {
             "code": "NOT_NULL",
             "fn": lambda sql_statements, **kw: any(
-                re.search("NOT NULL(?! PRIMARY)(?! DEFAULT)", sql)
+                re.search(r"NOT NULL(?! PRIMARY)(?! DEFAULT)", sql)
                 for sql in sql_statements
             )
             and any(
-                re.search("ALTER TABLE .* RENAME TO", sql)
+                re.search(r"ALTER TABLE .* RENAME TO", sql)
                 and ("__old" in sql or "new__" in sql)
                 for sql in sql_statements
             ),
@@ -42,9 +42,9 @@ class SqliteAnalyser(BaseAnalyser):
     @staticmethod
     def detect_table(sql):
         if isinstance(sql, str):
-            regex_result = re.search("TABLE [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            regex_result = re.search(r"TABLE [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
             if regex_result:
                 return regex_result.group(1)
-            regex_result = re.search("ON [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
+            regex_result = re.search(r"ON [`\"'](.*?)[`\"']", sql, re.IGNORECASE)
             if regex_result:
                 return regex_result.group(1)
