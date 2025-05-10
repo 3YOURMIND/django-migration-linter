@@ -7,6 +7,7 @@ from django_migration_linter.sql_analyser import (
     analyse_sql_statements,
     get_sql_analyser_class,
 )
+from django_migration_linter.sql_analyser.analyser import _load_custom_mapping
 from django_migration_linter.sql_analyser.base import (
     BaseAnalyser,
     Check,
@@ -475,3 +476,24 @@ class CustomAnalyserTestCase(SqlAnalyserTestCase):
     def test_alter_column(self):
         sql = "ALTER TABLE `app_alter_column_a` MODIFY `field` varchar(10) NULL;"
         self.assertValidSql(sql)
+
+
+class TestLoadCustomMapping(unittest.TestCase):
+    def test_load_custom_mapping_string(self):
+        custom_mapping = {"custom": CustomAnalyser}
+        result = _load_custom_mapping(custom_mapping)
+        self.assertEqual(result, {"custom": CustomAnalyser})
+
+    def test_load_custom_mapping_type(self):
+        custom_mapping = {
+            "custom": "tests.unit.test_sql_analyser.CustomAnalyser",
+        }
+        result = _load_custom_mapping(custom_mapping)
+        self.assertEqual(result, {"custom": CustomAnalyser})
+
+    def test_load_custom_mapping_invalid(self):
+        custom_mapping = {
+            "custom": "tests.unit.test_sql_analyser.InvalidClass",
+        }
+        with self.assertRaises(ValueError):
+            _load_custom_mapping(custom_mapping)

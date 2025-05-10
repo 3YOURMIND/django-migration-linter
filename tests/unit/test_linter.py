@@ -61,7 +61,7 @@ class LinterFunctionsTestCase(unittest.TestCase):
         self.assertTrue(linter.has_errors)
 
     def test_has_errors_custom_analyser(self):
-        linter = MigrationLinter(analyser_string="custom", analyser_string_mapping={"custom": CustomAnalyser})
+        linter = MigrationLinter(analyser_string="custom", analyser_string_mapping={"custom": "tests.unit.test_linter.CustomAnalyser"})
         self.assertFalse(linter.has_errors)
 
         m = Migration("0001_initial", "app_rename_column_custom")

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import configparser
 import itertools
+import json
 import os
 import sys
 from importlib import import_module
@@ -216,6 +217,8 @@ class Command(BaseCommand):
 
             config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
             if config_value is not None:
+                if key == "analyser_string_mapping" and isinstance(config_value, str):
+                    config_value = json.loads(config_value)
                 config_options[key] = config_value
         return config_options
 

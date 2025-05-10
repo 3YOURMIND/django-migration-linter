@@ -47,6 +47,7 @@ If you are using a config file, replace any dashes (`-`) with an underscore (`_`
 | `--quiet or -q {ok,ignore,warning,error}`             | Suppress certain output messages, instead of writing them to stdout.                                                                                                                                            |
 | `--warnings-as-errors [MIGRATION_TEST_CODE [...]]`    | Handle warnings as errors and therefore return an error status code if we should. Optionally specify migration test codes to handle as errors. When no test code specified, all warnings are handled as errors. |
 | `--sql-analyser`                                      | Specify the SQL analyser that should be used. Allowed values: 'sqlite', 'mysql', 'postgresql'.                                                                                                                  |
+| `--analyser-string-mapping`                           | Specify a JSON dict of custom SQL analysers with their fully qualified class names. Provide --sql-analyser key to use a custom analyser.                                                                        |
 | `--ignore-sqlmigrate-errors`                          | Ignore failures of sqlmigrate commands.                                                                                                                                                                         |
 | `--ignore-initial-migrations`                         | Ignore initial migrations.                                                                                                                                                                                      |
 
@@ -57,7 +58,10 @@ All settings can be defined in the Django settings:
 ```
 MIGRATION_LINTER_OPTIONS = {
     "no_cache": True,
-    "exclude_apps": ["users"]
+    "exclude_apps": ["users"],
+    "analyser_string_mapping": {
+        "custom_analyser": "test.example.CustomAnalyser",
+    },
 }
 ```
 
@@ -69,6 +73,7 @@ Example `setup.cfg` file:
 [django_migration_linter]
 no_cache = True
 exclude_apps = users
+analyser_string_mapping = {"custom_analyser": "test.example.CustomAnalyser"}
 ```
 
 ## Ignoring migrations
