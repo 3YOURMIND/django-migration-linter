@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterable, Type
+from typing import TYPE_CHECKING, Any, Iterable, Type
 
 if TYPE_CHECKING:
     from sql_analyser.base import Issue
@@ -23,22 +23,24 @@ ANALYSER_STRING_MAPPING: dict[str, Type[BaseAnalyser]] = {
 
 
 def get_sql_analyser_class(
-    database_vendor: str, analyser_string: str | None = None
+    database_vendor: str, analyser_string: str | None = None, **kwargs: Any
 ) -> Type[BaseAnalyser]:
     if analyser_string:
-        return get_sql_analyser_from_string(analyser_string)
+        return get_sql_analyser_from_string(analyser_string, **kwargs)
     return get_sql_analyser_class_from_db_vendor(database_vendor)
 
 
-def get_sql_analyser_from_string(analyser_string: str) -> Type[BaseAnalyser]:
-    if analyser_string not in ANALYSER_STRING_MAPPING:
+def get_sql_analyser_from_string(analyser_string: str, **kwargs) -> Type[BaseAnalyser]:
+    final_mapping = ANALYSER_STRING_MAPPING.copy()
+    final_mapping.update(kwargs.get("analyser_string_mapping", {}))
+    if analyser_string not in final_mapping:
         raise ValueError(
             "Unknown SQL analyser '{}'. Known values: '{}'".format(
                 analyser_string,
-                "','".join(ANALYSER_STRING_MAPPING.keys()),
+                "','".join(final_mapping.keys()),
             )
         )
-    return ANALYSER_STRING_MAPPING[analyser_string]
+    return final_mapping[analyser_string]
 
 
 def get_sql_analyser_class_from_db_vendor(database_vendor: str) -> Type[BaseAnalyser]:
