@@ -64,6 +64,7 @@ class MigrationLinter:
         all_warnings_as_errors: bool = False,
         no_output: bool = False,
         analyser_string: str | None = None,
+        analyser_string_mapping: dict[str, type] | None = None,
         ignore_sqlmigrate_errors: bool = False,
         ignore_initial_migrations: bool = False,
     ):
@@ -88,6 +89,7 @@ class MigrationLinter:
         self.sql_analyser_class = get_sql_analyser_class(
             settings.DATABASES[self.database]["ENGINE"],
             analyser_string=analyser_string,
+            analyser_string_mapping=analyser_string_mapping,
         )
         self.ignore_sqlmigrate_errors = ignore_sqlmigrate_errors
         self.ignore_initial_migrations = ignore_initial_migrations
