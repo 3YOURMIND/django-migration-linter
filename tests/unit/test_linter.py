@@ -75,6 +75,11 @@ class LinterFunctionsTestCase(unittest.TestCase):
             self.assertTrue(linter.has_errors)
             assert "Custom error message" in buffer.getvalue()
 
+        m = Migration("0003_rename_renamed_a_renamed_safe", "app_rename_column_custom")
+        linter.reset_counters()
+        linter.lint_migration(m)
+        self.assertFalse(linter.has_errors)
+
     def test_ignore_migration_include_apps(self):
         linter = MigrationLinter(include_apps=("app_add_not_null_column",))
         self.assertTrue(linter.should_ignore_migration("app_correct", "0001"))
