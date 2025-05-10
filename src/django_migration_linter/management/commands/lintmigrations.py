@@ -176,6 +176,7 @@ class Command(BaseCommand):
             all_warnings_as_errors=all_warnings_as_errors,
             no_output=options["verbosity"] == 0,
             analyser_string=options["sql_analyser"],
+            analyser_string_mapping=options.get("analyser_string_mapping"),
             ignore_sqlmigrate_errors=options["ignore_sqlmigrate_errors"],
             ignore_initial_migrations=options["ignore_initial_migrations"],
         )

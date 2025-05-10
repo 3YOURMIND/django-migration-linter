@@ -43,8 +43,7 @@ def register_linting_configuration_options(parser: CommandParser) -> None:
     parser.add_argument(
         "--analyser-string-mapping",
         nargs="?",
-        choices=list(ANALYSER_STRING_MAPPING.keys()),
-        help="select the SQL analyser",
+        help="JSON dict of custom SQL analysers with their fully qualified class names",
     )
 
     parser.add_argument(
