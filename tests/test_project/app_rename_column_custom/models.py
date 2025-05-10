@@ -4,4 +4,4 @@ from django.db import models
 
 
 class A(models.Model):
-    field = models.IntegerField()
+    renamed = models.IntegerField()
