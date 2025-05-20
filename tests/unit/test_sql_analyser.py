@@ -25,7 +25,9 @@ class SqlAnalyserTestCase(unittest.TestCase):
         if isinstance(sql, str):
             sql = sql.splitlines()
         return analyse_sql_statements(
-            get_sql_analyser_class(self.database_vendor, self.analyzer_string, **self.kwargs),
+            get_sql_analyser_class(
+                self.database_vendor, self.analyzer_string, **self.kwargs
+            ),
             sql_statements=sql,
         )
 
@@ -466,11 +468,13 @@ class CustomAnalyserTestCase(SqlAnalyserTestCase):
     }
 
     def test_get_sql_analyzer_class(self):
-        actual_type = get_sql_analyser_class(self.database_vendor, self.analyzer_string, **self.kwargs)
+        actual_type = get_sql_analyser_class(
+            self.database_vendor, self.analyzer_string, **self.kwargs
+        )
         self.assertEqual(actual_type, CustomAnalyser)
 
     def test_blah_sql(self):
-        sql = 'ALTER table `my_table` BLAH SQL HERE;'
+        sql = "ALTER table `my_table` BLAH SQL HERE;"
         self.assertBackwardIncompatibleSql(sql)
 
     def test_alter_column(self):

@@ -23,7 +23,9 @@ ANALYSER_STRING_MAPPING: dict[str, Type[BaseAnalyser]] = {
 }
 
 
-def _load_custom_mapping(custom_mapping: dict[str, str | Type[BaseAnalyser]]) -> dict[str, Type[BaseAnalyser]]:
+def _load_custom_mapping(
+    custom_mapping: dict[str, str | Type[BaseAnalyser]],
+) -> dict[str, Type[BaseAnalyser]]:
     """
     Load custom mapping for SQL analysers.
     """
@@ -37,13 +39,15 @@ def _load_custom_mapping(custom_mapping: dict[str, str | Type[BaseAnalyser]]) ->
                 result[key] = analyser_class
             except Exception as x:
                 raise ValueError(
-                    f"Custom mapping value for '{key}' must be a fully qualified SQL analyser class name: '{val}'",
+                    f"Custom mapping value for '{key}' must be a fully qualified "
+                    f"SQL analyser class name: '{val}'",
                 ) from x
         elif issubclass(val, BaseAnalyser):
             result[key] = val
         else:
             raise ValueError(
-                f"Custom mapping value for '{key}' must be a fully qualified SQL analyser class name or a subclass of BaseAnalyser: '{val}'",
+                f"Custom mapping value for '{key}' must be a fully qualified "
+                f"SQL analyser class name or a subclass of BaseAnalyser: '{val}'",
             )
     return result
 
