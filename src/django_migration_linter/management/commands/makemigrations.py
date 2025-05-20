@@ -53,9 +53,10 @@ class Command(MakeMigrationsCommand):
         self.exclude_migrations_tests = options["exclude_migration_tests"]
         self.warnings_as_errors = options["warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
-        self.analyser_string_mapping = (
-            json.loads(options.get("analyser_string_mapping", {})) or None
-        )
+        if custom_mapping := options.get("analyser_string_mapping", None):
+            self.analyser_string_mapping = json.loads(custom_mapping)
+        else:
+            self.analyser_string_mapping = None
         self.ignore_sqlmigrate_errors = options["ignore_sqlmigrate_errors"]
         configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
