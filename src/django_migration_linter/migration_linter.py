@@ -104,9 +104,15 @@ class MigrationLinter:
         # Initialise migrations
         from django.db.migrations.loader import MigrationLoader
 
-        self.migration_loader = MigrationLoader(
-            connection=connections[self.database], load=True
-        )
+        if only_applied_migrations or only_unapplied_migrations:
+            self.migration_loader = MigrationLoader(
+                connection=connections[self.database], load=True
+            )
+        else:
+            self.migration_loader = MigrationLoader(
+                connection=connections[self.database], load=False
+            )
+            self.migration_loader.load_disk()
 
     def reset_counters(self) -> None:
         self.nb_valid = 0
