@@ -43,7 +43,7 @@ def has_add_unique_column(sql_statements, **kwargs):
 
 
 def multiple_table_locks(sql_statements, **kwargs):
-    """Returns true if there are more than 2 table locks
+    """Returns true if there are more than 1 table locks
 
     go/created-at-migration-postportem
     """
@@ -56,7 +56,7 @@ def multiple_table_locks(sql_statements, **kwargs):
             table_name = result.group(1)
             tables.add(table_name)
 
-    return len(tables) > 2
+    return len(tables) > 1
 
 
 class PostgresqlAnalyser(BaseAnalyser):
@@ -94,7 +94,7 @@ class PostgresqlAnalyser(BaseAnalyser):
             "code": "MULTIPLE_TABLE_LOCKS",
             "fn": multiple_table_locks,
             "msg": (
-                "Do not lock more than two tables at a time in the same "
+                "Do not lock more than one table at a time in the same "
                 "transaction to minimize the chance of deadlocks and "
                 "production issues. go/created-at-migration-postportem"
             ),
