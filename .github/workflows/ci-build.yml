@@ -33,7 +33,7 @@ jobs:
     name: Build with Python ${{ matrix.python-version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         # Fetch all tags and branches because tests rely on it
         with:
           fetch-depth: 0
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -85,7 +85,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         # Fetch all tags and branches because tests rely on it
         with:
           fetch-depth: 0
