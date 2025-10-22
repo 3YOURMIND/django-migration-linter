@@ -38,6 +38,7 @@ You can ignore checks through the `--exclude-migration-tests` option by specifyi
 | `RUNPYTHON_ARGS_NAMING_CONVENTION` | By convention, RunPython names two arguments: apps, schema_editor                                                                                                                                                                                                                                                                 | Warning      |
 | `RUNPYTHON_MODEL_IMPORT`           | Missing apps.get_model() calls for model                                                                                                                                                                                                                                                                                          | Error        |
 | `RUNPYTHON_MODEL_VARIABLE_NAME`    | The model variable name is different from the model class itself                                                                                                                                                                                                                                                                  | Warning      |
+| `RUNPYTHON_MIXED_OPERATIONS`       | RunPython operation is mixed with schema operations (data migrations should be in separate files)                                                                                                                                                                                                                                 | Error        |
 | `RUNSQL_REVERSIBLE`                | RunSQL data migration is not reversible (missing reverse SQL)                                                                                                                                                                                                                                                                     | Warning      |
 | `CREATE_INDEX`                     | (Postgresql specific) Creating an index without the concurrent keyword will lock the table and may generate downtime                                                                                                                                                                                                              | Warning      |
 | `CREATE_INDEX_EXCLUSIVE`           | (Postgresql specific) Creating an index in a transaction acquiring an `EXCLUSIVE` lock (e.g. most `ALTER TABLE` statements acquire one) prolongs the exclusive lock on the table. Using concurrently clause does not address the issue. On the contrary, it prolongs the transaction, making it more dangerous in this situation. | Warning      |
@@ -176,6 +177,51 @@ However, in a migration, you should be using the version of the model, at the po
 It could happen that you use a `RunPython` operation to fill a new column. But if you import that latest version of the model, this column might not exist anymore, which will break a prior migration.
 
 :white_check_mark: **Solution**: use `apps.get_model` to get the model class
+
+### :arrow_forward: Mixing RunPython with schema operations
+
+Mixing RunPython data migrations with schema operations (like AddField, AlterField, etc.) in the same migration file can lead to serious production issues.
+
+**Why this is problematic**:
+
+1. **Database lock issues**: When running RunPython with data chunking in a transactional migration, you may hold database locks for extended periods, potentially causing downtime
+2. **Atomic flag complications**: If you set `atomic = False` on a migration that contains both data and schema operations, schema changes won't rollback if the data migration fails
+3. **Rollback problems**: When mixing operations, failures in data migration can leave schema changes applied but data changes reverted, creating inconsistent database states
+
+**Forward migration**:
+1. Migration adds a new field and runs RunPython to populate it
+2. If the RunPython operation fails mid-way through a large dataset, the schema change might be committed but data is only partially migrated
+3. Your application may crash because it expects the field to be fully populated
+
+**Rollback**:
+1. If you set `atomic = False` to prevent locks, rolling back becomes problematic
+2. Schema changes may have been committed separately from data changes
+3. You lose the safety of transactional rollback
+
+:white_check_mark: **Solution**: Always separate data migrations into their own files
+
+**Good pattern** (three separate files):
+```python
+# 0001_add_slug_field.py
+operations = [
+    migrations.AddField('model', 'slug', models.CharField(default='')),
+]
+
+# 0002_backfill_slug.py
+class Migration(migrations.Migration):
+    atomic = False  # Safe to set now, only data operations
+
+    operations = [
+        migrations.RunPython(backfill_slug_values),
+    ]
+
+# 0003_make_slug_required.py
+operations = [
+    migrations.AlterField('model', 'slug', models.CharField()),
+]
+```
+
+**Note**: Combining RunPython with RunSQL is acceptable, as both are data migration operations.
 
 ## The special case of sqlite
 

@@ -306,6 +306,67 @@ class DataMigrationModelVariableNamingTestCase(unittest.TestCase):
         self.assertEqual(1, len(issues))
 
 
+class MixedRunPythonOperationsTestCase(unittest.TestCase):
+    def setUp(self):
+        test_project_path = os.path.dirname(settings.BASE_DIR)
+        self.linter = MigrationLinter(
+            test_project_path,
+            include_apps=fixtures.MIXED_RUNPYTHON_OPERATIONS,
+        )
+
+    def test_mixed_runpython_with_schema_operations(self):
+        """Test that mixing RunPython with schema operations produces an error."""
+        mixed_migration = self.linter.migration_loader.disk_migrations[
+            ("app_mixed_runpython_operations", "0002_mixed_operations")
+        ]
+        self.linter.lint_migration(mixed_migration)
+
+        self.assertEqual(1, self.linter.nb_erroneous)
+        self.assertTrue(self.linter.has_errors)
+        self.assertEqual(0, self.linter.nb_valid)
+
+    def test_runpython_only(self):
+        """Test that RunPython-only migrations pass without errors."""
+        runpython_only_migration = self.linter.migration_loader.disk_migrations[
+            ("app_mixed_runpython_operations", "0003_runpython_only")
+        ]
+        self.linter.lint_migration(runpython_only_migration)
+
+        self.assertEqual(0, self.linter.nb_erroneous)
+        self.assertFalse(self.linter.has_errors)
+        # Might have warnings for other checks (reversible, etc), but no errors
+        self.assertTrue(self.linter.nb_valid >= 1 or self.linter.nb_warnings >= 1)
+
+    def test_runpython_with_runsql(self):
+        """Test that RunPython with RunSQL is allowed (both are data migrations)."""
+        mixed_data_migration = self.linter.migration_loader.disk_migrations[
+            ("app_mixed_runpython_operations", "0004_runpython_with_runsql")
+        ]
+        self.linter.lint_migration(mixed_data_migration)
+
+        self.assertEqual(0, self.linter.nb_erroneous)
+        self.assertFalse(self.linter.has_errors)
+
+    def test_exclude_mixed_operations_check(self):
+        """Test that RUNPYTHON_MIXED_OPERATIONS can be excluded."""
+        self.linter = MigrationLinter(
+            os.path.dirname(settings.BASE_DIR),
+            include_apps=fixtures.MIXED_RUNPYTHON_OPERATIONS,
+            exclude_migration_tests=("RUNPYTHON_MIXED_OPERATIONS",),
+        )
+
+        mixed_migration = self.linter.migration_loader.disk_migrations[
+            ("app_mixed_runpython_operations", "0002_mixed_operations")
+        ]
+        self.linter.lint_migration(mixed_migration)
+
+        # Should not error when excluded
+        self.assertEqual(0, self.linter.nb_erroneous)
+        self.assertFalse(self.linter.has_errors)
+        # Should be valid since the check is excluded
+        self.assertEqual(1, self.linter.nb_valid)
+
+
 class RunSQLMigrationTestCase(unittest.TestCase):
     def setUp(self):
         test_project_path = os.path.dirname(settings.BASE_DIR)

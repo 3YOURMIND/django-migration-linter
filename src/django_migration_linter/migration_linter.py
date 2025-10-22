@@ -529,6 +529,17 @@ class MigrationLinter:
             if op_warnings:
                 warnings += op_warnings
 
+        # Check for mixed RunPython and schema operations
+        mixed_errors, mixed_ignored, mixed_warnings = self.check_mixed_runpython_operations(
+            migration.operations
+        )
+        if mixed_errors:
+            errors += mixed_errors
+        if mixed_ignored:
+            ignored += mixed_ignored
+        if mixed_warnings:
+            warnings += mixed_warnings
+
         return errors, ignored, warnings
 
     @staticmethod
@@ -764,3 +775,63 @@ class MigrationLinter:
                 warning += sql_warnings
 
         return error, ignored, warning
+
+    def check_mixed_runpython_operations(
+        self, operations: Iterable[Operation]
+    ) -> tuple[list[Issue], list[Issue], list[Issue]]:
+        """
+        Check if migration mixes RunPython with schema operations.
+
+        Data migrations (RunPython/RunSQL) should be in separate migration files
+        from schema operations to avoid database lock issues and ensure proper
+        rollback behavior.
+
+        Returns:
+            Tuple of (errors, ignored, warnings) where each is a list of Issue objects
+        """
+        errors: list[Issue] = []
+        ignored: list[Issue] = []
+        warnings: list[Issue] = []
+
+        # Check if there are any RunPython operations
+        has_runpython = any(isinstance(op, RunPython) for op in operations)
+
+        if not has_runpython:
+            # No RunPython, nothing to check
+            return errors, ignored, warnings
+
+        # Check for other operation types (schema operations)
+        # RunSQL is allowed with RunPython as both are data migrations
+        # IgnoreMigration is a marker operation
+        # SeparateDatabaseAndState is OK with RunPython (advanced usage)
+        schema_operations = [
+            op
+            for op in operations
+            if not isinstance(op, (RunPython, RunSQL, IgnoreMigration))
+            and op.__class__.__name__ != "SeparateDatabaseAndState"
+        ]
+
+        if schema_operations:
+            # Get unique operation names for better error message
+            operation_names = list(
+                {op.__class__.__name__ for op in schema_operations[:3]}
+            )
+            operation_str = ", ".join(operation_names)
+            if len(schema_operations) > 3:
+                operation_str += "..."
+
+            issue = Issue(
+                code="RUNPYTHON_MIXED_OPERATIONS",
+                message=(
+                    "RunPython operation is mixed with schema operations. "
+                    "Data migrations should be in separate files. "
+                    f"Found schema operations: {operation_str}"
+                ),
+            )
+
+            if issue.code in self.exclude_migration_tests:
+                ignored.append(issue)
+            else:
+                errors.append(issue)
+
+        return errors, ignored, warnings
