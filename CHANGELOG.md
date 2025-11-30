@@ -10,6 +10,7 @@ Bug:
 Miscellaneous:
 - Add py.typed file (#303)
 - Add support for Django 5.2 (#304)
+- Add support for Python 3.14
 
 ## 5.2.0
 
