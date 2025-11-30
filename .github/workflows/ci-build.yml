@@ -33,7 +33,7 @@ jobs:
     name: Build with Python ${{ matrix.python-version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         # Fetch all tags and branches because tests rely on it
         with:
           fetch-depth: 0
@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: python -m pip install tox==4.6.3 tox-gh-actions
+        run: python -m pip install tox==4.30.3 tox-gh-actions
       - name: Test with tox ${{ matrix.python-version }}
         run: tox
 
@@ -51,51 +51,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-      - name: Set up Python 3.12
+        uses: actions/checkout@v6
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - name: Install dependencies
-        run: python -m pip install tox==4.24.1
+        run: python -m pip install tox==4.30.3
       - name: Lint with tox
         run: tox
         env:
           TOXENV: lint
-
-  coverage:
-    name: Generate coverage
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-        # Fetch all tags and branches because tests rely on it
-        with:
-          fetch-depth: 0
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-      - name: Install dependencies and coverage
-        run: python -m pip install tox==4.24.1
-      - name: Test with tox with coverage
-        run: tox
-        env:
-          TOXENV: coverage

@@ -415,7 +415,8 @@ class MigrationLinter:
 
         migrations = []
         for line in map(
-            clean_bytes_to_str, diff_process.stdout.readlines()  # type: ignore
+            clean_bytes_to_str,
+            diff_process.stdout.readlines(),  # type: ignore
         ):
             # Only gather lines that include added migrations.
             if self.is_migration_file(line):
@@ -455,7 +456,8 @@ class MigrationLinter:
         if diff_process.returncode != 0:
             output = []
             for line in map(
-                clean_bytes_to_str, diff_process.stderr.readlines()  # type: ignore
+                clean_bytes_to_str,
+                diff_process.stderr.readlines(),  # type: ignore
             ):
                 output.append(line)
             logger.error("Error while git diff command:\n{}".format("".join(output)))
