@@ -11,6 +11,7 @@ Miscellaneous:
 - Add py.typed file (#303)
 - Add support for Django 5.2 (#304)
 - Add support for Python 3.14
+- Remove coverage from CI
 
 ## 5.2.0
 

@@ -58,11 +58,10 @@ django_migration_linter = ['py.typed']
 
 [project.optional-dependencies]
 test = [
-    "tox>=4.6.3",
+    "tox>=4.30.3",
     "mysqlclient>=2.1.1",
     "psycopg2>=2.9.6",
     "django_add_default_value>=0.4.0",
-    "coverage>=7.2.7",
 ]
 
 [tool.isort]
