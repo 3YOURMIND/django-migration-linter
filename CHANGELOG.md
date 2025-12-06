@@ -12,6 +12,7 @@ Miscellaneous:
 - Add support for Django 5.2 (#304)
 - Add support for Python 3.14
 - Remove coverage from CI
+- Add support for Django 6.0
 
 ## 5.2.0
 
