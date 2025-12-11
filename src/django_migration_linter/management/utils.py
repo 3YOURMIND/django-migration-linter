@@ -41,6 +41,12 @@ def register_linting_configuration_options(parser: CommandParser) -> None:
     )
 
     parser.add_argument(
+        "--analyser-string-mapping",
+        nargs="?",
+        help="JSON dict of custom SQL analysers with their fully qualified class names",
+    )
+
+    parser.add_argument(
         "--ignore-sqlmigrate-errors",
         action="store_true",
         help="ignore failures of sqlmigrate command",
