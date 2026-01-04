@@ -1,3 +1,11 @@
+## 7.0.0
+
+Feature:
+- **Breaking change**: clarify "warning as error" behaviour.
+  - Option `--warnings-as-errors` (both words are plural) is deleted.
+  - Instead, use `--all-warnings-as-errors` to treat all warnings as errors.
+  - Or use `--warning-as-error [MIGRATION_TEST_CODE [...]]` (both words are singular) to specify which linter rules to treat as errors instead of warnings.
+
 ## 6.0.0
 
 Feature:
