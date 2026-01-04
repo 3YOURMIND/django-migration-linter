@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-migration-linter"
-version = "5.2.0"
+version = "6.0.0"
 description = "Detect backward incompatible migrations for your django project"
 authors = [
   { name="3YOURMIND GmbH", email="fb@3yourmind.com" },
