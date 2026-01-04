@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import logging
 
 from django.core.management import CommandParser
@@ -26,11 +27,17 @@ def register_linting_configuration_options(parser: CommandParser) -> None:
     )
 
     parser.add_argument(
-        "--warnings-as-errors",
+        "--all-warnings-as-errors",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="treat all warnings as errors",
+    )
+    parser.add_argument(
+        "--warning-as-error",
         type=str,
         nargs="*",
-        help="handle warnings as errors. Optionally specify the tests to handle as "
-        "errors (e.g. RUNPYTHON_REVERSIBLE)",
+        help="treat specified tests as errors. Specify the tests through their code "
+        "(e.g. RUNPYTHON_REVERSIBLE)",
     )
 
     parser.add_argument(
@@ -62,18 +69,3 @@ def configure_logging(verbosity: int) -> None:
         logger.disabled = True
     else:
         logging.basicConfig(format="%(message)s")
-
-
-def extract_warnings_as_errors_option(
-    warnings_as_errors: list[str] | None,
-) -> tuple[list[str] | None, bool]:
-    if isinstance(warnings_as_errors, list):
-        warnings_as_errors_tests = warnings_as_errors
-        # If the option is specified but without any test codes,
-        # all warnings become errors
-        all_warnings_as_errors = len(warnings_as_errors) == 0
-    else:
-        warnings_as_errors_tests = None
-        all_warnings_as_errors = False
-
-    return warnings_as_errors_tests, all_warnings_as_errors

@@ -13,11 +13,7 @@ from django.db.migrations.writer import MigrationWriter
 
 from django_migration_linter import MigrationLinter
 
-from ..utils import (
-    configure_logging,
-    extract_warnings_as_errors_option,
-    register_linting_configuration_options,
-)
+from ..utils import configure_logging, register_linting_configuration_options
 
 
 def ask_should_keep_migration() -> bool:
@@ -50,7 +46,8 @@ class Command(MakeMigrationsCommand):
         self.lint = options["lint"]
         self.database = options["database"]
         self.exclude_migrations_tests = options["exclude_migration_tests"]
-        self.warnings_as_errors = options["warnings_as_errors"]
+        self.warning_as_error = options["warning_as_error"]
+        self.all_warnings_as_errors = options["all_warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
         self.ignore_sqlmigrate_errors = options["ignore_sqlmigrate_errors"]
         configure_logging(options["verbosity"])
@@ -79,19 +76,14 @@ class Command(MakeMigrationsCommand):
             else default_should_keep_migration
         )
 
-        (
-            warnings_as_errors_tests,
-            all_warnings_as_errors,
-        ) = extract_warnings_as_errors_option(self.warnings_as_errors)
-
         # Lint migrations.
         linter = MigrationLinter(
             path=os.environ["DJANGO_SETTINGS_MODULE"],
             database=self.database,
             no_cache=True,
             exclude_migration_tests=self.exclude_migrations_tests,
-            warnings_as_errors_tests=warnings_as_errors_tests,
-            all_warnings_as_errors=all_warnings_as_errors,
+            warnings_as_errors_tests=self.warning_as_error,
+            all_warnings_as_errors=self.all_warnings_as_errors,
             analyser_string=self.sql_analyser,
             ignore_sqlmigrate_errors=self.ignore_sqlmigrate_errors,
         )
