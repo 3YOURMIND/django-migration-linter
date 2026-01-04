@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 
 from django.conf import settings
@@ -52,6 +53,10 @@ class Command(MakeMigrationsCommand):
         self.exclude_migrations_tests = options["exclude_migration_tests"]
         self.warnings_as_errors = options["warnings_as_errors"]
         self.sql_analyser = options["sql_analyser"]
+        if custom_mapping := options.get("analyser_string_mapping", None):
+            self.analyser_string_mapping = json.loads(custom_mapping)
+        else:
+            self.analyser_string_mapping = None
         self.ignore_sqlmigrate_errors = options["ignore_sqlmigrate_errors"]
         configure_logging(options["verbosity"])
         return super().handle(*app_labels, **options)
@@ -93,6 +98,7 @@ class Command(MakeMigrationsCommand):
             warnings_as_errors_tests=warnings_as_errors_tests,
             all_warnings_as_errors=all_warnings_as_errors,
             analyser_string=self.sql_analyser,
+            analyser_string_mapping=self.analyser_string_mapping,
             ignore_sqlmigrate_errors=self.ignore_sqlmigrate_errors,
         )
 

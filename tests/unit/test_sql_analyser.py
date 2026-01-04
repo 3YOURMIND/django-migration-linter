@@ -1,21 +1,33 @@
 from __future__ import annotations
 
+import re
 import unittest
 
 from django_migration_linter.sql_analyser import (
     analyse_sql_statements,
     get_sql_analyser_class,
 )
+from django_migration_linter.sql_analyser.analyser import _load_custom_mapping
+from django_migration_linter.sql_analyser.base import (
+    BaseAnalyser,
+    Check,
+    CheckMode,
+    CheckType,
+)
 
 
 class SqlAnalyserTestCase(unittest.TestCase):
     database_vendor = "default"
+    analyzer_string = None
+    kwargs = {}
 
     def analyse_sql(self, sql):
         if isinstance(sql, str):
             sql = sql.splitlines()
         return analyse_sql_statements(
-            get_sql_analyser_class(self.database_vendor),
+            get_sql_analyser_class(
+                self.database_vendor, self.analyzer_string, **self.kwargs
+            ),
             sql_statements=sql,
         )
 
@@ -428,3 +440,64 @@ class SqlUtilsTestCase(unittest.TestCase):
             "Unsupported database vendor 'unknown'. Try specifying an SQL analyser.",
         ):
             get_sql_analyser_class("unknown")
+
+
+class CustomAnalyser(BaseAnalyser):
+    """
+    Custom analyser for testing purposes.
+    """
+
+    migration_checks = [
+        Check(
+            code="BLAH_SQL",
+            fn=lambda sql, **kw: re.search("BLAH", sql),
+            message="BLAH SQL found",
+            mode=CheckMode.ONE_LINER,
+            type=CheckType.ERROR,
+        ),
+    ]
+
+
+class CustomAnalyserTestCase(SqlAnalyserTestCase):
+    database_vendor = "custom"
+    analyzer_string = "custom"
+    kwargs = {
+        "analyser_string_mapping": {
+            "custom": CustomAnalyser,
+        }
+    }
+
+    def test_get_sql_analyzer_class(self):
+        actual_type = get_sql_analyser_class(
+            self.database_vendor, self.analyzer_string, **self.kwargs
+        )
+        self.assertEqual(actual_type, CustomAnalyser)
+
+    def test_blah_sql(self):
+        sql = "ALTER table `my_table` BLAH SQL HERE;"
+        self.assertBackwardIncompatibleSql(sql)
+
+    def test_alter_column(self):
+        sql = "ALTER TABLE `app_alter_column_a` MODIFY `field` varchar(10) NULL;"
+        self.assertValidSql(sql)
+
+
+class TestLoadCustomMapping(unittest.TestCase):
+    def test_load_custom_mapping_string(self):
+        custom_mapping = {"custom": CustomAnalyser}
+        result = _load_custom_mapping(custom_mapping)
+        self.assertEqual(result, {"custom": CustomAnalyser})
+
+    def test_load_custom_mapping_type(self):
+        custom_mapping = {
+            "custom": "tests.unit.test_sql_analyser.CustomAnalyser",
+        }
+        result = _load_custom_mapping(custom_mapping)
+        self.assertEqual(result, {"custom": CustomAnalyser})
+
+    def test_load_custom_mapping_invalid(self):
+        custom_mapping = {
+            "custom": "tests.unit.test_sql_analyser.InvalidClass",
+        }
+        with self.assertRaises(ValueError):
+            _load_custom_mapping(custom_mapping)

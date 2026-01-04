@@ -1,13 +1,39 @@
 from __future__ import annotations
 
+import io
+import re
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from django.db import ProgrammingError
 from django.db.migrations import Migration
 
 from django_migration_linter import MigrationLinter
+from django_migration_linter.sql_analyser.base import (
+    BaseAnalyser,
+    Check,
+    CheckMode,
+    CheckType,
+)
+
+
+class CustomAnalyser(BaseAnalyser):
+    """
+    Custom analyser for testing purposes.
+    """
+
+    migration_checks = [
+        Check(
+            code="RENAME_COLUMN",
+            fn=lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
+            or re.search("ALTER TABLE .* RENAME COLUMN", sql),
+            message="Custom error message",
+            mode=CheckMode.ONE_LINER,
+            type=CheckType.ERROR,
+        ),
+    ]
 
 
 class LinterFunctionsTestCase(unittest.TestCase):
@@ -33,6 +59,29 @@ class LinterFunctionsTestCase(unittest.TestCase):
         m = Migration("0001_create_table", "app_add_not_null_column")
         linter.lint_migration(m)
         self.assertTrue(linter.has_errors)
+
+    def test_has_errors_custom_analyser(self):
+        linter = MigrationLinter(
+            analyser_string="custom",
+            analyser_string_mapping={"custom": "tests.unit.test_linter.CustomAnalyser"},
+        )
+        self.assertFalse(linter.has_errors)
+
+        m = Migration("0001_initial", "app_rename_column_custom")
+        linter.lint_migration(m)
+        self.assertFalse(linter.has_errors)
+
+        m = Migration("0002_rename_field_a_renamed", "app_rename_column_custom")
+        with io.StringIO() as buffer, redirect_stdout(buffer):
+            linter.lint_migration(m)
+            self.assertEqual(linter.sql_analyser_class, CustomAnalyser)
+            self.assertTrue(linter.has_errors)
+            assert "Custom error message" in buffer.getvalue()
+
+        m = Migration("0003_rename_renamed_a_renamed_safe", "app_rename_column_custom")
+        linter.reset_counters()
+        linter.lint_migration(m)
+        self.assertFalse(linter.has_errors)
 
     def test_ignore_migration_include_apps(self):
         linter = MigrationLinter(include_apps=("app_add_not_null_column",))

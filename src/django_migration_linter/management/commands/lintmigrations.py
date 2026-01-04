@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import configparser
 import itertools
+import json
 import os
 import sys
 from importlib import import_module
@@ -175,6 +176,7 @@ class Command(BaseCommand):
             all_warnings_as_errors=all_warnings_as_errors,
             no_output=options["verbosity"] == 0,
             analyser_string=options["sql_analyser"],
+            analyser_string_mapping=options.get("analyser_string_mapping"),
             ignore_sqlmigrate_errors=options["ignore_sqlmigrate_errors"],
             ignore_initial_migrations=options["ignore_initial_migrations"],
         )
@@ -216,6 +218,8 @@ class Command(BaseCommand):
 
             config_value = config_get_fn(CONFIG_NAME, key, fallback=None)
             if config_value is not None:
+                if key == "analyser_string_mapping" and isinstance(config_value, str):
+                    config_value = json.loads(config_value)
                 config_options[key] = config_value
         return config_options
 
