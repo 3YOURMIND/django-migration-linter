@@ -13,7 +13,7 @@ from subprocess import PIPE, Popen
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connections
+from django.db import DEFAULT_DB_ALIAS, NotSupportedError, ProgrammingError, connections
 from django.db.migrations import Migration, RunPython, RunSQL
 from django.db.migrations.operations.base import Operation
 
@@ -178,20 +178,35 @@ class MigrationLinter:
             self.lint_cached_migration(app_label, migration_name, md5hash)
             return
 
-        sql_statements = self.get_sql(app_label, migration_name)
-        errors, ignored, warnings = analyse_sql_statements(
-            self.sql_analyser_class,
-            sql_statements,
-            self.exclude_migration_tests,
-        )
+        errors: list[Issue]
+        ignored: list[Issue]
+        warnings: list[Issue]
 
-        err, ignored_data, warnings_data = self.analyse_data_migration(migration)
-        if err:
-            errors += err
-        if ignored_data:
-            ignored += ignored_data
-        if warnings_data:
-            warnings += warnings_data
+        try:
+            sql_statements = self.get_sql(app_label, migration_name)
+        except NotSupportedError as e:
+            errors = [
+                Issue(
+                    code="MIGRATION_NOT_SUPPORTED_ERROR",
+                    message=f"Migration raised NotSupportedError: {e}",
+                )
+            ]
+            ignored = []
+            warnings = []
+        else:
+            errors, ignored, warnings = analyse_sql_statements(
+                self.sql_analyser_class,
+                sql_statements,
+                self.exclude_migration_tests,
+            )
+
+            err, ignored_data, warnings_data = self.analyse_data_migration(migration)
+            if err:
+                errors += err
+            if ignored_data:
+                ignored += ignored_data
+            if warnings_data:
+                warnings += warnings_data
 
         if self.all_warnings_as_errors:
             errors += warnings

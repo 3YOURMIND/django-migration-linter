@@ -207,3 +207,11 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
     def test_detected_not_null_column_with_null_db_default(self):
         app = fixtures.ADD_NOT_NULL_COLUMN_WITH_NULL_DB_DEFAULT
         self._test_linter_finds_errors(app)
+
+    @override_settings(
+        INSTALLED_APPS=settings.INSTALLED_APPS
+        + ["tests.test_project.app_create_index_concurrently_exclusive"]
+    )
+    def test_detected_create_index_concurrently_exclusive(self):
+        app = fixtures.ADD_APP_CREATE_INDEX_CONCURRENTLY_EXCLUSIVE
+        self._test_linter_finds_errors(app)
