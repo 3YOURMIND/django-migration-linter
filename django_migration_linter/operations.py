@@ -12,13 +12,13 @@ class IgnoreMigration(Operation):
     elidable = True
 
     def state_forwards(self, app_label, state):
-        pass
+        raise Exception("Please don't use this operation. Update lint_lcv_migrations.py to exclude the migration.")
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        pass
+        raise Exception("Please don't use this operation. Update lint_lcv_migrations.py to exclude the migration.")
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        pass
+        raise Exception("Please don't use this operation. Update lint_lcv_migrations.py to exclude the migration.")
 
     def describe(self):
-        return "The Django migration linter will ignore this migration"
+        return "Please don't use this operation. Update lint_lcv_migrations.py to exclude the migration."
