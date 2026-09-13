@@ -14,7 +14,7 @@ repos:
       - id: forbid-submodules
       - id: trailing-whitespace
   - repo: https://github.com/psf/black
-    rev: 25.11.0
+    rev: 26.5.1
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/flake8
@@ -23,24 +23,24 @@ repos:
       - id: flake8
         exclude: ^tests/
   - repo: https://github.com/pycqa/isort
-    rev: 7.0.0
+    rev: 9.0.1
     hooks:
       - id: isort
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.0
+    rev: v2.3.1
     hooks:
       - id: mypy
         additional_dependencies:
-          - types-toml==0.10.8.20240310
+          - types-toml==0.10.8.20260518
         args:
           - "--ignore-missing-imports"
         exclude: ^tests/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.7
+    rev: v0.16.7
     hooks:
       - id: ruff-check
         args:
-          - "--line-length=88"
+          - "--line-length=110"
           - "--fix"
         exclude: ^tests/
       - id: ruff-format

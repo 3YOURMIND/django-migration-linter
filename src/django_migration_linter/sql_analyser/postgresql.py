@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import ClassVar
 
 from .base import BaseAnalyser, Check, CheckMode, CheckType
 
@@ -60,7 +61,7 @@ def has_create_index(
 
 
 class PostgresqlAnalyser(BaseAnalyser):
-    migration_checks: list[Check] = [
+    specific_migration_checks: ClassVar[list[Check]] = [
         Check(
             code="CREATE_INDEX",
             fn=has_create_index,
@@ -77,8 +78,10 @@ class PostgresqlAnalyser(BaseAnalyser):
         ),
         Check(
             code="DROP_INDEX",
-            fn=lambda sql, **kw: re.search("DROP INDEX", sql)
-            and not re.search("INDEX CONCURRENTLY", sql),
+            fn=lambda sql, **kw: (
+                re.search("DROP INDEX", sql)
+                and not re.search("INDEX CONCURRENTLY", sql)
+            ),
             message="DROP INDEX locks table",
             mode=CheckMode.ONE_LINER,
             type=CheckType.WARNING,

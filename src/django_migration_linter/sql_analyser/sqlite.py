@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import re
+from typing import ClassVar
 
 from .base import BaseAnalyser, Check, CheckMode, CheckType
 
 
 class SqliteAnalyser(BaseAnalyser):
-    migration_checks: list[Check] = [
+    specific_migration_checks: ClassVar[list[Check]] = [
         Check(
             code="RENAME_TABLE",
-            fn=lambda sql, **kw: re.search("ALTER TABLE .* RENAME TO", sql)
-            and "__old" not in sql
-            and "new__" not in sql,
+            fn=lambda sql, **kw: (
+                re.search("ALTER TABLE .* RENAME TO", sql)
+                and "__old" not in sql
+                and "new__" not in sql
+            ),
             message="RENAMING tables",
             mode=CheckMode.ONE_LINER,
             type=CheckType.ERROR,
@@ -19,24 +22,26 @@ class SqliteAnalyser(BaseAnalyser):
         Check(
             code="DROP_TABLE",
             # TODO: improve to detect that the table names overlap
-            fn=lambda sql_statements, **kw: any(
-                sql.startswith("DROP TABLE") for sql in sql_statements
-            )
-            and not any(sql.startswith("CREATE TABLE") for sql in sql_statements),
+            fn=lambda sql_statements, **kw: (
+                any(sql.startswith("DROP TABLE") for sql in sql_statements)
+                and not any(sql.startswith("CREATE TABLE") for sql in sql_statements)
+            ),
             message="DROPPING table",
             mode=CheckMode.TRANSACTION,
             type=CheckType.ERROR,
         ),
         Check(
             code="NOT_NULL",
-            fn=lambda sql_statements, **kw: any(
-                re.search("NOT NULL(?! PRIMARY)(?! DEFAULT)", sql)
-                for sql in sql_statements
-            )
-            and any(
-                re.search("ALTER TABLE .* RENAME TO", sql)
-                and ("__old" in sql or "new__" in sql)
-                for sql in sql_statements
+            fn=lambda sql_statements, **kw: (
+                any(
+                    re.search("NOT NULL(?! PRIMARY)(?! DEFAULT)", sql)
+                    for sql in sql_statements
+                )
+                and any(
+                    re.search("ALTER TABLE .* RENAME TO", sql)
+                    and ("__old" in sql or "new__" in sql)
+                    for sql in sql_statements
+                )
             ),
             message="NOT NULL constraint on columns",
             mode=CheckMode.TRANSACTION,

@@ -19,7 +19,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:8.0
+        image: mysql:9.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
         ports:
@@ -33,16 +33,16 @@ jobs:
     name: Build with Python ${{ matrix.python-version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         # Fetch all tags and branches because tests rely on it
         with:
           fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: python -m pip install tox==4.30.3 tox-gh-actions
+        run: python -m pip install tox==4.61.4 tox-gh-actions
       - name: Test with tox ${{ matrix.python-version }}
         run: tox
 
@@ -51,13 +51,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
+        uses: actions/checkout@v7
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       - name: Install dependencies
-        run: python -m pip install tox==4.30.3
+        run: python -m pip install tox==4.61.4
       - name: Lint with tox
         run: tox
         env:

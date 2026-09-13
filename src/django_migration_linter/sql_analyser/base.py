@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Iterable
+from typing import ClassVar
 
 logger = logging.getLogger("django_migration_linter")
 
@@ -37,9 +38,7 @@ def has_not_null_column(sql_statements: list[str], **kwargs) -> bool:
 
     for sql in sql_statements:
         if re.search("(?<!DROP )(?<!IS )NOT NULL", sql) and not (
-            sql.startswith("CREATE TABLE")
-            or sql.startswith("CREATE INDEX")
-            or sql.startswith("CREATE UNIQUE INDEX")
+            sql.startswith(("CREATE TABLE", "CREATE INDEX", "CREATE UNIQUE INDEX"))
         ):
             not_null_column = True
         if re.search("DEFAULT (?!NULL).*NOT NULL", sql):
@@ -106,11 +105,13 @@ class Issue:
 
 
 class BaseAnalyser:
-    base_migration_checks: list[Check] = [
+    base_migration_checks: ClassVar[list[Check]] = [
         Check(
             code="RENAME_TABLE",
-            fn=lambda sql, **kw: re.search("RENAME TABLE", sql)
-            or re.search("ALTER TABLE .* RENAME TO", sql),
+            fn=lambda sql, **kw: (
+                re.search("RENAME TABLE", sql)
+                or re.search("ALTER TABLE .* RENAME TO", sql)
+            ),
             message="RENAMING tables",
             mode=CheckMode.ONE_LINER,
             type=CheckType.ERROR,
@@ -138,8 +139,10 @@ class BaseAnalyser:
         ),
         Check(
             code="RENAME_COLUMN",
-            fn=lambda sql, **kw: re.search("ALTER TABLE .* CHANGE", sql)
-            or re.search("ALTER TABLE .* RENAME COLUMN", sql),
+            fn=lambda sql, **kw: (
+                re.search("ALTER TABLE .* CHANGE", sql)
+                or re.search("ALTER TABLE .* RENAME COLUMN", sql)
+            ),
             message="RENAMING columns",
             mode=CheckMode.ONE_LINER,
             type=CheckType.ERROR,
@@ -163,7 +166,7 @@ class BaseAnalyser:
         ),
     ]
 
-    migration_checks: list[Check] = []
+    specific_migration_checks: ClassVar[list[Check]] = []
 
     def __init__(self, exclude_migration_tests: Iterable[str] | None):
         self.exclude_migration_tests: Iterable[str] = exclude_migration_tests or []
@@ -171,7 +174,7 @@ class BaseAnalyser:
         self.warnings: list[Issue] = []
         self.ignored: list[Issue] = []
         self.migration_checks = update_migration_checks(
-            self.base_migration_checks, self.migration_checks
+            self.base_migration_checks, self.specific_migration_checks
         )
 
     def analyse(self, sql_statements: list[str]) -> None:
