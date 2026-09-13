@@ -1,5 +1,8 @@
 ## 7.0.0
 
+Feature:
+- Django `sqlmigrate` errors are now caught properly by the linter, and raised in the final result. (#322)
+
 Miscellaneous:
 - Add support for Django 6.1
 - Drop support of Python 3.9
