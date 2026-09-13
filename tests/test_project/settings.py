@@ -60,13 +60,8 @@ INSTALLED_APPS = [
     "tests.test_project.app_make_not_null_with_lib_default",
     "tests.test_project.app_create_index_exclusive",
     "tests.test_project.app_with_custom_name.apps.DefaultConfig",
+    "tests.test_project.app_add_not_null_column_followed_by_db_default",
 ]
-
-if django.VERSION[0] >= 5:
-    # db_default attribute was only added in Django 5.0
-    INSTALLED_APPS.append(
-        "tests.test_project.app_add_not_null_column_followed_by_db_default"
-    )
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

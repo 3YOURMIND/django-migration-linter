@@ -1,3 +1,14 @@
+## 7.0.0
+
+Miscellaneous:
+- Drop support of Python 3.9
+- Drop support of Django 3.2
+- Drop support of Django 4.0
+- Drop support of Django 4.1
+- Drop support of Django 4.2
+- Drop support of Django 5.0
+- Drop support of Django 5.1
+
 ## 6.0.0
 
 Feature:
