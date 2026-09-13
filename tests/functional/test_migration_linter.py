@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import os
 import unittest
-from unittest import skipIf
 
-import django
 from django.conf import settings
 from django.core.management import call_command
 from django.test import override_settings
@@ -101,7 +99,6 @@ class BaseBackwardCompatibilityDetection:
         app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DEFAULT
         self._test_linter_finds_no_errors(app)
 
-    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
     def test_accept_not_null_column_followed_by_adding_db_default(self):
         app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DB_DEFAULT
         self._test_linter_finds_no_errors(app)
@@ -162,12 +159,10 @@ class SqliteBackwardCompatibilityDetectionTestCase(
         app = fixtures.MAKE_NOT_NULL_WITH_DJANGO_DEFAULT
         self._test_linter_finds_errors(app)
 
-    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
     def test_accept_not_null_column_followed_by_adding_db_default(self):
         app = fixtures.ADD_NOT_NULL_COLUMN_FOLLOWED_BY_DB_DEFAULT
         self._test_linter_finds_errors(app)
 
-    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
     @override_settings(
         INSTALLED_APPS=settings.INSTALLED_APPS
         + ["tests.test_project.app_add_not_null_column_with_null_db_default"]
@@ -205,7 +200,6 @@ class PostgresqlBackwardCompatibilityDetectionTestCase(
         self.assertFalse(linter.has_errors)
         self.assertTrue(linter.nb_warnings)
 
-    @skipIf(django.VERSION[0] < 5, "db_default was implemented in Django 5.0")
     @override_settings(
         INSTALLED_APPS=settings.INSTALLED_APPS
         + ["tests.test_project.app_add_not_null_column_with_null_db_default"]
