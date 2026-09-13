@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Iterable, Type
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sql_analyser.base import Issue
@@ -15,7 +16,7 @@ from django_migration_linter.sql_analyser import (
 
 logger = logging.getLogger("django_migration_linter")
 
-ANALYSER_STRING_MAPPING: dict[str, Type[BaseAnalyser]] = {
+ANALYSER_STRING_MAPPING: dict[str, type[BaseAnalyser]] = {
     "sqlite": SqliteAnalyser,
     "mysql": MySqlAnalyser,
     "postgresql": PostgresqlAnalyser,
@@ -24,13 +25,13 @@ ANALYSER_STRING_MAPPING: dict[str, Type[BaseAnalyser]] = {
 
 def get_sql_analyser_class(
     database_vendor: str, analyser_string: str | None = None
-) -> Type[BaseAnalyser]:
+) -> type[BaseAnalyser]:
     if analyser_string:
         return get_sql_analyser_from_string(analyser_string)
     return get_sql_analyser_class_from_db_vendor(database_vendor)
 
 
-def get_sql_analyser_from_string(analyser_string: str) -> Type[BaseAnalyser]:
+def get_sql_analyser_from_string(analyser_string: str) -> type[BaseAnalyser]:
     if analyser_string not in ANALYSER_STRING_MAPPING:
         raise ValueError(
             "Unknown SQL analyser '{}'. Known values: '{}'".format(
@@ -41,8 +42,8 @@ def get_sql_analyser_from_string(analyser_string: str) -> Type[BaseAnalyser]:
     return ANALYSER_STRING_MAPPING[analyser_string]
 
 
-def get_sql_analyser_class_from_db_vendor(database_vendor: str) -> Type[BaseAnalyser]:
-    sql_analyser_class: Type[BaseAnalyser]
+def get_sql_analyser_class_from_db_vendor(database_vendor: str) -> type[BaseAnalyser]:
+    sql_analyser_class: type[BaseAnalyser]
     if "mysql" in database_vendor:
         sql_analyser_class = MySqlAnalyser
     elif "postgre" in database_vendor:
@@ -51,9 +52,7 @@ def get_sql_analyser_class_from_db_vendor(database_vendor: str) -> Type[BaseAnal
         sql_analyser_class = SqliteAnalyser
     else:
         raise ValueError(
-            "Unsupported database vendor '{}'. Try specifying an SQL analyser.".format(
-                database_vendor
-            )
+            f"Unsupported database vendor '{database_vendor}'. Try specifying an SQL analyser."
         )
 
     logger.debug("Chosen SQL analyser class: %s", sql_analyser_class)
@@ -61,7 +60,7 @@ def get_sql_analyser_class_from_db_vendor(database_vendor: str) -> Type[BaseAnal
 
 
 def analyse_sql_statements(
-    sql_analyser_class: Type[BaseAnalyser],
+    sql_analyser_class: type[BaseAnalyser],
     sql_statements: list[str],
     exclude_migration_tests: Iterable[str] | None = None,
 ) -> tuple[list[Issue], list[Issue], list[Issue]]:

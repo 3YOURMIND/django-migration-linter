@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import re
+from typing import ClassVar
 
 from .base import BaseAnalyser, Check, CheckMode, CheckType
 
 
 class MySqlAnalyser(BaseAnalyser):
-    migration_checks: list[Check] = [
+    specific_migration_checks: ClassVar[list[Check]] = [
         Check(
             code="ALTER_COLUMN",
             fn=lambda sql, **kw: re.search("ALTER TABLE .* MODIFY .* (?!NULL);?$", sql),

@@ -99,14 +99,13 @@ class Command(MakeMigrationsCommand):
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
                 self.stdout.write(
-                    self.style.MIGRATE_HEADING("Linting for '%s':" % app_label) + "\n"
+                    self.style.MIGRATE_HEADING(f"Linting for '{app_label}':") + "\n"
                 )
 
             for migration in app_migrations:
                 linter.lint_migration(migration)
-                if linter.has_errors:
-                    if not should_keep_migration():
-                        self.delete_migration(migration)
+                if linter.has_errors and not should_keep_migration():
+                    self.delete_migration(migration)
                 linter.reset_counters()
 
     def delete_migration(self, migration: Migration) -> None:
@@ -120,6 +119,4 @@ class Command(MakeMigrationsCommand):
                 migration_string = writer.path
             if migration_string.startswith(".."):
                 migration_string = writer.path
-            self.stdout.write(
-                "Deleted %s\n" % (self.style.MIGRATE_LABEL(migration_string))
-            )
+            self.stdout.write(f"Deleted {self.style.MIGRATE_LABEL(migration_string)}\n")
