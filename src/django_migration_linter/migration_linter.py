@@ -178,21 +178,27 @@ class MigrationLinter:
             self.lint_cached_migration(app_label, migration_name, md5hash)
             return
 
-        errors: list[Issue]
-        ignored: list[Issue]
-        warnings: list[Issue]
+        errors: list[Issue] = []
+        ignored: list[Issue] = []
+        warnings: list[Issue] = []
 
         try:
             sql_statements = self.get_sql(app_label, migration_name)
-        except NotSupportedError as e:
-            errors = [
-                Issue(
-                    code="MIGRATION_NOT_SUPPORTED_ERROR",
-                    message=f"Migration raised NotSupportedError: {e}",
-                )
-            ]
-            ignored = []
-            warnings = []
+        except (ValueError, ProgrammingError, NotSupportedError) as e:
+            log_msg = "Error while executing sqlmigrate on (%s, %s) with exception: %s."
+            if self.ignore_sqlmigrate_errors:
+                log_msg += " Continuing execution with empty SQL."
+            logger.warning(log_msg, app_label, migration_name, str(e))
+
+            issue = Issue(
+                code="SQLMIGRATE_ERROR",
+                message=f"Migration SQL generation raised {type(e).__name__}: {e}",
+            )
+            if self.ignore_sqlmigrate_errors:
+                ignored = [issue]
+                self.nb_ignored += 1
+            else:
+                errors = [issue]
         else:
             errors, ignored, warnings = analyse_sql_statements(
                 self.sql_analyser_class,
@@ -335,33 +341,14 @@ class MigrationLinter:
 
     def get_sql(self, app_label: str, migration_name: str) -> list[str]:
         logger.info(f"Calling sqlmigrate command {app_label} {migration_name}")
-        try:
-            with open(os.devnull, "w") as dev_null:
-                sql_statement = call_command(
-                    "sqlmigrate",
-                    app_label,
-                    migration_name,
-                    database=self.database,
-                    stdout=dev_null,
-                )
-        except (ValueError, ProgrammingError) as err:
-            if self.ignore_sqlmigrate_errors:
-                logger.warning(
-                    "Error while executing sqlmigrate on (%s, %s) with exception: %s. "
-                    "Continuing execution with empty SQL.",
-                    app_label,
-                    migration_name,
-                    str(err),
-                )
-                sql_statement = ""
-            else:
-                logger.warning(
-                    "Error while executing sqlmigrate on (%s, %s) with exception: %s.",
-                    app_label,
-                    migration_name,
-                    str(err),
-                )
-                raise
+        with open(os.devnull, "w") as dev_null:
+            sql_statement = call_command(
+                "sqlmigrate",
+                app_label,
+                migration_name,
+                database=self.database,
+                stdout=dev_null,
+            )
         return sql_statement.splitlines()
 
     @staticmethod

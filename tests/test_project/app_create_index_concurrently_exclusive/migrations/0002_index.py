@@ -11,6 +11,8 @@ class Migration(migrations.Migration):
         ("app_create_index_concurrently_exclusive", "0001_initial"),
     ]
 
+    atomic = True
+
     operations = [
         AddIndexConcurrently(
             model_name="user",

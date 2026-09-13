@@ -117,10 +117,13 @@ class LinterFunctionsTestCase(unittest.TestCase):
     )
     def test_raise_exception_on_sqlmigrate_error(self, call_command_mock):
         linter = MigrationLinter(
-            exclude_migration_tests=[], database="mysql", ignore_sqlmigrate_errors=False
+            exclude_migration_tests=[],
+            database="mysql",
+            ignore_sqlmigrate_errors=False,
         )
-        with self.assertRaises(ProgrammingError):
-            linter.get_sql("app_correct", "0002_foo")
+        linter.lint_migration(Migration("0002_foo", "app_correct"))
+        self.assertTrue(linter.has_errors)
+        self.assertEqual(linter.nb_ignored, 0)
 
     @patch(
         "django_migration_linter.migration_linter.call_command",
@@ -128,10 +131,13 @@ class LinterFunctionsTestCase(unittest.TestCase):
     )
     def test_ignore_exception_on_sqlmigrate_error(self, call_command_mock):
         linter = MigrationLinter(
-            exclude_migration_tests=[], database="mysql", ignore_sqlmigrate_errors=True
+            exclude_migration_tests=[],
+            database="mysql",
+            ignore_sqlmigrate_errors=True,
         )
-        sql_result = linter.get_sql("app_correct", "0002_foo")
-        self.assertEqual([], sql_result)
+        linter.lint_migration(Migration("0002_foo", "app_correct"))
+        self.assertFalse(linter.has_errors)
+        self.assertEqual(linter.nb_ignored, 1)
 
     def test_read_migrations_no_file(self):
         migration_list = MigrationLinter.read_migrations_list(None)
