@@ -5,6 +5,8 @@ Feature:
 
 Miscellaneous:
 - Add support for Django 6.1
+- Add support for Python 3.15
+
 - Drop support of Python 3.9
 - Drop support of Django 3.2
 - Drop support of Django 4.0
