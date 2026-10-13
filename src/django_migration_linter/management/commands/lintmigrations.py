@@ -8,7 +8,6 @@ from collections.abc import Callable
 from importlib import import_module
 from typing import Any
 
-import toml
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 
@@ -19,6 +18,11 @@ from ..utils import (
     extract_warnings_as_errors_option,
     register_linting_configuration_options,
 )
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomlkit as tomllib
 
 CONFIG_NAME = "django_migration_linter"
 PYPROJECT_TOML = "pyproject.toml"
@@ -225,7 +229,8 @@ class Command(BaseCommand):
         toml_options = {}
 
         if os.path.exists(PYPROJECT_TOML):
-            pyproject_toml = toml.load(PYPROJECT_TOML)
+            with open(PYPROJECT_TOML, encoding="utf-8") as f:
+                pyproject_toml = tomllib.loads(f.read())
             section = pyproject_toml.get("tool", {}).get(CONFIG_NAME, {})
             for key in options:
                 if key in section:

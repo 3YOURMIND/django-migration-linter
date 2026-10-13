@@ -30,8 +30,6 @@ repos:
     rev: v2.3.1
     hooks:
       - id: mypy
-        additional_dependencies:
-          - types-toml==0.10.8.20260518
         args:
           - "--ignore-missing-imports"
         exclude: ^tests/
