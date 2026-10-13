@@ -4,6 +4,7 @@ Feature:
 - Django `sqlmigrate` errors are now caught properly by the linter, and raised in the final result. (#322)
 
 Miscellaneous:
+- Replace the unmaintained `toml` dependency with the standard library `tomllib`, falling back to `tomlkit` on Python 3.10 (#325)
 - Add support for Django 6.1
 - Add support for Python 3.15
 
